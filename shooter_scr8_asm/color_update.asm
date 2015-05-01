@@ -1,8 +1,44 @@
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; update main ship
+;
+	
+_plot_spt:
+		ld		c,0
+		ld		de,0F000h
+		call	_vdpsetvramwr
+		ld	a, :ms_spt
+		ld	(_kBank3),a
 
+		ld	hl,(aniframe)
+		ld	a,l
+		cp	h
+		ret	z
+		ld	(old_aniframe),a
+		ld	hl,ms_ani
+		ld	c,a
+		ld	b,0
+		add	hl,bc
+		ld	l,(hl)
+		ld	h,b
+		add hl,hl
+		add hl,hl
+		add hl,hl
+		add hl,hl
+		add hl,hl
+		ld	e,l
+		ld	d,h
+		add	hl,hl
+		add	hl,de
+		ld	de,ms_spt
+		add hl,de
+		ld	c,0x98
+[96]	outi
+		ret
+	
 manta_color
-	ds	16,13
-	ds	16,6+64
-	ds	16,1
+		ds	16,13
+		ds	16,6+64
+		ds	16,0
 
 set_manta_color
 		ld a,e 					; set bits 0-7
@@ -19,6 +55,7 @@ set_manta_color
 
 
 color_enemy:
+		call 	_plot_spt
 		ld	a,(flip_flop)
 		and	1
 		jp nz, reversecolor_enemy

@@ -52,7 +52,7 @@ _isrinit:
 		ld	(hl),high _scroll
 
 ; set interrupt line
-		LD    A,YSIZE-2
+		LD    A,YSIZE
 		out (0x99),a
 		LD    A,19+128
 		out (0x99),a

@@ -31,7 +31,7 @@ _kBank3: 	equ 09000h ;- 97FFh (9000h used)
 _kBank4: 	equ 0B000h ;- B7FFh (B000h used)
 	
 mapWidth	equ	256
-mapHeight	equ	12
+mapHeight	equ	11
 YSIZE		equ	10*16+8
 
 	macro setpage_a
@@ -42,6 +42,10 @@ YSIZE		equ	10*16+8
   
 		page 0
 		include enemies.asm
+		page 2
+ms_spt:
+		incbin ms_demo_frm.bin
+
 		page 1
 		include	"..\TTplayer\code\ttreplay.asm"
 		include	"ms_crtl.asm"
@@ -171,7 +175,7 @@ _ntsc:	ld	(SEL_NTSC),a	; if set NSTC, if reset PAL
 		call 	_hw_sprite_init
 
 		ld	a, :_scorebar
-		setpage_a
+		ld	(_kBank4),a
 		ld		c,0
 		ld		de,256*(mapHeight*16+3)
 		call	_vdpsetvramwr
@@ -339,7 +343,7 @@ AFXPLAY:
 	; include probe_level.asm
 	
 
-	page 2
+	page 24
 _scorebar:	
 	incbin scorebar.bin
 	

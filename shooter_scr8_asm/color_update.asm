@@ -1,16 +1,40 @@
 
+manta_color
+	ds	16,13
+	ds	16,6+64
+	ds	16,1
+
+set_manta_color
+		ld a,e 					; set bits 0-7
+		out (0x99),a
+		ld a,d 					; set bits 8-13 with write access
+		out (0x99),a
+		
+		ld	bc,0x98+16*3*256
+		ld  hl,manta_color
+		otir
+		
+		ret
+	
+
+
 color_enemy:
 		ld	a,(flip_flop)
 		and	1
 		jp nz, reversecolor_enemy
 	
 directcolor_enemy		
-		ld		de,16*(max_bullets+max_enem_bullets)+07800h	; F800h 6 positions for bullets
 		
 		ld	a,3
 		out (0x99),a 		;set bits 14-16 of F800h
 		ld a,14+128
 		out (0x99),a
+		
+		ld		de,07800h	; F800h 3 positions  for bullets and manta
+		
+		call	set_manta_color
+
+		ld		de,16*(3+max_bullets+max_enem_bullets)+07800h	; F800h 6 positions for bullets
 		
 		ld	ix,enemies		; process two layer enemies
 
@@ -100,4 +124,8 @@ reversecolor_enemy:
 		ex de,hl
 		
 		djnz	1b
+
+		ld		de,07C00h+16*(2*max_enem+max_bullets + max_enem_bullets)	; FC00h 6 positions for bullets
+
+		call	set_manta_color
 		ret

@@ -5,6 +5,7 @@
 
 		incdir ene_code
 		incdir music
+		incdir manta
 
 		defpage	 0,0x4000, 0x2000		; page 0 main code + far call routines
 		defpage	 1,0x6000, 0x2000		; page 1 main code + far call routines
@@ -268,9 +269,10 @@ main_loop:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; run ms FSM and place its sprites in the SAT in RAM
 		call	ms_ctrl
+		
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; place MS in the SAT and test for collision
-		; call	put_ms_sprt
+		call	put_ms_sprt
 		ld		a,(god_mode)
 		and 	a
 		; call	z,test_obstacles

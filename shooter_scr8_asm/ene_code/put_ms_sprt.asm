@@ -14,9 +14,12 @@ put_ms_sprt:
 	dec	a
 	ld	(hl),a
 	inc hl
-	ld	(hl),xship_rel
+	ld	a,(_xoffset)		; compensate R#18 
+	add	a,xship_rel
+	ld	(hl),a
 	inc hl
-	ld	(hl),0		; shape 0 hard wired
+	; ld	(hl),0		; shape 0 hard wired
+	ld	(hl),64		; shape 0 hard wired
 	inc hl
 	ld	(hl),15
 	inc hl
@@ -25,9 +28,12 @@ put_ms_sprt:
 	dec	a
 	ld	(hl),a
 	inc hl
-	ld	(hl),xship_rel
+	ld	a,(_xoffset)		; compensate R#18 
+	add	a,xship_rel
+	ld	(hl),a
 	inc hl
-	ld	(hl),4		; shape 4 hard wired
+	; ld	(hl),4		; shape 4 hard wired
+	ld	(hl),64+4		; shape 4 hard wired
 	ld	c,a
 	inc hl
 	ld	(hl),7
@@ -37,9 +43,12 @@ put_ms_sprt:
 	add a,16-1
 	ld	(hl),a
 	inc hl
-	ld	(hl),xship_rel+16
+	ld	a,(_xoffset)		; compensate R#18 
+	add	a,xship_rel+16
+	ld	(hl),a
 	inc hl
-	ld	(hl),8		; shape 8 hard wired
+	; ld	(hl),8		; shape 8 hard wired
+	ld	(hl),64+4		; shape 8 hard wired
 	inc hl
 	ld	(hl),1
 	ret

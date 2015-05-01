@@ -16,6 +16,11 @@
 	; djnz 1b
 	; ret
 	
+set_manta:	
+	ld	bc,0x98+4*3*256
+	ld  hl,ram_sat
+	otir
+	ret
 	
 plot_enemy:
 	ld	a,(flip_flop)
@@ -33,7 +38,8 @@ directplot_enemy:
 	ld		c,0
 	ld		de,0FA00h	;+4*3	; 3 positions for main ship and its shadow
 	call	_vdpsetvramwr
-	
+	call	set_manta	
+
 	ld	ix,any_object
 
 ; process MS bullets and enemy bullets
@@ -113,15 +119,10 @@ directplot_enemy:
 	add ix,de
 	djnz	1b
 	
-	; ld	bc,0x98+4*3*256
-	; ld  hl,ram_sat
-	; otir
-
 	ld	a,0xD8
 	out (0x98),a			; SAT terminator
 	ret
-	
-	
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	
 .spriteoff1
@@ -147,7 +148,6 @@ reverseplot_enemy:
 	ld		de,0FE00h	;+4*3	; 3 positions for main ship and its shadow
 	call	_vdpsetvramwr
 
-	; ld	ix,any_object+(max_bullets+max_enem_bullets+max_enem-1)*enemy_data
 	ld	ix,enemies+(max_enem-1)*enemy_data
 
 ; process two layer enemies
@@ -226,11 +226,9 @@ reverseplot_enemy:
 	ld	de,-enemy_data
 	add ix,de
 	djnz	1b
-	
-	; ld	bc,0x98+4*3*256
-	; ld  hl,ram_sat
-	; otir
 
+	call	set_manta	
+	
 	ld	a,0xD8
 	out (0x98),a			; SAT terminator
 	ret

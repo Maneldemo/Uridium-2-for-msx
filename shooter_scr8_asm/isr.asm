@@ -52,7 +52,7 @@ _isrinit:
 		ld	(hl),high _scroll
 
 ; set interrupt line
-		LD    A,YSIZE
+		LD    A,YSIZE-1
 		out (0x99),a
 		LD    A,19+128
 		out (0x99),a
@@ -124,9 +124,9 @@ waitHBLANK
 		ld a,128+15
 		out (0x99),a		; poll for HBLANK
 		 
-1:		in	a,(0x99)		; we are in HBLANK already, so wait until end of HBLANK
-		and	0x20
-		jp	nz,1b			
+; 1:		in	a,(0x99)		; we are in HBLANK already, so wait until end of HBLANK
+		; and	0x20
+		; jp	nz,1b			
 2:		in	a,(0x99)		; wait until end of the active area
 		and	0x20
 		jp	z,2b
@@ -134,7 +134,7 @@ waitHBLANK
 	
 lint:	
 		; call	waitHBLANK
-						; now we are at the start of HBLANK
+		; now we are at the start of HBLANK
 	
 		; ld	a,(RG1SAV)
 		; and	010111111B			; disable screen
@@ -143,27 +143,29 @@ lint:
 		; ld	a,1+128
 		; out	(0x99),a
 
-		ld	a,(RG8SAV)
-		or	000000010B		; disable sprites
-		ld	(RG8SAV),a
-		out	(0x99),a
-		ld	a,8+128
-		out	(0x99),a
-
-		LD    A,mapHeight*16-(YSIZE-2)	; SCROLL DOWN
-		out (0x99),a
-		LD    A,23+128
-		out (0x99),a
 
 		ld a,00011111B		; 0XX11111B
 		out (0x99),a
 		ld a,2+128			; R#2 
 		out (0x99),a		; score bar in page 0
 
+		LD    A,mapHeight*16-(YSIZE-2)	; SCROLL DOWN
+		out (0x99),a
+		LD    A,23+128
+		out (0x99),a
+
 		xor		a
 		out	(099h),a
 		ld	a,18+128
 		out	(099h),a		; set adjust 0,0
+
+
+		ld	a,(RG8SAV)
+		or	000000010B		; disable sprites
+		ld	(RG8SAV),a
+		out	(0x99),a
+		ld	a,8+128
+		out	(0x99),a
 
 		; call	waitHBLANK
 		
@@ -274,12 +276,6 @@ vblank:
 		pop		af
 		ei
 		ret
-
-;-------------------------------------
-.stand:
-		call 	plot_enemy		
-		call	color_enemy
-		ret
 ;-------------------------------------
 
 _blank_line_lft:
@@ -291,6 +287,10 @@ _blank_line_lft:
 		ld	e,0
 		call	blank_line
 		call	replay_route		; first output data	
+		
+		ld		a,(_xoffset)
+		and		1
+		call	z,_plot_distrucable
 		
 		xor	a
 		out	(0x99),a
@@ -427,7 +427,7 @@ activate_window
 		
 		LD    A,(_yoffset)		; SCROLL DOWN
 		out (0x99),a
-		add    A,YSIZE-2
+		add    A,YSIZE-1
 		ld		l,a
 		LD    A,23+128
 		out (0x99),a

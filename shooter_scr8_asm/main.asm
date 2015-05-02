@@ -20,8 +20,7 @@
 		defpage	14,0x8000, 0x2000		; swapped data 
 		defpage	15,0xA000, 0x2000		; swapped data 
 
-		defpage	 16,0xA000, 0x2000		; swapped data 
-		defpage	 17..31					; 128KB of swapped data 
+		defpage	16..31					; 128KB of swapped data 
 
 		;	konami scc
 		
@@ -57,17 +56,17 @@ opening_screen
 		ld		de,0
 		call	_vdpsetvramwr
 		ld	e,7
-		ld	a, :_opening
-		ld	d,a
-2:		ld	(_kBank4),a
-		ld	hl,_opening
+		ld	d,:_opening
+outvram:
+2:		ld	a,d
+		ld	(_kBank4),a
+		ld	hl,0xA000
 		ld	bc,0x98
 		ld	a,32
 1:		otir
 		dec	a
 		jr	nz,1b
 		inc	d
-		ld	a,d
 		dec	e
 		jr	nz,2b
 		ret
@@ -164,29 +163,33 @@ _ntsc:	ld	(SEL_NTSC),a	; if set NSTC, if reset PAL
 		ld	(_kBank2),a
 		
 		call	opening_screen
+		
 1:		ld e,8
 		call	checkkbd
 		and		00000001B
 		jr		nz,1b
 
 		call	_cls
-		ld	a, :sprtdata
-		ld	(_kBank4),a
+
 		call 	_hw_sprite_init
 
-		ld	a, :_scorebar
-		ld	(_kBank4),a
 		ld		c,0
 		ld		de,256*(mapHeight*16+3)
 		call	_vdpsetvramwr
-		ld		hl,_scorebar
-		ld		bc,0x0098
-		ld		a,24
-1:		otir
-		dec	a
-		jr	nz,1b
+
+		ld		d, :_scorebar
+		ld		e, 1
+		call	outvram
 		
-	;--- initialise demo song
+		ld		c,1
+		ld		de,256*mapHeight*16
+		call	_vdpsetvramwr
+
+		ld		d, :_animated
+		ld		e, 2
+		call	outvram
+
+		;--- initialise demo song
 		ld	bc,	_levelmap-ttreplayRAM
 		ld	hl,	ttreplayRAM
 		ld	de,	ttreplayRAM+1
@@ -217,7 +220,6 @@ _ntsc:	ld	(SEL_NTSC),a	; if set NSTC, if reset PAL
 		ld		bc,mapWidth*mapHeight
 		ldir
 				
-		
 		ld		hl,0
 		ld		a,h
 		ld		(flip_flop),a
@@ -291,23 +293,22 @@ main_loop:
 ; run MS bullets FSM
 		call	bullet_loop
 
-		; ld	a,00100101B			; random colour
-		; out		(0x99),a
-		; ld		a,7+128
-		; out		(0x99),a
+		ld	a,00100101B			; random colour
+		out		(0x99),a
+		ld		a,7+128
+		out		(0x99),a
 		
-		; call	_waitvdp
+		call	_waitvdp
 		
-		; xor		a
-		; out		(0x99),a
-		; ld		a,7+128
-		; out		(0x99),a
+		xor		a
+		out		(0x99),a
+		ld		a,7+128
+		out		(0x99),a
 		
 1:		ld	a,(_jiffy)		; wait for vblank (and not for linit)
 		or	a
 		jr	z,1b
 	
-
 		ld	hl,(xmap)
 		ld	bc,xship_rel
 		add hl,bc
@@ -337,16 +338,10 @@ AFXPLAY:
 ; _backmap:
 	; incbin	backmap.bin
 
-	; include hwsprites.asm
 	
 	; include mainhero_LMMM.asm
 	; include probe_level.asm
-	
-
-	page 24
-_scorebar:	
-	incbin scorebar.bin
-	
+		
 	page 4
 _tiles0:
 	incbin "tiles.bin",0x0000,0x2000
@@ -364,6 +359,17 @@ _tiles0:
 	incbin "tiles.bin",0xC000,0x2000
 	page 11
 	incbin "tiles.bin",0xE000;,0x2000
+
+	page 14
+demo_song:
+	org 0x0040
+	include	"demosong.asm"
+	include	"..\TTplayer\code\ttreplayDAT.asm"
+end_demo_song:	
+
+	page 15
+_level:
+	incbin "datamap.bin"
 	
 	page 16
 _opening:
@@ -383,20 +389,20 @@ _opening:
 	page 23
 	; incbin "opening.bin",0xE000;,,0x2000
 	
-	page 15
-_level:
-	incbin "datamap.bin"
-	page 15
+	page 24
+_scorebar:	
+	incbin scorebar.bin
+	
+	page 25
+_animated:	
+	incbin animated.bin,0x0000,0x2000
+	page 26
+	incbin animated.bin,0x2000,0x2000
+
+	page 27
 sprtdata:
 	incbin 	uridium_revA.bin
 	
-	page 14,15
-demo_song:
-	org 0x0040
-	include	"demosong.asm"
-	include	"..\TTplayer\code\ttreplayDAT.asm"
-end_demo_song:	
-
 	
 FINISH:
 

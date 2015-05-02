@@ -19,22 +19,22 @@ end
 %[A,MAP] = imread('bmp\Sprite_Palette_OR.bmp'); sprtpaldec = round(MAP(double(A(1:16:256,1))+1,:)*7);
 
       %  green red blue
-sprtpalgrb = [ 0 0 0
-    0 0 2
-    0 3 0
-    0 3 2
-    3 0 0
-    3 0 2
-    3 3 0
-    3 3 2
-    4 7 2
-    0 0 7
-    0 7 0
-    0 7 7
-    7 0 0
-    7 0 7
-    7 7 0
-    7 7 7];
+sprtpalgrb =  [ 0 0 0
+                0 0 2
+                0 3 0
+                0 3 2
+                3 0 0
+                3 0 2
+                3 3 0
+                3 3 2
+                4 7 2
+                0 0 7
+                0 7 0
+                0 7 7
+                7 0 0
+                7 0 7
+                7 7 0
+                7 7 7];
         
 sprtpalrgb = sprtpalgrb(:,[2 1 3])/7;
         
@@ -46,18 +46,24 @@ colormap(sprtpalrgb);
 axis equal
 grid
 
-name = 'main ship02.gif';
-[AA,MMAP] = imread(['ene_code\' name]);
+name = 'Uridium ship_v02.png';
+[AA,MMAP] = imread(name);
+
 MMAP = MMAP(1:16,:);
 %name = 'uridium_rev9';
 MAP = sprtpalrgb;
 
 %[A,MAP] = imread(['ene_code\' name '.bmp']);
-MAP(1,:) = [7 0 7]/7;
+MAP(17,:) = [3 3 3]/7;
 
-A= AA(:,:,1,1);
-F = imapprox(A, MMAP, sprtpalrgb,'nodither');
+A = AA;
+%F = imapprox(A, MMAP, sprtpalrgb,'nodither');
+figure
+image(A)
+axis equal
+colormap(MAP)
 
+return
 
 F0 = zeros(size(F));
 F1 = zeros(size(F));

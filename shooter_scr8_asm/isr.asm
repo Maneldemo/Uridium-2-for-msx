@@ -288,9 +288,6 @@ _blank_line_lft:
 		call	blank_line
 		call	replay_route		; first output data	
 		
-		ld		a,(_xoffset)
-		and		1
-		call	z,_plot_distrucable
 		
 		xor	a
 		out	(0x99),a

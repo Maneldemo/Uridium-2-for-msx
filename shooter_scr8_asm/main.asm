@@ -12,8 +12,7 @@
 		defpage	 2,0x8000, 0x2000		; swapped data 
 		defpage	 3,0xA000, 0x2000		; swapped data 
 		
-		defpage	 4,0xA000, 0x2000		; swapped data 
-		defpage	 5..11					; 64KB of swapped data 
+		defpage	 4..11					; 64KB of swapped data 
 
 		defpage	12,0x4000, 0x2000		; swapped code
 		defpage	13,0x6000, 0x2000		; swapped code 
@@ -41,9 +40,8 @@ YSIZE		equ	10*16+8
   
 		page 0
 		include enemies.asm
-		page 2
-ms_spt:
-		incbin ms_demo_frm.bin
+		include plot_distrucable.asm
+		
 
 		page 1
 		include	"..\TTplayer\code\ttreplay.asm"
@@ -55,8 +53,8 @@ opening_screen
 		ld		c,0
 		ld		de,0
 		call	_vdpsetvramwr
-		ld	e,7
-		ld	d,:_opening
+		ld	de,256*:_opening+7
+		
 outvram:
 2:		ld	a,d
 		ld	(_kBank4),a
@@ -65,49 +63,13 @@ outvram:
 		ld	a,32
 1:		otir
 		dec	a
-		jr	nz,1b
+		jp	nz,1b
 		inc	d
 		dec	e
 		jr	nz,2b
 		ret
 		
 		
-		align 0x100
-color_base:
-		repeat 4
-		ds	16,8
-		ds	16,3+64
-		endrepeat
-		repeat 4
-		ds	16,13
-		ds	16,6+64
-		endrepeat
-
-		repeat 4
-		ds	16,12
-		ds	16,6+64
-		endrepeat
-		repeat 4
-		ds	16,10
-		ds	16,1+64
-		endrepeat
-		repeat 4
-		ds	16,4
-		ds	16,9+64
-		endrepeat
-		repeat 4
-		ds	16,12
-		ds	16,1+64
-		endrepeat
-		repeat 4
-		ds	16,12
-		ds	16,5+64
-		endrepeat
-		repeat 4
-		ds	16,10
-		ds	16,3+64
-		endrepeat
-	
 		page 0
 		
         org 4000h
@@ -177,16 +139,14 @@ _ntsc:	ld	(SEL_NTSC),a	; if set NSTC, if reset PAL
 		ld		de,256*(mapHeight*16+3)
 		call	_vdpsetvramwr
 
-		ld		d, :_scorebar
-		ld		e, 1
+		ld		de, 256*:_scorebar+1
 		call	outvram
 		
 		ld		c,1
 		ld		de,256*mapHeight*16
 		call	_vdpsetvramwr
 
-		ld		d, :_animated
-		ld		e, 2
+		ld		de, 256*:_animated+2
 		call	outvram
 
 		;--- initialise demo song
@@ -219,9 +179,10 @@ _ntsc:	ld	(SEL_NTSC),a	; if set NSTC, if reset PAL
 		ld		de,_levelmap
 		ld		bc,mapWidth*mapHeight
 		ldir
-				
-		ld		hl,0
-		ld		a,h
+						
+		xor		a
+		ld		h,a
+		ld		l,a
 		ld		(flip_flop),a
 		ld		(_ymappos),a
 		ld		(_xmappos),hl
@@ -236,14 +197,15 @@ _ntsc:	ld	(SEL_NTSC),a	; if set NSTC, if reset PAL
 		ld		hl,_levelmap
 		ld		(_levelmap_pos),hl
 								
-		xor a
 		ld	(aniframe),a
 		ld	(anispeed),a
 		ld	(ms_state),a
 		inc a
 		ld	(old_aniframe),a		; old_aniframe!=aniframe
 	
-		ld		hl,0
+		ld		(dxmap),a		; moving right
+		ld		(_dxmap),a		; moving right
+
 		ld		(xmap),hl
 		ld		(_xmapx4),hl
 		ld		bc,xship_rel
@@ -251,9 +213,6 @@ _ntsc:	ld	(SEL_NTSC),a	; if set NSTC, if reset PAL
 		ld		(xship),hl
 		ld		a,80
 		ld		(yship),a
-		ld		a,1
-		ld		(dxmap),a		; moving right
-		ld		(_dxmap),a		; moving right
 
 		call 	npc_init								
 		call 	load_colors
@@ -299,12 +258,19 @@ main_loop:
 		out		(0x99),a
 		
 		call	_waitvdp
-		
-		xor		a
+
+		ld	a,10100101B			; random colour
 		out		(0x99),a
 		ld		a,7+128
 		out		(0x99),a
 		
+		call	_plot_distrucable
+
+		xor		a
+		out		(0x99),a
+		ld		a,7+128
+		out		(0x99),a
+
 1:		ld	a,(_jiffy)		; wait for vblank (and not for linit)
 		or	a
 		jr	z,1b
@@ -341,7 +307,45 @@ AFXPLAY:
 	
 	; include mainhero_LMMM.asm
 	; include probe_level.asm
-		
+	page 3
+ms_spt:
+	incbin ms_demo_frm.bin
+color_base:
+	repeat 4
+	ds	16,8
+	ds	16,3+64
+	endrepeat
+	repeat 4
+	ds	16,13
+	ds	16,6+64
+	endrepeat
+
+	repeat 4
+	ds	16,12
+	ds	16,6+64
+	endrepeat
+	repeat 4
+	ds	16,10
+	ds	16,1+64
+	endrepeat
+	repeat 4
+	ds	16,4
+	ds	16,9+64
+	endrepeat
+	repeat 4
+	ds	16,12
+	ds	16,1+64
+	endrepeat
+	repeat 4
+	ds	16,12
+	ds	16,5+64
+	endrepeat
+	repeat 4
+	ds	16,10
+	ds	16,3+64
+	endrepeat
+	
+	
 	page 4
 _tiles0:
 	incbin "tiles.bin",0x0000,0x2000
@@ -403,7 +407,7 @@ _animated:
 sprtdata:
 	incbin 	uridium_revA.bin
 	
-	
+
 FINISH:
 
 
@@ -411,8 +415,7 @@ FINISH:
 ; Variables
 ;---------------------------------------------------------
 	MAP 0x0040
-musbuff:	#15*1024
-	
+musbuff:		#15*1024
 	ENDMAP
 	
 	MAP 0xC000
@@ -460,7 +463,7 @@ _currentpage:		#1
 
 _displaypage:		#1
 
-_xtic				#1
+_mccolorchange:		#1
 _xoffset:			#1
 _yoffset:			#1
 
@@ -510,5 +513,5 @@ any_object:			#0
 ms_bullets:			#enemy_data*max_bullets
 enem_bullets:		#enemy_data*max_enem_bullets
 enemies:			#enemy_data*max_enem
-
+endram:				#1
 	ENDMAP

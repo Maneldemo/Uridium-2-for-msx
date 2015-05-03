@@ -49,11 +49,6 @@ YSIZE		equ	10*16+8
 		include	"ms_bllts.asm"
 		include	"put_ms_sprt.asm"
 				
-opening_screen		
-		ld		c,0
-		ld		de,0
-		call	_vdpsetvramwr
-		ld	de,256*:_opening+7
 		
 outvram:
 2:		ld	a,d
@@ -123,8 +118,16 @@ _ntsc:	ld	(SEL_NTSC),a	; if set NSTC, if reset PAL
 		ld	(_kBank1),a
 		inc	a
 		ld	(_kBank2),a
+		inc	a
+		ld	(_kBank3),a
 		
-		call	opening_screen
+		ld		c,0
+		ld		d,c
+		ld		e,c
+		call	_vdpsetvramwr
+
+		ld	de,256*:_opening+7
+		call	outvram
 		
 1:		ld e,8
 		call	checkkbd
@@ -132,6 +135,14 @@ _ntsc:	ld	(SEL_NTSC),a	; if set NSTC, if reset PAL
 		jr		nz,1b
 
 		call	_cls
+		di
+		ld		a,(RG9SAV)		
+		and		01111111B		; Set 192 lines
+		ld		(RG9SAV),a
+		out		(0x99),a
+		ld		a,128+9
+		out		(0x99),a
+		ei
 
 		call 	_hw_sprite_init
 
@@ -173,13 +184,16 @@ _ntsc:	ld	(SEL_NTSC),a	; if set NSTC, if reset PAL
 		
 		
 		ld	a, :_level
-		ld	(_kBank3),a
+		ld	(_kBank4),a
 		
 		ld		hl,_level
 		ld		de,_levelmap
 		ld		bc,mapWidth*mapHeight
 		ldir
-						
+
+		ld		hl,_levelmap
+		ld		(_levelmap_pos),hl
+		
 		xor		a
 		ld		h,a
 		ld		l,a
@@ -193,9 +207,6 @@ _ntsc:	ld	(SEL_NTSC),a	; if set NSTC, if reset PAL
 		ld		(_mcframe),a
 		
 		ld		(_yoffset),a		;  0 tutto su
-
-		ld		hl,_levelmap
-		ld		(_levelmap_pos),hl
 								
 		ld	(aniframe),a
 		ld	(anispeed),a
@@ -313,11 +324,11 @@ ms_spt:
 color_base:
 	repeat 4
 	ds	16,8
-	ds	16,3+64
+	ds	16,10+64
 	endrepeat
 	repeat 4
-	ds	16,13
-	ds	16,6+64
+	ds	16,8
+	ds	16,10+64
 	endrepeat
 
 	repeat 4

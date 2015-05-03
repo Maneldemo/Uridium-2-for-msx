@@ -41,6 +41,7 @@ colormap(MAP);
 
 InpTiles = im2col(B,'indexed',[16 16],'distinct');
 
+ 
 % if (0)
 % 	RGB = ind2rgb(InpTiles',MAP);
 % 	t = [RGB(:,:,1) RGB(:,:,2) RGB(:,:,3)];

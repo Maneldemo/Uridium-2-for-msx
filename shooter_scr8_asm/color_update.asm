@@ -56,7 +56,7 @@ set_manta_color
 		
 manta_color
 		ds	16,13
-		ds	16,6+64
+		ds	16,5+64
 		ds	16,0
 
 color_enemy:

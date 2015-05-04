@@ -274,8 +274,10 @@ main_loop:
 		out		(0x99),a
 		ld		a,7+128
 		out		(0x99),a
-		
-		call	_plot_distrucable
+				
+		ld	a,(joystick)
+		and	32
+		call	z,_plot_distrucable
 
 		xor		a
 		out		(0x99),a
@@ -321,41 +323,6 @@ AFXPLAY:
 	page 3
 ms_spt:
 	incbin ms_demo_frm.bin
-color_base:
-	repeat 4
-	ds	16,8
-	ds	16,10+64
-	endrepeat
-	repeat 4
-	ds	16,8
-	ds	16,10+64
-	endrepeat
-
-	repeat 4
-	ds	16,12
-	ds	16,6+64
-	endrepeat
-	repeat 4
-	ds	16,10
-	ds	16,1+64
-	endrepeat
-	repeat 4
-	ds	16,4
-	ds	16,9+64
-	endrepeat
-	repeat 4
-	ds	16,12
-	ds	16,1+64
-	endrepeat
-	repeat 4
-	ds	16,12
-	ds	16,5+64
-	endrepeat
-	repeat 4
-	ds	16,10
-	ds	16,3+64
-	endrepeat
-	
 	
 	page 4
 _tiles0:
@@ -417,6 +384,42 @@ _animated:
 	page 27
 sprtdata:
 	incbin 	uridium_revA.bin
+
+	page 28
+color_base:
+	repeat 4
+	ds	16,8
+	ds	16,10+64
+	endrepeat
+	repeat 4
+	ds	16,8
+	ds	16,10+64
+	endrepeat
+
+	repeat 4
+	ds	16,12
+	ds	16,6+64
+	endrepeat
+	repeat 4
+	ds	16,10
+	ds	16,1+64
+	endrepeat
+	repeat 4
+	ds	16,4
+	ds	16,9+64
+	endrepeat
+	repeat 4
+	ds	16,12
+	ds	16,1+64
+	endrepeat
+	repeat 4
+	ds	16,12
+	ds	16,5+64
+	endrepeat
+	repeat 4
+	ds	16,10
+	ds	16,3+64
+	endrepeat
 	
 
 FINISH:

@@ -10,7 +10,7 @@ Planned features
 - radar 1:16 zoom on the current ( updated eaach 16 frames)
 - multicolor sprites (on fly color update)
 - sprite multiplexing (reverse SAT allows up to 16 sprites per line, i.e. 8 enemies with 3 colors per line)
-- animated background (updating une 16x16 tile per frame)
+- animated background (updating one 16x16 tile per frame)
 
 
 

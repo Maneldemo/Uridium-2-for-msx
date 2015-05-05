@@ -38,31 +38,8 @@ YSIZE		equ	10*16+8
 		ld	(_kBank4),a
 	endmacro
   
-		page 0
-		include enemies.asm
-		include plot_distrucable.asm
+  		include "header.asm"
 		
-
-		page 1
-		include	"..\TTplayer\code\ttreplay.asm"
-		include	"ms_crtl.asm"
-		include	"ms_bllts.asm"
-		include	"put_ms_sprt.asm"
-				
-		
-outvram:
-2:		ld	a,d
-		ld	(_kBank4),a
-		ld	hl,0xA000
-		ld	bc,0x98
-		ld	a,32
-1:		otir
-		dec	a
-		jp	nz,1b
-		inc	d
-		dec	e
-		jr	nz,2b
-		ret
 		
 		
 		page 0
@@ -72,7 +49,7 @@ outvram:
 
 	;-------------------------------------		
 
-		include "header.asm"
+
 		include "rominit64.asm"
 		include "vdpio.asm"
 		include "turbo.asm"
@@ -82,6 +59,8 @@ outvram:
 		include sprts.asm
 		include sat_update.asm
 		include collision_tst.asm
+		include enemies.asm
+		include plot_distrucable.asm
 		
 ;-------------------------------------
 ; Entry point
@@ -284,6 +263,12 @@ main_loop:
 		ld		a,7+128
 		out		(0x99),a
 
+		di
+		ld	a,:test_star
+		ld	(_kBank3),a
+		call	test_star
+		ei
+		
 1:		ld	a,(_jiffy)		; wait for vblank (and not for linit)
 		or	a
 		jr	z,1b
@@ -308,119 +293,135 @@ AFXPLAY:
 	include color_update.asm
 	
 ;-------------------------------------
-	
-	; page 0,1	
-; _metatable:
-	; incbin 	metatable.bin
-	
-	; page 1
-; _backmap:
-	; incbin	backmap.bin
 
 	
+		page 1
+
+		include	"..\TTplayer\code\ttreplay.asm"
+		include	"ms_crtl.asm"
+		include	"ms_bllts.asm"
+		include	"put_ms_sprt.asm"
+				
+		
+outvram:
+2:		ld	a,d
+		ld	(_kBank4),a
+		ld	hl,0xA000
+		ld	bc,0x98
+		ld	a,32
+1:		otir
+		dec	a
+		jp	nz,1b
+		inc	d
+		dec	e
+		jr	nz,2b
+		ret
+		
+		page 2
 	; include mainhero_LMMM.asm
-	; include probe_level.asm
-	page 3
-ms_spt:
-	incbin ms_demo_frm.bin
+		include probe_level.asm
 	
-	page 4
+		page 3
+ms_spt:
+		incbin ms_demo_frm.bin
+	
+		page 4
 _tiles0:
-	incbin "tiles.bin",0x0000,0x2000
-	page 5
-	incbin "tiles.bin",0x2000,0x2000
-	page 6
-	incbin "tiles.bin",0x4000,0x2000
-	page 7
-	incbin "tiles.bin",0x6000,0x2000
-	page 8
-	incbin "tiles.bin",0x8000,0x2000
-	page 9
-	incbin "tiles.bin",0xA000,0x2000
-	page 10
-	incbin "tiles.bin",0xC000,0x2000
-	page 11
-	incbin "tiles.bin",0xE000;,0x2000
+		incbin "tiles.bin",0x0000,0x2000
+		page 5
+		incbin "tiles.bin",0x2000,0x2000
+		page 6
+		incbin "tiles.bin",0x4000,0x2000
+		page 7
+		incbin "tiles.bin",0x6000,0x2000
+		page 8
+		incbin "tiles.bin",0x8000,0x2000
+		page 9
+		incbin "tiles.bin",0xA000,0x2000
+		page 10
+		incbin "tiles.bin",0xC000,0x2000
+		page 11
+		incbin "tiles.bin",0xE000;,0x2000
 
-	page 14
+		page 14
 demo_song:
-	org 0x0040
-	include	"demosong.asm"
-	include	"..\TTplayer\code\ttreplayDAT.asm"
+		org 0x0040
+		include	"demosong.asm"
+		include	"..\TTplayer\code\ttreplayDAT.asm"
 end_demo_song:	
 
-	page 15
+		page 15
 _level:
-	incbin "datamap.bin"
+		incbin "datamap.bin"
 	
-	page 16
+		page 16
 _opening:
-	incbin "opening.bin",0x0000,0x2000
-	page 17
-	incbin "opening.bin",0x2000,0x2000
-	page 18
-	incbin "opening.bin",0x4000,0x2000
-	page 19
-	incbin "opening.bin",0x6000,0x2000
-	page 20
-	incbin "opening.bin",0x8000,0x2000
-	page 21
-	incbin "opening.bin",0xA000,0x2000
-	page 22
-	incbin "opening.bin",0xC000;,0x2000
-	page 23
-	; incbin "opening.bin",0xE000;,,0x2000
+		incbin "opening.bin",0x0000,0x2000
+		page 17
+		incbin "opening.bin",0x2000,0x2000
+		page 18
+		incbin "opening.bin",0x4000,0x2000
+		page 19
+		incbin "opening.bin",0x6000,0x2000
+		page 20
+		incbin "opening.bin",0x8000,0x2000
+		page 21
+		incbin "opening.bin",0xA000,0x2000
+		page 22
+		incbin "opening.bin",0xC000;,0x2000
+		page 23
+		; incbin "opening.bin",0xE000;,,0x2000
 	
-	page 24
+		page 24
 _scorebar:	
-	incbin scorebar.bin
+		incbin scorebar.bin
 	
-	page 25
+		page 25
 _animated:	
-	incbin animated.bin,0x0000,0x2000
-	page 26
-	incbin animated.bin,0x2000,0x2000
+		incbin animated.bin,0x0000,0x2000
+		page 26
+		incbin animated.bin,0x2000,0x2000
 
-	page 27
+		page 27
 sprtdata:
-	incbin 	uridium_revA.bin
+		incbin 	uridium_revA.bin
 
-	page 28
+		page 28
 color_base:
-	repeat 4
-	ds	16,8
-	ds	16,10+64
-	endrepeat
-	repeat 4
-	ds	16,8
-	ds	16,10+64
-	endrepeat
+		repeat 4
+		ds	16,8
+		ds	16,10+64
+		endrepeat
+		repeat 4
+		ds	16,8
+		ds	16,10+64
+		endrepeat
 
-	repeat 4
-	ds	16,12
-	ds	16,6+64
-	endrepeat
-	repeat 4
-	ds	16,10
-	ds	16,1+64
-	endrepeat
-	repeat 4
-	ds	16,4
-	ds	16,9+64
-	endrepeat
-	repeat 4
-	ds	16,12
-	ds	16,1+64
-	endrepeat
-	repeat 4
-	ds	16,12
-	ds	16,5+64
-	endrepeat
-	repeat 4
-	ds	16,10
-	ds	16,3+64
-	endrepeat
-	
+		repeat 4
+		ds	16,12
+		ds	16,6+64
+		endrepeat
+		repeat 4
+		ds	16,10
+		ds	16,1+64
+		endrepeat
+		repeat 4
+		ds	16,4
+		ds	16,9+64
+		endrepeat
+		repeat 4
+		ds	16,12
+		ds	16,1+64
+		endrepeat
+		repeat 4
+		ds	16,12
+		ds	16,5+64
+		endrepeat
+		repeat 4
+		ds	16,10
+		ds	16,3+64
+		endrepeat
+		
 
 FINISH:
 

@@ -11,33 +11,33 @@ _cls:
 		ld		e,1
 1:		xor		a
 		out		(0x98),a
-		dec		bc
-		ld		a,b
-		or		c
-		jr		nz,1b
+        cpi
+        jp   	pe,1b
 		dec	e
-		jr		nz,1b
+		jp		nz,1b
 		ret
+		
+
 ;-------------------------------------
 		
 vdpport1 equ 0x99
 vdpport2 equ 0x9A
 
-levelcolors:
-	; incbin "palette.bin"
+; levelcolors:
+	;  incbin "palette.bin"
 
-_SetPalet:   
-		di
-		xor a 			;Set pointer to zero.
-		out (vdpport1),a        
-		ld  a,16 | 010000000B
-		out (vdpport1),a
+; _SetPalet:   
+		; di
+		; xor a 			;Set pointer to zero.
+		; out (vdpport1),a        
+		; ld  a,16 | 010000000B
+		; out (vdpport1),a
 
-		ld  hl,levelcolors
-		ld bc,vdpport2+32*256
-		otir
-		ei
-		ret
+		; ld  hl,levelcolors
+		; ld bc,vdpport2+32*256
+		; otir
+		; ei
+		; ret
 
 ;Set VDP for writing at address CDE (17-bit) 
 
@@ -132,10 +132,9 @@ set_scr:
 2:	ld		(RG9SAV),a
 
 	ld  	a,8
-	call	chgmod
+	jp		chgmod
 
-	
-	ret
+
 
 
 _waitvdp:
@@ -143,8 +142,6 @@ _waitvdp:
 	out (0x99),a
 	ld a, 128+15
 	out (0x99),a
-	; push hl
-	; pop hl
 1:  in	a,(0x99)
 	rrca
 	jp c,1b

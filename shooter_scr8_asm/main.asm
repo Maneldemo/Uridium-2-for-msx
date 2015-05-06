@@ -439,8 +439,6 @@ ttreplayRAM:		#0
 
 _levelmap:			#mapWidth*mapHeight
 
-_cur_level_bf:		#mapWidth*mapHeight/2
-
 slotvar				#1
 slotram				#1
 SEL_NTSC			#1

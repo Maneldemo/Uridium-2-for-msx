@@ -1,7 +1,10 @@
  
- ;-------------------------------------
- ;	in x = hl, y = a in pixels
- ; 	out tile
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;	peek a tile
+; in	a:	y (screen coordinate)
+;		hl: x (level coordinate)
+; out	a:  tile at x,y
+;		hl: pointer in level_buffer to  tile
  
 probe_level:
 

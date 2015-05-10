@@ -256,10 +256,10 @@ vblank:
 		
 		call	replay_play			; calculate next output
 
-		xor		a		; black
-		out	(0x99),a
-		ld	a,7+128
-		out	(0x99),a
+		; xor		a		; black
+		; out	(0x99),a
+		; ld	a,7+128
+		; out	(0x99),a
 	
 		pop    ix         
 		pop    iy         
@@ -279,38 +279,38 @@ vblank:
 ;-------------------------------------
 
 _blank_line_lft:
-		ld	a,00000111B		; blue
-		out	(0x99),a
-		ld	a,7+128
-		out	(0x99),a
+		; ld	a,00000111B		; blue
+		; out	(0x99),a
+		; ld	a,7+128
+		; out	(0x99),a
 
 		ld	e,0
 		call	blank_line
 		call	replay_route		; first output data	
 		
 		
-		xor	a
-		out	(0x99),a
-		ld	a,7+128
-		out	(0x99),a
+		; xor	a
+		; out	(0x99),a
+		; ld	a,7+128
+		; out	(0x99),a
 		ret
 
 ;-------------------------------------	
 
 _blank_line_rgt
-		ld	a,00000111B		; blue
-		out	(0x99),a
-		ld	a,7+128
-		out	(0x99),a
+		; ld	a,00000111B		; blue
+		; out	(0x99),a
+		; ld	a,7+128
+		; out	(0x99),a
 
 		ld	e,240
 		call	blank_line
 		call	replay_route		; first output data	
 
-		xor	a
-		out	(0x99),a
-		ld	a,7+128
-		out	(0x99),a
+		; xor	a
+		; out	(0x99),a
+		; ld	a,7+128
+		; out	(0x99),a
 		ret
 		
 ;-------------------------------------	

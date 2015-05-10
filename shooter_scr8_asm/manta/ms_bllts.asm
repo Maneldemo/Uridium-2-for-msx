@@ -88,7 +88,7 @@ bullet_loop:
 	add hl,de
 	ld	(ix+enemy_data.x),l
 	ld	(ix+enemy_data.x+1),h
-	; call	.test_obstacles
+	call	.test_obstacles
 	dec	(ix+enemy_data.cntr)
 	jr	nz,1f
 	res 0,(ix+enemy_data.status)
@@ -100,42 +100,49 @@ bullet_loop:
 	ret
 
 
-; .test_obstacles:
-	; ld	e,(ix+enemy_data.frame)
-	; ld	d,0
-	; ld	iy,ms_bllts_col_win-32
-	; add	iy,de			; here iy points to the collision window of the current frame of the bullet
+.test_obstacles:
+	ld	e,(ix+enemy_data.frame)
+	ld	d,0
+	ld	iy,ms_bllts_col_win-32
+	add	iy,de			; here iy points to the collision window of the current frame of the bullet
 
-	; bit	7,(ix+enemy_data.speed+1)
-	; jr	z,2f			;.x_positive
+	bit	7,(ix+enemy_data.speed+1)
+	jr	z,2f			;.x_positive
+	ld	e,(iy+0)		;.x_negative:
+	jp	3f
 
-	; ld	e,(iy+0)		;.x_negative:
-	; jp	3f
-
-; 2:	ld	e,(iy+1)		;.x_positive:
+2:	ld	e,(iy+1)		;.x_positive:
 	
-; 3:
-	; ld	l,(ix+enemy_data.x)
-	; ld	h,(ix+enemy_data.x+1)
-	; add hl,de
-	; ld	a,(ix+enemy_data.y)
-	; add	a,(iy+2)
-	; push	hl
-	; push	af
-	; call	.tst_block
-	; pop		de
-	; pop		hl
-	; ret	z				; skip the rest if already hit
-	; ld	a,d
-	; and	0xF8
-	; ld	d,a
-	; ld	a,(ix+enemy_data.y)
-	; add	a,(iy+3)
-	; and	0xF8
-	; cp	d
-	; ret	z				; avoid testing twice the same tile
-	; jp	.tst_block
+3:	ld	l,(ix+enemy_data.x)
+	ld	h,(ix+enemy_data.x+1)
+	add hl,de
+	ld	a,(ix+enemy_data.y)
+	add	a,(iy+2)
+	push	hl
+	push	af
+	call	.tst_block
+	pop		de
+	pop		hl
+	ret	z				; skip the rest if already hit
+	ld	a,d
+	and	0xF0
+	ld	d,a
+	ld	a,(ix+enemy_data.y)
+	add	a,(iy+3)
+	and	0xF0
+	cp	d
+	ret	z				; avoid testing twice the same 16x16 tile
+	jp	.tst_block
 
+.tst_block:			; x=hl,y=a
+	di
+	ld	a,:test_star
+	ld	(_kBank3),a
+	call probe_level
+	ei
+	xor	a
+	ret
+	
 
 ; .tst_block:
 	; call test_obstacles.meta_tile_peek

@@ -24,25 +24,45 @@ _hw_sprite_init:
 	; load static colors 
 load_colors:
 		ld		c,0
-		ld		de,0FA00h-512
+		ld		de,0F800h			;	0FA00h-512
 		call	_vdpsetvramwr
 
-		call	3f
+		call	ship_color
+		call	bull_color
+		call	enem_color
 		
 		ld		c,0
 		ld		de,0FE00h-512
 		call	_vdpsetvramwr
-3:				
-		ld	c,32
-2:
-		ld	b,16
+				
+		call	enem_color
+		call	bull_color
+		call	ship_color
+		ret
+		
+ship_color:
+		ld	b,16*3
+		xor	a
+1:
+		out	(0x98),a
+		djnz 1b		
+		ret
+
+bull_color:	
+		ld	b,16*(max_bullets+max_enem_bullets)
 		ld	a,15
 1:
 		out	(0x98),a
 		djnz 1b		
-		dec	c
-		jp	nz,2b
-			
 		ret
-
-
+		
+enem_color:	
+		ld	c,2*max_enem
+		ld	b,16
+		xor	a
+1:
+		out	(0x98),a
+		djnz 1b	
+		dec	c
+		jr	nz,1b
+		ret

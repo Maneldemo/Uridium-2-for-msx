@@ -36,7 +36,7 @@ directplot_enemy:
 	out (0x99),a
 	
 	ld		c,0
-	ld		de,0FA00h	;+4*3	; 3 positions for main ship and its shadow
+	ld		de,0FA00h	; 3 positions for main ship and its shadow
 	call	_vdpsetvramwr
 	call	set_manta	
 
@@ -145,7 +145,7 @@ reverseplot_enemy:
 	out (0x99),a
 
 	ld		c,0
-	ld		de,0FE00h	;+4*3	; 3 positions for main ship and its shadow
+	ld		de,0FE00h	; 3 positions for main ship and its shadow
 	call	_vdpsetvramwr
 
 	ld	ix,enemies+(max_enem-1)*enemy_data
@@ -216,7 +216,7 @@ reverseplot_enemy:
 	
 	ld	d,(ix+enemy_data.y)	
 	out (c),d				; write Y
-	out (c),a			; write X
+	out (c),a				; write X
 
 	ld	a,(ix+enemy_data.frame)
 	out (0x98),a			; write shape

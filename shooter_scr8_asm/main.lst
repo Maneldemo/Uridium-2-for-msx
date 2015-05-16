@@ -1,4 +1,4 @@
-Sjasm Z80 Assembler v0.42c - www.xl2s.tk             [2015.05.16 - 19:45:56]
+Sjasm Z80 Assembler v0.42c - www.xl2s.tk             [2015.05.17 - 00:45:09]
 
 main.asm
 Errors: 0
@@ -1029,8 +1029,8 @@ Errors: 0
      381.  00:439C                      
      382.  00:439C                      ;-------------------------------------
      383.  00:439C                      newxmap
-     384.  00:439C  CD E9 44            		call 	plot_enemy		
-     385.  00:439F  CD C3 59            		call	color_enemy
+     384.  00:439C  CD 08 45            		call 	plot_enemy		
+     385.  00:439F  CD A8 59            		call	color_enemy
      386.  00:43A2                      
      387.  00:43A2  2A 11 CE            		ld		hl,(_xmapx4)
      388.  00:43A5  3A 0E CE            		ld		a,(dxmap)
@@ -1215,284 +1215,304 @@ Errors: 0
       24.  00:44BE                      	; load static colors 
       25.  00:44BE                      load_colors:
       26.  00:44BE  0E 00               		ld		c,0
-      27.  00:44C0  11 00 F8            		ld		de,0FA00h-512
+      27.  00:44C0  11 00 F8            		ld		de,0F800h			;	0FA00h-512
       28.  00:44C3  CD 90 41            		call	_vdpsetvramwr
       29.  00:44C6                      
-      30.  00:44C6  CD D1 44            		call	3f
-      31.  00:44C9                      		
-      32.  00:44C9  0E 00               		ld		c,0
-      33.  00:44CB  11 00 FC            		ld		de,0FE00h-512
-      34.  00:44CE  CD 90 41            		call	_vdpsetvramwr
-      35.  00:44D1                      3:				
-      36.  00:44D1  0E 20               		ld	c,32
-      37.  00:44D3                      2:
-      38.  00:44D3  06 10               		ld	b,16
-      39.  00:44D5  3E 0F               		ld	a,15
-      40.  00:44D7                      1:
-      41.  00:44D7  D3 98               		out	(0x98),a
-      42.  00:44D9  10 FC               		djnz 1b		
-      43.  00:44DB  0D                  		dec	c
-      44.  00:44DC  C2 D3 44            		jp	nz,2b
-      45.  00:44DF                      			
-      46.  00:44DF  C9                  		ret
-      47.  00:44E0                      
-      48.  00:44E0                      
-      60   00:44E0                      		include sat_update.asm
-       1.  00:44E0                      
-       2.  00:44E0                      ; _plot_enemy:
-       3.  00:44E0                      
-       4.  00:44E0                      ; __sat_update
-       5.  00:44E0                      	; ld		c,0
-       6.  00:44E0                      	; ld		de,0FA00h
-       7.  00:44E0                      	; call	_vdpsetvramwr
-       8.  00:44E0                      	; ld		hl,_sat
-       9.  00:44E0                      	; ld		bc,0x8098
-      10.  00:44E0                      ; 1:	outi
-      11.  00:44E0                      	; ld	a,(_xoffset)		; set R#18 only if not scrolling
-      12.  00:44E0                      	; add	a,(hl)
-      13.  00:44E0                      	; out (0x98),a
-      14.  00:44E0                      	; inc hl
-      15.  00:44E0                      ; [2]	outi
-      16.  00:44E0                      	; djnz 1b
-      17.  00:44E0                      	; ret
-      18.  00:44E0                      	
-      19.  00:44E0                      set_manta:	
-      20.  00:44E0  01 98 0C            	ld	bc,0x98+4*3*256
-      21.  00:44E3  21 1F CE            	ld  hl,ram_sat
-      22.  00:44E6  ED B3               	otir
-      23.  00:44E8  C9                  	ret
-      24.  00:44E9                      	
-      25.  00:44E9                      plot_enemy:
-      26.  00:44E9  3A 1E CE            	ld	a,(flip_flop)
-      27.  00:44EC  EE 01               	xor	1
-      28.  00:44EE  32 1E CE            	ld	(flip_flop),a
-      29.  00:44F1  C2 BA 45            	jp nz, reverseplot_enemy
-      30.  00:44F4                      	
-      31.  00:44F4                      directplot_enemy:
-      32.  00:44F4                      	; R#5=0xF7 -> sat = FA000
-      33.  00:44F4  3E F7               	ld 		a,0xF7
-      34.  00:44F6  D3 99               	out (0x99),a
-      35.  00:44F8  3E 85               	ld 		a,128+5
-      36.  00:44FA  D3 99               	out (0x99),a
-      37.  00:44FC                      	
-      38.  00:44FC  0E 00               	ld		c,0
-      39.  00:44FE  11 00 FA            	ld		de,0FA00h	;+4*3	; 3 positions for main ship and its shadow
-      40.  00:4501  CD 90 41            	call	_vdpsetvramwr
-      41.  00:4504  CD E0 44            	call	set_manta	
-      42.  00:4507                      
-      43.  00:4507  DD 21 2B CE         	ld	ix,any_object
-      44.  00:450B                      
-      45.  00:450B                      ; process MS bullets and enemy bullets
-      46.  00:450B                      
-      47.  00:450B  01 98 05            	ld	bc,0x98+256*(max_bullets + max_enem_bullets)
-      48.  00:450E                      	
-      49.  00:450E  DD CB 07 46         1:	bit 0,(ix+enemy_data.status)
-      50.  00:4512  CA 98 45            	jp	z,.spriteoff1
-      51.  00:4515                      	
-      52.  00:4515  DD 6E 01            	ld	l,(ix+enemy_data.x+0)
-      53.  00:4518  DD 66 02            	ld	h,(ix+enemy_data.x+1)
-      54.  00:451B  ED 5B 0F CE         	ld	de,(xmap)
-      55.  00:451F  AF                  	xor a
-      56.  00:4520  ED 52               	sbc hl,de				; dx = enemy.x - xmap
-      57.  00:4522  FA 98 45            	jp	m,.spriteoff1		; dx <0
-      58.  00:4525                      
-      59.  00:4525  B4                  	or	h
-      60.  00:4526  C2 98 45            	jp	nz,.spriteoff1		; dx >255
-      61.  00:4529                      
-      62.  00:4529  3A 02 CE            	ld	a,(_xoffset)		; compensate R#18 
-      63.  00:452C  85                  	add	a,l
-      64.  00:452D  DA 98 45            	jp	c,.spriteoff1		; remove if off screen i.e. dx + _xoffset > 255
-      65.  00:4530  FE F0               	cp	240
-      66.  00:4532  D2 98 45            	jp	nc,.spriteoff1		; remove if dx + _xoffset > 240
-      67.  00:4535                      	
-      68.  00:4535  DD 56 00            	ld	d,(ix+enemy_data.y)	; write Y
-      69.  00:4538  ED 51               	out (c),d
-      70.  00:453A  ED 79               	out (c),a				; write X
-      71.  00:453C  DD 7E 0A            	ld	a,(ix+enemy_data.frame)
-      72.  00:453F  D3 98               	out (0x98),a			; write shape
-      73.  00:4541  ED 79               	out (c),a				; write crap
-      74.  00:4543                      	
-      75.  00:4543                      .next1
-      76.  00:4543  11 0F 00            	ld	de,enemy_data
-      77.  00:4546  DD 19               	add ix,de
-      78.  00:4548  10 C4               	djnz	1b
-      79.  00:454A                      
-      80.  00:454A                      ; process two layer enemies
-      81.  00:454A                      
-      82.  00:454A  06 0C               	ld	b,max_enem 
-      83.  00:454C  DD CB 07 46         1:	bit 0,(ix+enemy_data.status)
-      84.  00:4550  CA A5 45            	jp	z,.spriteoff2
-      85.  00:4553                      
-      86.  00:4553  DD 6E 01            	ld	l,(ix+enemy_data.x+0)
-      87.  00:4556  DD 66 02            	ld	h,(ix+enemy_data.x+1)
-      88.  00:4559  ED 5B 0F CE         	ld	de,(xmap)
-      89.  00:455D  AF                  	xor a
-      90.  00:455E  ED 52               	sbc hl,de				; dx = enemy.x - xmap
-      91.  00:4560  FA A5 45            	jp	m,.spriteoff2		; dx <0
-      92.  00:4563                      
-      93.  00:4563  B4                  	or	h
-      94.  00:4564  C2 A5 45            	jp	nz,.spriteoff2		; dx >255
-      95.  00:4567                      
-      96.  00:4567  3A 02 CE            	ld	a,(_xoffset)		; compensate R#18 
-      97.  00:456A  85                  	add	a,l
-      98.  00:456B  DA A5 45            	jp	c,.spriteoff2		; remove if off screen i.e. dx + _xoffset > 255
-      99.  00:456E  FE F0               	cp	240
-     100.  00:4570  D2 A5 45            	jp	nc,.spriteoff2		; remove if dx + _xoffset > 240
-     101.  00:4573                      	
-     102.  00:4573  DD 56 00            	ld	d,(ix+enemy_data.y)	
-     103.  00:4576  ED 51               	out (c),d				; write Y
-     104.  00:4578  6F                  	ld  l,a
-     105.  00:4579  D3 98               	out (0x98),a			; write X
-     106.  00:457B                      
-     107.  00:457B  DD 7E 0A            	ld	a,(ix+enemy_data.frame)
-     108.  00:457E  D3 98               	out (0x98),a			; write shape
-     109.  00:4580  ED 79               	out (c),a				; write crap
-     110.  00:4582                      
-     111.  00:4582  ED 51               	out (c),d				; write Y
-     112.  00:4584  ED 69               	out (c),l				; write X
-     113.  00:4586  C6 04               	add	a,4
-     114.  00:4588  D3 98               	out (0x98),a			; write shape
-     115.  00:458A  ED 79               	out (c),a				; write crap
-     116.  00:458C                      	
-     117.  00:458C                      .next2
-     118.  00:458C  11 0F 00            	ld	de,enemy_data
-     119.  00:458F  DD 19               	add ix,de
-     120.  00:4591  10 B9               	djnz	1b
-     121.  00:4593                      	
-     122.  00:4593  3E D8               	ld	a,0xD8
-     123.  00:4595  D3 98               	out (0x98),a			; SAT terminator
-     124.  00:4597  C9                  	ret
-     125.  00:4598                      
-     126.  00:4598                      ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-     127.  00:4598                      	
-     128.  00:4598                      .spriteoff1
-     129.  00:4598  3E D9               	ld	a,0xD9
-     130.  00:459A                      [4]	out (c),a				; write crap
-     130.  00:459A  ED 79 ED 79 ED 79 ED 79 
-     131.  00:45A2  C3 43 45            	jp	.next1
-     132.  00:45A5                      
-     133.  00:45A5                      .spriteoff2
-     134.  00:45A5  3E D9               	ld	a,0xD9
-     135.  00:45A7                      [8]	out (c),a				; write crap
-     135.  00:45A7  ED 79 ED 79 ED 79 ED 79 ED 79 ED 79 ED 79 ED 79 
-     136.  00:45B7  C3 8C 45            	jp	.next2
-     137.  00:45BA                      
-     138.  00:45BA                      ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-     139.  00:45BA                      
-     140.  00:45BA                      reverseplot_enemy:
-     141.  00:45BA                      	; R#5=0xFF -> sat = FE000
-     142.  00:45BA  3E FF               	ld 		a,0xFF
-     143.  00:45BC  D3 99               	out (0x99),a
-     144.  00:45BE  3E 85               	ld 		a,128+5
-     145.  00:45C0  D3 99               	out (0x99),a
-     146.  00:45C2                      
-     147.  00:45C2  0E 00               	ld		c,0
-     148.  00:45C4  11 00 FE            	ld		de,0FE00h	;+4*3	; 3 positions for main ship and its shadow
-     149.  00:45C7  CD 90 41            	call	_vdpsetvramwr
-     150.  00:45CA                      
-     151.  00:45CA  DD 21 1B CF         	ld	ix,enemies+(max_enem-1)*enemy_data
-     152.  00:45CE                      
-     153.  00:45CE                      ; process two layer enemies
-     154.  00:45CE                      
-     155.  00:45CE  01 98 0C            	ld	bc,0x98+256*max_enem
-     156.  00:45D1                      	
-     157.  00:45D1  DD CB 07 46         1:	bit 0,(ix+enemy_data.status)
-     158.  00:45D5  CA 6B 46            	jp	z,.spriteoff2
-     159.  00:45D8                      	
-     160.  00:45D8  DD 6E 01            	ld	l,(ix+enemy_data.x+0)
-     161.  00:45DB  DD 66 02            	ld	h,(ix+enemy_data.x+1)
-     162.  00:45DE  ED 5B 0F CE         	ld	de,(xmap)
-     163.  00:45E2  AF                  	xor a
-     164.  00:45E3  ED 52               	sbc hl,de				; dx = enemy.x - xmap
-     165.  00:45E5  FA 6B 46            	jp	m,.spriteoff2		; dx <0
-     166.  00:45E8                      
-     167.  00:45E8  B4                  	or	h
-     168.  00:45E9  C2 6B 46            	jp	nz,.spriteoff2		; dx >255
-     169.  00:45EC                      
-     170.  00:45EC  3A 02 CE            	ld	a,(_xoffset)		; compensate R#18 
-     171.  00:45EF  85                  	add	a,l
-     172.  00:45F0  DA 6B 46            	jp	c,.spriteoff2		; remove if off screen i.e. dx + _xoffset > 255
-     173.  00:45F3  FE F0               	cp	240
-     174.  00:45F5  D2 6B 46            	jp	nc,.spriteoff2		; remove if dx + _xoffset > 240
-     175.  00:45F8  DD 56 00            	ld	d,(ix+enemy_data.y)	
-     176.  00:45FB  ED 51               	out (c),d				; write Y
-     177.  00:45FD  6F                  	ld  l,a
-     178.  00:45FE  D3 98               	out (0x98),a			; write X
-     179.  00:4600                      
-     180.  00:4600  DD 7E 0A            	ld	a,(ix+enemy_data.frame)
-     181.  00:4603  D3 98               	out (0x98),a			; write shape
-     182.  00:4605  ED 79               	out (c),a				; write crap
-     183.  00:4607                      
-     184.  00:4607  ED 51               	out (c),d				; write Y
-     185.  00:4609  ED 69               	out (c),l				; write X
-     186.  00:460B  C6 04               	add	a,4
-     187.  00:460D  D3 98               	out (0x98),a			; write shape
-     188.  00:460F  ED 79               	out (c),a				; write crap
-     189.  00:4611                      	
-     190.  00:4611                      .next2
-     191.  00:4611  11 F1 FF            	ld	de,-enemy_data
-     192.  00:4614  DD 19               	add ix,de
-     193.  00:4616  10 B9               	djnz	1b
-     194.  00:4618                      
-     195.  00:4618                      ; process one layer enemies
-     196.  00:4618                      
-     197.  00:4618  06 05               	ld	b,max_bullets + max_enem_bullets 
-     198.  00:461A  DD CB 07 46         1:	bit 0,(ix+enemy_data.status)
-     199.  00:461E  CA 5E 46            	jp	z,.spriteoff1
-     200.  00:4621                      
-     201.  00:4621  DD 6E 01            	ld	l,(ix+enemy_data.x+0)
-     202.  00:4624  DD 66 02            	ld	h,(ix+enemy_data.x+1)
-     203.  00:4627  ED 5B 0F CE         	ld	de,(xmap)
-     204.  00:462B  AF                  	xor a
-     205.  00:462C  ED 52               	sbc hl,de				; dx = enemy.x - xmap
-     206.  00:462E  FA 5E 46            	jp	m,.spriteoff1		; dx <0
-     207.  00:4631                      
-     208.  00:4631  B4                  	or	h
-     209.  00:4632  C2 5E 46            	jp	nz,.spriteoff1		; dx >255
-     210.  00:4635                      
-     211.  00:4635  3A 02 CE            	ld	a,(_xoffset)		; compensate R#18 
-     212.  00:4638  85                  	add	a,l
-     213.  00:4639  DA 5E 46            	jp	c,.spriteoff1		; remove if off screen i.e. dx + _xoffset > 255
-     214.  00:463C  FE F0               	cp	240
-     215.  00:463E  D2 5E 46            	jp	nc,.spriteoff1		; remove if dx + _xoffset > 240
-     216.  00:4641                      	
-     217.  00:4641  DD 56 00            	ld	d,(ix+enemy_data.y)	
-     218.  00:4644  ED 51               	out (c),d				; write Y
-     219.  00:4646  ED 79               	out (c),a			; write X
-     220.  00:4648                      
-     221.  00:4648  DD 7E 0A            	ld	a,(ix+enemy_data.frame)
-     222.  00:464B  D3 98               	out (0x98),a			; write shape
-     223.  00:464D  ED 79               	out (c),a				; write crap
-     224.  00:464F                      
-     225.  00:464F                      .next1
-     226.  00:464F  11 F1 FF            	ld	de,-enemy_data
-     227.  00:4652  DD 19               	add ix,de
-     228.  00:4654  10 C4               	djnz	1b
-     229.  00:4656                      
-     230.  00:4656  CD E0 44            	call	set_manta	
-     231.  00:4659                      	
-     232.  00:4659  3E D8               	ld	a,0xD8
-     233.  00:465B  D3 98               	out (0x98),a			; SAT terminator
-     234.  00:465D  C9                  	ret
-     235.  00:465E                      	
-     236.  00:465E                      	
-     237.  00:465E                      ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-     238.  00:465E                      	
-     239.  00:465E                      .spriteoff1
-     240.  00:465E  3E D9               	ld	a,0xD9
-     241.  00:4660                      [4]	out (c),a				; write crap
-     241.  00:4660  ED 79 ED 79 ED 79 ED 79 
-     242.  00:4668  C3 4F 46            	jp	.next1
-     243.  00:466B                      
-     244.  00:466B                      .spriteoff2
-     245.  00:466B  3E D9               	ld	a,0xD9
-     246.  00:466D                      [8]	out (c),a				; write crap
-     246.  00:466D  ED 79 ED 79 ED 79 ED 79 ED 79 ED 79 ED 79 ED 79 
-     247.  00:467D  C3 11 46            	jp	.next2
-     248.  00:4680                      
-     249.  00:4680                      ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-      61   00:4680                      		include collision_tst.asm
-       1.  00:4680  (0080)              	align 0x100
+      30.  00:44C6  CD E1 44            		call	ship_color
+      31.  00:44C9  CD E9 44            		call	bull_color
+      32.  00:44CC  CD F2 44            		call	enem_color
+      33.  00:44CF                      		
+      34.  00:44CF  0E 00               		ld		c,0
+      35.  00:44D1  11 00 FC            		ld		de,0FE00h-512
+      36.  00:44D4  CD 90 41            		call	_vdpsetvramwr
+      37.  00:44D7                      				
+      38.  00:44D7  CD F2 44            		call	enem_color
+      39.  00:44DA  CD E9 44            		call	bull_color
+      40.  00:44DD  CD E1 44            		call	ship_color
+      41.  00:44E0  C9                  		ret
+      42.  00:44E1                      		
+      43.  00:44E1                      ship_color:
+      44.  00:44E1  06 30               		ld	b,16*3
+      45.  00:44E3  AF                  		xor	a
+      46.  00:44E4                      1:
+      47.  00:44E4  D3 98               		out	(0x98),a
+      48.  00:44E6  10 FC               		djnz 1b		
+      49.  00:44E8  C9                  		ret
+      50.  00:44E9                      
+      51.  00:44E9                      bull_color:	
+      52.  00:44E9  06 50               		ld	b,16*(max_bullets+max_enem_bullets)
+      53.  00:44EB  3E 0F               		ld	a,15
+      54.  00:44ED                      1:
+      55.  00:44ED  D3 98               		out	(0x98),a
+      56.  00:44EF  10 FC               		djnz 1b		
+      57.  00:44F1  C9                  		ret
+      58.  00:44F2                      		
+      59.  00:44F2                      enem_color:	
+      60.  00:44F2  0E 18               		ld	c,2*max_enem
+      61.  00:44F4  06 10               		ld	b,16
+      62.  00:44F6  AF                  		xor	a
+      63.  00:44F7                      1:
+      64.  00:44F7  D3 98               		out	(0x98),a
+      65.  00:44F9  10 FC               		djnz 1b	
+      66.  00:44FB  0D                  		dec	c
+      67.  00:44FC  20 F9               		jr	nz,1b
+      68.  00:44FE  C9                  		ret
+      60   00:44FF                      		include sat_update.asm
+       1.  00:44FF                      
+       2.  00:44FF                      ; _plot_enemy:
+       3.  00:44FF                      
+       4.  00:44FF                      ; __sat_update
+       5.  00:44FF                      	; ld		c,0
+       6.  00:44FF                      	; ld		de,0FA00h
+       7.  00:44FF                      	; call	_vdpsetvramwr
+       8.  00:44FF                      	; ld		hl,_sat
+       9.  00:44FF                      	; ld		bc,0x8098
+      10.  00:44FF                      ; 1:	outi
+      11.  00:44FF                      	; ld	a,(_xoffset)		; set R#18 only if not scrolling
+      12.  00:44FF                      	; add	a,(hl)
+      13.  00:44FF                      	; out (0x98),a
+      14.  00:44FF                      	; inc hl
+      15.  00:44FF                      ; [2]	outi
+      16.  00:44FF                      	; djnz 1b
+      17.  00:44FF                      	; ret
+      18.  00:44FF                      	
+      19.  00:44FF                      set_manta:	
+      20.  00:44FF  01 98 0C            	ld	bc,0x98+4*3*256
+      21.  00:4502  21 1F CE            	ld  hl,ram_sat
+      22.  00:4505  ED B3               	otir
+      23.  00:4507  C9                  	ret
+      24.  00:4508                      	
+      25.  00:4508                      plot_enemy:
+      26.  00:4508  3A 1E CE            	ld	a,(flip_flop)
+      27.  00:450B  EE 01               	xor	1
+      28.  00:450D  32 1E CE            	ld	(flip_flop),a
+      29.  00:4510  C2 D9 45            	jp nz, reverseplot_enemy
+      30.  00:4513                      	
+      31.  00:4513                      directplot_enemy:
+      32.  00:4513                      	; R#5=0xF7 -> sat = FA000
+      33.  00:4513  3E F7               	ld 		a,0xF7
+      34.  00:4515  D3 99               	out (0x99),a
+      35.  00:4517  3E 85               	ld 		a,128+5
+      36.  00:4519  D3 99               	out (0x99),a
+      37.  00:451B                      	
+      38.  00:451B  0E 00               	ld		c,0
+      39.  00:451D  11 00 FA            	ld		de,0FA00h	; 3 positions for main ship and its shadow
+      40.  00:4520  CD 90 41            	call	_vdpsetvramwr
+      41.  00:4523  CD FF 44            	call	set_manta	
+      42.  00:4526                      
+      43.  00:4526  DD 21 2B CE         	ld	ix,any_object
+      44.  00:452A                      
+      45.  00:452A                      ; process MS bullets and enemy bullets
+      46.  00:452A                      
+      47.  00:452A  01 98 05            	ld	bc,0x98+256*(max_bullets + max_enem_bullets)
+      48.  00:452D                      	
+      49.  00:452D  DD CB 07 46         1:	bit 0,(ix+enemy_data.status)
+      50.  00:4531  CA B7 45            	jp	z,.spriteoff1
+      51.  00:4534                      	
+      52.  00:4534  DD 6E 01            	ld	l,(ix+enemy_data.x+0)
+      53.  00:4537  DD 66 02            	ld	h,(ix+enemy_data.x+1)
+      54.  00:453A  ED 5B 0F CE         	ld	de,(xmap)
+      55.  00:453E  AF                  	xor a
+      56.  00:453F  ED 52               	sbc hl,de				; dx = enemy.x - xmap
+      57.  00:4541  FA B7 45            	jp	m,.spriteoff1		; dx <0
+      58.  00:4544                      
+      59.  00:4544  B4                  	or	h
+      60.  00:4545  C2 B7 45            	jp	nz,.spriteoff1		; dx >255
+      61.  00:4548                      
+      62.  00:4548  3A 02 CE            	ld	a,(_xoffset)		; compensate R#18 
+      63.  00:454B  85                  	add	a,l
+      64.  00:454C  DA B7 45            	jp	c,.spriteoff1		; remove if off screen i.e. dx + _xoffset > 255
+      65.  00:454F  FE F0               	cp	240
+      66.  00:4551  D2 B7 45            	jp	nc,.spriteoff1		; remove if dx + _xoffset > 240
+      67.  00:4554                      	
+      68.  00:4554  DD 56 00            	ld	d,(ix+enemy_data.y)	; write Y
+      69.  00:4557  ED 51               	out (c),d
+      70.  00:4559  ED 79               	out (c),a				; write X
+      71.  00:455B  DD 7E 0A            	ld	a,(ix+enemy_data.frame)
+      72.  00:455E  D3 98               	out (0x98),a			; write shape
+      73.  00:4560  ED 79               	out (c),a				; write crap
+      74.  00:4562                      	
+      75.  00:4562                      .next1
+      76.  00:4562  11 0F 00            	ld	de,enemy_data
+      77.  00:4565  DD 19               	add ix,de
+      78.  00:4567  10 C4               	djnz	1b
+      79.  00:4569                      
+      80.  00:4569                      ; process two layer enemies
+      81.  00:4569                      
+      82.  00:4569  06 0C               	ld	b,max_enem 
+      83.  00:456B  DD CB 07 46         1:	bit 0,(ix+enemy_data.status)
+      84.  00:456F  CA C4 45            	jp	z,.spriteoff2
+      85.  00:4572                      
+      86.  00:4572  DD 6E 01            	ld	l,(ix+enemy_data.x+0)
+      87.  00:4575  DD 66 02            	ld	h,(ix+enemy_data.x+1)
+      88.  00:4578  ED 5B 0F CE         	ld	de,(xmap)
+      89.  00:457C  AF                  	xor a
+      90.  00:457D  ED 52               	sbc hl,de				; dx = enemy.x - xmap
+      91.  00:457F  FA C4 45            	jp	m,.spriteoff2		; dx <0
+      92.  00:4582                      
+      93.  00:4582  B4                  	or	h
+      94.  00:4583  C2 C4 45            	jp	nz,.spriteoff2		; dx >255
+      95.  00:4586                      
+      96.  00:4586  3A 02 CE            	ld	a,(_xoffset)		; compensate R#18 
+      97.  00:4589  85                  	add	a,l
+      98.  00:458A  DA C4 45            	jp	c,.spriteoff2		; remove if off screen i.e. dx + _xoffset > 255
+      99.  00:458D  FE F0               	cp	240
+     100.  00:458F  D2 C4 45            	jp	nc,.spriteoff2		; remove if dx + _xoffset > 240
+     101.  00:4592                      	
+     102.  00:4592  DD 56 00            	ld	d,(ix+enemy_data.y)	
+     103.  00:4595  ED 51               	out (c),d				; write Y
+     104.  00:4597  6F                  	ld  l,a
+     105.  00:4598  D3 98               	out (0x98),a			; write X
+     106.  00:459A                      
+     107.  00:459A  DD 7E 0A            	ld	a,(ix+enemy_data.frame)
+     108.  00:459D  D3 98               	out (0x98),a			; write shape
+     109.  00:459F  ED 79               	out (c),a				; write crap
+     110.  00:45A1                      
+     111.  00:45A1  ED 51               	out (c),d				; write Y
+     112.  00:45A3  ED 69               	out (c),l				; write X
+     113.  00:45A5  C6 04               	add	a,4
+     114.  00:45A7  D3 98               	out (0x98),a			; write shape
+     115.  00:45A9  ED 79               	out (c),a				; write crap
+     116.  00:45AB                      	
+     117.  00:45AB                      .next2
+     118.  00:45AB  11 0F 00            	ld	de,enemy_data
+     119.  00:45AE  DD 19               	add ix,de
+     120.  00:45B0  10 B9               	djnz	1b
+     121.  00:45B2                      	
+     122.  00:45B2  3E D8               	ld	a,0xD8
+     123.  00:45B4  D3 98               	out (0x98),a			; SAT terminator
+     124.  00:45B6  C9                  	ret
+     125.  00:45B7                      
+     126.  00:45B7                      ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+     127.  00:45B7                      	
+     128.  00:45B7                      .spriteoff1
+     129.  00:45B7  3E D9               	ld	a,0xD9
+     130.  00:45B9                      [4]	out (c),a				; write crap
+     130.  00:45B9  ED 79 ED 79 ED 79 ED 79 
+     131.  00:45C1  C3 62 45            	jp	.next1
+     132.  00:45C4                      
+     133.  00:45C4                      .spriteoff2
+     134.  00:45C4  3E D9               	ld	a,0xD9
+     135.  00:45C6                      [8]	out (c),a				; write crap
+     135.  00:45C6  ED 79 ED 79 ED 79 ED 79 ED 79 ED 79 ED 79 ED 79 
+     136.  00:45D6  C3 AB 45            	jp	.next2
+     137.  00:45D9                      
+     138.  00:45D9                      ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+     139.  00:45D9                      
+     140.  00:45D9                      reverseplot_enemy:
+     141.  00:45D9                      	; R#5=0xFF -> sat = FE000
+     142.  00:45D9  3E FF               	ld 		a,0xFF
+     143.  00:45DB  D3 99               	out (0x99),a
+     144.  00:45DD  3E 85               	ld 		a,128+5
+     145.  00:45DF  D3 99               	out (0x99),a
+     146.  00:45E1                      
+     147.  00:45E1  0E 00               	ld		c,0
+     148.  00:45E3  11 00 FE            	ld		de,0FE00h	; 3 positions for main ship and its shadow
+     149.  00:45E6  CD 90 41            	call	_vdpsetvramwr
+     150.  00:45E9                      
+     151.  00:45E9  DD 21 1B CF         	ld	ix,enemies+(max_enem-1)*enemy_data
+     152.  00:45ED                      
+     153.  00:45ED                      ; process two layer enemies
+     154.  00:45ED                      
+     155.  00:45ED  01 98 0C            	ld	bc,0x98+256*max_enem
+     156.  00:45F0                      	
+     157.  00:45F0  DD CB 07 46         1:	bit 0,(ix+enemy_data.status)
+     158.  00:45F4  CA 8A 46            	jp	z,.spriteoff2
+     159.  00:45F7                      	
+     160.  00:45F7  DD 6E 01            	ld	l,(ix+enemy_data.x+0)
+     161.  00:45FA  DD 66 02            	ld	h,(ix+enemy_data.x+1)
+     162.  00:45FD  ED 5B 0F CE         	ld	de,(xmap)
+     163.  00:4601  AF                  	xor a
+     164.  00:4602  ED 52               	sbc hl,de				; dx = enemy.x - xmap
+     165.  00:4604  FA 8A 46            	jp	m,.spriteoff2		; dx <0
+     166.  00:4607                      
+     167.  00:4607  B4                  	or	h
+     168.  00:4608  C2 8A 46            	jp	nz,.spriteoff2		; dx >255
+     169.  00:460B                      
+     170.  00:460B  3A 02 CE            	ld	a,(_xoffset)		; compensate R#18 
+     171.  00:460E  85                  	add	a,l
+     172.  00:460F  DA 8A 46            	jp	c,.spriteoff2		; remove if off screen i.e. dx + _xoffset > 255
+     173.  00:4612  FE F0               	cp	240
+     174.  00:4614  D2 8A 46            	jp	nc,.spriteoff2		; remove if dx + _xoffset > 240
+     175.  00:4617  DD 56 00            	ld	d,(ix+enemy_data.y)	
+     176.  00:461A  ED 51               	out (c),d				; write Y
+     177.  00:461C  6F                  	ld  l,a
+     178.  00:461D  D3 98               	out (0x98),a			; write X
+     179.  00:461F                      
+     180.  00:461F  DD 7E 0A            	ld	a,(ix+enemy_data.frame)
+     181.  00:4622  D3 98               	out (0x98),a			; write shape
+     182.  00:4624  ED 79               	out (c),a				; write crap
+     183.  00:4626                      
+     184.  00:4626  ED 51               	out (c),d				; write Y
+     185.  00:4628  ED 69               	out (c),l				; write X
+     186.  00:462A  C6 04               	add	a,4
+     187.  00:462C  D3 98               	out (0x98),a			; write shape
+     188.  00:462E  ED 79               	out (c),a				; write crap
+     189.  00:4630                      	
+     190.  00:4630                      .next2
+     191.  00:4630  11 F1 FF            	ld	de,-enemy_data
+     192.  00:4633  DD 19               	add ix,de
+     193.  00:4635  10 B9               	djnz	1b
+     194.  00:4637                      
+     195.  00:4637                      ; process one layer enemies
+     196.  00:4637                      
+     197.  00:4637  06 05               	ld	b,max_bullets + max_enem_bullets 
+     198.  00:4639  DD CB 07 46         1:	bit 0,(ix+enemy_data.status)
+     199.  00:463D  CA 7D 46            	jp	z,.spriteoff1
+     200.  00:4640                      
+     201.  00:4640  DD 6E 01            	ld	l,(ix+enemy_data.x+0)
+     202.  00:4643  DD 66 02            	ld	h,(ix+enemy_data.x+1)
+     203.  00:4646  ED 5B 0F CE         	ld	de,(xmap)
+     204.  00:464A  AF                  	xor a
+     205.  00:464B  ED 52               	sbc hl,de				; dx = enemy.x - xmap
+     206.  00:464D  FA 7D 46            	jp	m,.spriteoff1		; dx <0
+     207.  00:4650                      
+     208.  00:4650  B4                  	or	h
+     209.  00:4651  C2 7D 46            	jp	nz,.spriteoff1		; dx >255
+     210.  00:4654                      
+     211.  00:4654  3A 02 CE            	ld	a,(_xoffset)		; compensate R#18 
+     212.  00:4657  85                  	add	a,l
+     213.  00:4658  DA 7D 46            	jp	c,.spriteoff1		; remove if off screen i.e. dx + _xoffset > 255
+     214.  00:465B  FE F0               	cp	240
+     215.  00:465D  D2 7D 46            	jp	nc,.spriteoff1		; remove if dx + _xoffset > 240
+     216.  00:4660                      	
+     217.  00:4660  DD 56 00            	ld	d,(ix+enemy_data.y)	
+     218.  00:4663  ED 51               	out (c),d				; write Y
+     219.  00:4665  ED 79               	out (c),a				; write X
+     220.  00:4667                      
+     221.  00:4667  DD 7E 0A            	ld	a,(ix+enemy_data.frame)
+     222.  00:466A  D3 98               	out (0x98),a			; write shape
+     223.  00:466C  ED 79               	out (c),a				; write crap
+     224.  00:466E                      
+     225.  00:466E                      .next1
+     226.  00:466E  11 F1 FF            	ld	de,-enemy_data
+     227.  00:4671  DD 19               	add ix,de
+     228.  00:4673  10 C4               	djnz	1b
+     229.  00:4675                      
+     230.  00:4675  CD FF 44            	call	set_manta	
+     231.  00:4678                      	
+     232.  00:4678  3E D8               	ld	a,0xD8
+     233.  00:467A  D3 98               	out (0x98),a			; SAT terminator
+     234.  00:467C  C9                  	ret
+     235.  00:467D                      	
+     236.  00:467D                      	
+     237.  00:467D                      ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+     238.  00:467D                      	
+     239.  00:467D                      .spriteoff1
+     240.  00:467D  3E D9               	ld	a,0xD9
+     241.  00:467F                      [4]	out (c),a				; write crap
+     241.  00:467F  ED 79 ED 79 ED 79 ED 79 
+     242.  00:4687  C3 6E 46            	jp	.next1
+     243.  00:468A                      
+     244.  00:468A                      .spriteoff2
+     245.  00:468A  3E D9               	ld	a,0xD9
+     246.  00:468C                      [8]	out (c),a				; write crap
+     246.  00:468C  ED 79 ED 79 ED 79 ED 79 ED 79 ED 79 ED 79 ED 79 
+     247.  00:469C  C3 30 46            	jp	.next2
+     248.  00:469F                      
+     249.  00:469F                      ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+      61   00:469F                      		include collision_tst.asm
+       1.  00:469F  (0061)              	align 0x100
        2.  00:4700                      sprite_collision_windows:
        3.  00:4700  00 (12)             	ds	3*4				; first 3 frames are missing
        4.  00:470C                      	include sprite_collision_window.asm
@@ -4426,167 +4446,167 @@ Errors: 0
       43.  00:5973  3A 01 CE            	ld	a,(_mccolorchange)
       44.  00:5976  A7                  	and	a
       45.  00:5977  C8                  	ret z
-      46.  00:5978                      
-      47.  00:5978  7B                  	ld a,e 					; set bits 0-7
-      48.  00:5979  D3 99               	out (0x99),a
-      49.  00:597B  7A                  	ld a,d 					; set bits 8-13 with write access
-      50.  00:597C  D3 99               	out (0x99),a
-      51.  00:597E                      
-      52.  00:597E  AF                  	xor	a
-      53.  00:597F  32 01 CE            	ld	(_mccolorchange),a
-      54.  00:5982                      	
-      55.  00:5982  3E 03               	ld	a, :manta_color
-      56.  00:5984  32 00 B0            	ld	(_kBank4),a
-      57.  00:5987                      	
-      58.  00:5987  ED 4B 16 CE         	ld	bc,(aniframe)
-      59.  00:598B  06 00               	ld	b,0
-      60.  00:598D  21 46 49            	ld	hl,ms_ani
-      61.  00:5990  09                  	add	hl,bc
-      62.  00:5991  6E                  	ld	l,(hl)
-      63.  00:5992  60                  	ld	h,b
-      64.  00:5993  29 29 29 29 29      [5]	add hl,hl
-      65.  00:5998  01 60 B5            	ld  bc,manta_color
-      66.  00:599B  09                  	add	hl,bc
-      67.  00:599C  0E 98               	ld	c,0x98
-      68.  00:599E  CD 32 59            	call	out32
-      69.  00:59A1  AF                  	xor	a
-      70.  00:59A2                      [16]	out	(0x98),a
-      70.  00:59A2  D3 98 D3 98 D3 98 D3 98 D3 98 D3 98 D3 98 D3 98 
-      70.  00:59B2  D3 98 D3 98 D3 98 D3 98 D3 98 D3 98 D3 98 D3 98 
-      71.  00:59C2  C9                  	ret
-      72.  00:59C3                      		
-      73.  00:59C3                      
-      74.  00:59C3                      color_enemy:
-      75.  00:59C3  CD DC 58            	call 	_plot_spt
-      76.  00:59C6  3A 1E CE            	ld	a,(flip_flop)
-      77.  00:59C9  E6 01               	and	1
-      78.  00:59CB  C2 5E 5A            	jp nz, reversecolor_enemy
-      79.  00:59CE                      	
-      80.  00:59CE                      directcolor_enemy:		
-      81.  00:59CE                      		
-      82.  00:59CE  3E 03               	ld	a,3
-      83.  00:59D0  D3 99               	out (0x99),a 		;set bits 14-16 of F800h
-      84.  00:59D2  3E 8E               	ld a,14+128
-      85.  00:59D4  D3 99               	out (0x99),a
-      86.  00:59D6                      		
-      87.  00:59D6  11 00 78            	ld		de,07800h	; F800h 3 positions  for bullets and manta
-      88.  00:59D9                      	
-      89.  00:59D9  CD 73 59            	call	set_manta_color
-      90.  00:59DC                      
-      91.  00:59DC  3E 1C               	ld	a, :color_base
-      92.  00:59DE  32 00 B0            	ld	(_kBank4),a
-      93.  00:59E1                      
-      94.  00:59E1  11 80 78            	ld		de,16*(3+max_bullets+max_enem_bullets)+07800h	; F800h 6 positions for bullets
-      95.  00:59E4                      	
-      96.  00:59E4  DD 21 76 CE         	ld	ix,enemies		; process two layer enemies
-      97.  00:59E8                      
-      98.  00:59E8  01 98 0C            	ld	bc,256*max_enem+0x98
-      99.  00:59EB                      		
-     100.  00:59EB  DD CB 07 46         1:	bit	0,(ix+enemy_data.status)
-     101.  00:59EF  CA 4F 5A            	jp	z,.next
-     102.  00:59F2                      		
-     103.  00:59F2  DD 7E 0A            	ld	a,(ix+enemy_data.frame)
-     104.  00:59F5  DD BE 0B            	cp  (ix+enemy_data.color)
-     105.  00:59F8  CA 4F 5A            	jp	z,.next
-     106.  00:59FB                      	
-     107.  00:59FB  DD 77 0B            	ld   (ix+enemy_data.color),a
-     108.  00:59FE                      	
-     109.  00:59FE  6F                  	ld	l,a					; color x 4
-     110.  00:59FF  26 00               	ld	h,0
-     111.  00:5A01  29 29               [2]	add hl,hl				; color x 16
-     112.  00:5A03                      		
-     113.  00:5A03  3E A0               	ld	a,high color_base	; nb: the first 16 patterns reserved to mship, explosions and bullets
-     114.  00:5A05  84                  	add	a,h
-     115.  00:5A06  67                  	ld	h,a
-     116.  00:5A07                      	
-     117.  00:5A07  7B                  	ld a,e 					; set bits 0-7
-     118.  00:5A08  D3 99               	out (0x99),a
-     119.  00:5A0A  7A                  	ld a,d 					; set bits 8-13 with write access
-     120.  00:5A0B  D3 99               	out (0x99),a
-     121.  00:5A0D  78                  	ld	a,b
-     122.  00:5A0E                      [32]	outi
-     122.  00:5A0E  ED A3 ED A3 ED A3 ED A3 ED A3 ED A3 ED A3 ED A3 
-     122.  00:5A1E  ED A3 ED A3 ED A3 ED A3 ED A3 ED A3 ED A3 ED A3 
-     122.  00:5A2E  ED A3 ED A3 ED A3 ED A3 ED A3 ED A3 ED A3 ED A3 
-     122.  00:5A3E  ED A3 ED A3 ED A3 ED A3 ED A3 ED A3 ED A3 ED A3 
-     123.  00:5A4E  47                  	ld b,a
-     124.  00:5A4F                      
-     125.  00:5A4F                      .next
-     126.  00:5A4F  C5                  	push bc
-     127.  00:5A50  01 0F 00            	ld	bc,enemy_data
-     128.  00:5A53  DD 09               	add ix,bc
-     129.  00:5A55  C1                  	pop bc
-     130.  00:5A56  21 20 00            	ld hl,32
-     131.  00:5A59  19                  	add hl,de
-     132.  00:5A5A  EB                  	ex de,hl
-     133.  00:5A5B                      	
-     134.  00:5A5B  10 8E               	djnz	1b
-     135.  00:5A5D  C9                  	ret
-     136.  00:5A5E                      
-     137.  00:5A5E                      reversecolor_enemy:
-     138.  00:5A5E  11 00 7C            	ld		de,07C00h	; FC00h 6 positions for bullets
-     139.  00:5A61                      
-     140.  00:5A61  3E 03               	ld	a,3
-     141.  00:5A63  D3 99               	out (0x99),a 		;set bits 14-16 of F800h
-     142.  00:5A65  3E 8E               	ld a,14+128
-     143.  00:5A67  D3 99               	out (0x99),a
-     144.  00:5A69                      	
-     145.  00:5A69  3E 1C               	ld	a, :color_base
-     146.  00:5A6B  32 00 B0            	ld	(_kBank4),a
-     147.  00:5A6E                      	
-     148.  00:5A6E  DD 21 1B CF         	ld	ix,enemies+(max_enem-1)*enemy_data
-     149.  00:5A72                      	
-     150.  00:5A72  01 98 0C            	ld	bc,0x98+256*max_enem
-     151.  00:5A75                      	
-     152.  00:5A75  DD CB 07 46         1:	bit	0,(ix+enemy_data.status)
-     153.  00:5A79  CA D9 5A            	jp	z,.next
-     154.  00:5A7C                      	
-     155.  00:5A7C  DD 7E 0A            	ld	a,(ix+enemy_data.frame)
-     156.  00:5A7F  DD BE 0C            	cp  (ix+enemy_data.color2)
-     157.  00:5A82  CA D9 5A            	jp	z,.next
-     158.  00:5A85                      	
-     159.  00:5A85  DD 77 0C            	ld   (ix+enemy_data.color2),a
-     160.  00:5A88                      	
-     161.  00:5A88  6F                  	ld	l,a					; color x 4
-     162.  00:5A89  26 00               	ld	h,0
-     163.  00:5A8B  29 29               [2]	add hl,hl				; color x 16
-     164.  00:5A8D                      	
-     165.  00:5A8D  3E A0               	ld	a,high color_base	; nb: the first 16 patterns reserved to mship, explosions and bullets
-     166.  00:5A8F  84                  	add	a,h
-     167.  00:5A90  67                  	ld	h,a
-     168.  00:5A91                      	
-     169.  00:5A91  7B                  	ld a,e 					; set bits 0-7
-     170.  00:5A92  D3 99               	out (0x99),a
-     171.  00:5A94  7A                  	ld a,d 					; set bits 8-13 with write access
-     172.  00:5A95  D3 99               	out (0x99),a
-     173.  00:5A97  78                  	ld	a,b
-     174.  00:5A98                      [32]	outi
-     174.  00:5A98  ED A3 ED A3 ED A3 ED A3 ED A3 ED A3 ED A3 ED A3 
-     174.  00:5AA8  ED A3 ED A3 ED A3 ED A3 ED A3 ED A3 ED A3 ED A3 
-     174.  00:5AB8  ED A3 ED A3 ED A3 ED A3 ED A3 ED A3 ED A3 ED A3 
-     174.  00:5AC8  ED A3 ED A3 ED A3 ED A3 ED A3 ED A3 ED A3 ED A3 
-     175.  00:5AD8  47                  	ld b,a
-     176.  00:5AD9                      
-     177.  00:5AD9                      .next
-     178.  00:5AD9  C5                  	push bc
-     179.  00:5ADA  01 F1 FF            	ld	bc,-enemy_data
-     180.  00:5ADD  DD 09               	add ix,bc
-     181.  00:5ADF  C1                  	pop bc
-     182.  00:5AE0  21 20 00            	ld hl,32
-     183.  00:5AE3  19                  	add hl,de
-     184.  00:5AE4  EB                  	ex de,hl
-     185.  00:5AE5                      	
-     186.  00:5AE5  10 8E               	djnz	1b
-     187.  00:5AE7                      
-     188.  00:5AE7  11 D0 7D            	ld	de,07C00h+16*(2*max_enem+max_bullets + max_enem_bullets)	; FC00h 6 positions for bullets
-     189.  00:5AEA                      
-     190.  00:5AEA  C3 73 59            	jp	set_manta_color
-     191.  00:5AED                      	
-     294   00:5AED                      	
-     295   00:5AED                      ;-------------------------------------
-     296   00:5AED                      
-     297   00:5AED                      	
-     298   00:5AED  (01)                		page 1
+      46.  00:5978  F3                  	di
+      47.  00:5979  7B                  	ld a,e 					; set bits 0-7
+      48.  00:597A  D3 99               	out (0x99),a
+      49.  00:597C  7A                  	ld a,d 					; set bits 8-13 with write access
+      50.  00:597D  D3 99               	out (0x99),a
+      51.  00:597F                      
+      52.  00:597F  AF                  	xor	a
+      53.  00:5980  32 01 CE            	ld	(_mccolorchange),a
+      54.  00:5983                      	
+      55.  00:5983  3E 0D               	ld	a, :manta_color
+      56.  00:5985  32 00 70            	ld	(_kBank2),a
+      57.  00:5988                      	
+      58.  00:5988  ED 4B 16 CE         	ld	bc,(aniframe)
+      59.  00:598C  06 00               	ld	b,0
+      60.  00:598E  21 46 49            	ld	hl,ms_ani
+      61.  00:5991  09                  	add	hl,bc
+      62.  00:5992  6E                  	ld	l,(hl)
+      63.  00:5993  60                  	ld	h,b
+      64.  00:5994  29 29 29 29 29      [5]	add hl,hl
+      65.  00:5999  01 00 60            	ld  bc,manta_color
+      66.  00:599C  09                  	add	hl,bc
+      67.  00:599D  0E 98               	ld	c,0x98
+      68.  00:599F  CD 32 59            	call	out32
+      69.  00:59A2  3E 01               	ld	a,1
+      70.  00:59A4  32 00 70            	ld	(_kBank2),a
+      71.  00:59A7  C9                  	ret
+      72.  00:59A8                      		
+      73.  00:59A8                      
+      74.  00:59A8                      color_enemy:
+      75.  00:59A8  CD DC 58            	call 	_plot_spt
+      76.  00:59AB  3A 1E CE            	ld	a,(flip_flop)
+      77.  00:59AE  E6 01               	and	1
+      78.  00:59B0  C2 43 5A            	jp nz, reversecolor_enemy
+      79.  00:59B3                      	
+      80.  00:59B3                      directcolor_enemy:		
+      81.  00:59B3                      		
+      82.  00:59B3  3E 03               	ld	a,3
+      83.  00:59B5  D3 99               	out (0x99),a 		;set bits 14-16 of F800h
+      84.  00:59B7  3E 8E               	ld a,14+128
+      85.  00:59B9  D3 99               	out (0x99),a
+      86.  00:59BB                      		
+      87.  00:59BB  11 00 78            	ld		de,07800h	; F800h 3 positions  for bullets and manta
+      88.  00:59BE                      	
+      89.  00:59BE  CD 73 59            	call	set_manta_color
+      90.  00:59C1                      
+      91.  00:59C1  3E 1C               	ld	a, :color_base
+      92.  00:59C3  32 00 B0            	ld	(_kBank4),a
+      93.  00:59C6                      
+      94.  00:59C6  11 80 78            	ld		de,16*(3+max_bullets+max_enem_bullets)+07800h	; F800h 6 positions for bullets
+      95.  00:59C9                      	
+      96.  00:59C9  DD 21 76 CE         	ld	ix,enemies		; process two layer enemies
+      97.  00:59CD                      
+      98.  00:59CD  01 98 0C            	ld	bc,256*max_enem+0x98
+      99.  00:59D0                      		
+     100.  00:59D0  DD CB 07 46         1:	bit	0,(ix+enemy_data.status)
+     101.  00:59D4  CA 34 5A            	jp	z,.next
+     102.  00:59D7                      		
+     103.  00:59D7  DD 7E 0A            	ld	a,(ix+enemy_data.frame)
+     104.  00:59DA  DD BE 0B            	cp  (ix+enemy_data.color)
+     105.  00:59DD  CA 34 5A            	jp	z,.next
+     106.  00:59E0                      	
+     107.  00:59E0  DD 77 0B            	ld   (ix+enemy_data.color),a
+     108.  00:59E3                      	
+     109.  00:59E3  6F                  	ld	l,a					; color x 4
+     110.  00:59E4  26 00               	ld	h,0
+     111.  00:59E6  29 29               [2]	add hl,hl				; color x 16
+     112.  00:59E8                      		
+     113.  00:59E8  3E A0               	ld	a,high color_base	; nb: the first 16 patterns reserved to mship, explosions and bullets
+     114.  00:59EA  84                  	add	a,h
+     115.  00:59EB  67                  	ld	h,a
+     116.  00:59EC                      	
+     117.  00:59EC  7B                  	ld a,e 					; set bits 0-7
+     118.  00:59ED  D3 99               	out (0x99),a
+     119.  00:59EF  7A                  	ld a,d 					; set bits 8-13 with write access
+     120.  00:59F0  D3 99               	out (0x99),a
+     121.  00:59F2  78                  	ld	a,b
+     122.  00:59F3                      [32]	outi
+     122.  00:59F3  ED A3 ED A3 ED A3 ED A3 ED A3 ED A3 ED A3 ED A3 
+     122.  00:5A03  ED A3 ED A3 ED A3 ED A3 ED A3 ED A3 ED A3 ED A3 
+     122.  00:5A13  ED A3 ED A3 ED A3 ED A3 ED A3 ED A3 ED A3 ED A3 
+     122.  00:5A23  ED A3 ED A3 ED A3 ED A3 ED A3 ED A3 ED A3 ED A3 
+     123.  00:5A33  47                  	ld b,a
+     124.  00:5A34                      
+     125.  00:5A34                      .next
+     126.  00:5A34  C5                  	push bc
+     127.  00:5A35  01 0F 00            	ld	bc,enemy_data
+     128.  00:5A38  DD 09               	add ix,bc
+     129.  00:5A3A  C1                  	pop bc
+     130.  00:5A3B  21 20 00            	ld hl,32
+     131.  00:5A3E  19                  	add hl,de
+     132.  00:5A3F  EB                  	ex de,hl
+     133.  00:5A40                      	
+     134.  00:5A40  10 8E               	djnz	1b
+     135.  00:5A42  C9                  	ret
+     136.  00:5A43                      
+     137.  00:5A43                      reversecolor_enemy:
+     138.  00:5A43  11 00 7C            	ld		de,07C00h	; FC00h 6 positions for bullets
+     139.  00:5A46                      
+     140.  00:5A46  3E 03               	ld	a,3
+     141.  00:5A48  D3 99               	out (0x99),a 		;set bits 14-16 of F800h
+     142.  00:5A4A  3E 8E               	ld a,14+128
+     143.  00:5A4C  D3 99               	out (0x99),a
+     144.  00:5A4E                      	
+     145.  00:5A4E  3E 1C               	ld	a, :color_base
+     146.  00:5A50  32 00 B0            	ld	(_kBank4),a
+     147.  00:5A53                      	
+     148.  00:5A53  DD 21 1B CF         	ld	ix,enemies+(max_enem-1)*enemy_data
+     149.  00:5A57                      	
+     150.  00:5A57  01 98 0C            	ld	bc,0x98+256*max_enem
+     151.  00:5A5A                      	
+     152.  00:5A5A  DD CB 07 46         1:	bit	0,(ix+enemy_data.status)
+     153.  00:5A5E  CA BE 5A            	jp	z,.next
+     154.  00:5A61                      	
+     155.  00:5A61  DD 7E 0A            	ld	a,(ix+enemy_data.frame)
+     156.  00:5A64  DD BE 0C            	cp  (ix+enemy_data.color2)
+     157.  00:5A67  CA BE 5A            	jp	z,.next
+     158.  00:5A6A                      	
+     159.  00:5A6A  DD 77 0C            	ld   (ix+enemy_data.color2),a
+     160.  00:5A6D                      	
+     161.  00:5A6D  6F                  	ld	l,a					; color x 4
+     162.  00:5A6E  26 00               	ld	h,0
+     163.  00:5A70  29 29               [2]	add hl,hl				; color x 16
+     164.  00:5A72                      	
+     165.  00:5A72  3E A0               	ld	a,high color_base	; nb: the first 16 patterns reserved to mship, explosions and bullets
+     166.  00:5A74  84                  	add	a,h
+     167.  00:5A75  67                  	ld	h,a
+     168.  00:5A76                      	
+     169.  00:5A76  7B                  	ld a,e 					; set bits 0-7
+     170.  00:5A77  D3 99               	out (0x99),a
+     171.  00:5A79  7A                  	ld a,d 					; set bits 8-13 with write access
+     172.  00:5A7A  D3 99               	out (0x99),a
+     173.  00:5A7C  78                  	ld	a,b
+     174.  00:5A7D                      [32]	outi
+     174.  00:5A7D  ED A3 ED A3 ED A3 ED A3 ED A3 ED A3 ED A3 ED A3 
+     174.  00:5A8D  ED A3 ED A3 ED A3 ED A3 ED A3 ED A3 ED A3 ED A3 
+     174.  00:5A9D  ED A3 ED A3 ED A3 ED A3 ED A3 ED A3 ED A3 ED A3 
+     174.  00:5AAD  ED A3 ED A3 ED A3 ED A3 ED A3 ED A3 ED A3 ED A3 
+     175.  00:5ABD  47                  	ld b,a
+     176.  00:5ABE                      
+     177.  00:5ABE                      .next
+     178.  00:5ABE  C5                  	push bc
+     179.  00:5ABF  01 F1 FF            	ld	bc,-enemy_data
+     180.  00:5AC2  DD 09               	add ix,bc
+     181.  00:5AC4  C1                  	pop bc
+     182.  00:5AC5  21 20 00            	ld hl,32
+     183.  00:5AC8  19                  	add hl,de
+     184.  00:5AC9  EB                  	ex de,hl
+     185.  00:5ACA                      	
+     186.  00:5ACA  10 8E               	djnz	1b
+     187.  00:5ACC                      		
+     188.  00:5ACC                      	
+     189.  00:5ACC  11 D0 7D            	ld	de,07C00h+16*(2*max_enem+max_bullets + max_enem_bullets)	; FC00h 6 positions for bullets
+     190.  00:5ACF                      
+     191.  00:5ACF  C3 73 59            	jp	set_manta_color
+     192.  00:5AD2                      
+     193.  00:5AD2                      
+     294   00:5AD2                      	
+     295   00:5AD2                      ;-------------------------------------
+     296   00:5AD2                      
+     297   00:5AD2                      	
+     298   00:5AD2  (01)                		page 1
      299   01:6000                      
      300   01:6000                      		include	"..\TTplayer\code\ttreplay.asm"
        1.  01:6000                      ;=================================
@@ -8202,31 +8222,29 @@ Errors: 0
      327   03:A000                      ms_spt:
      328   03:A000                      		; incbin ms_demo_frm.bin
      329   03:A000  (1560)              		incbin mship02_frm.bin
-     330   03:B560                      manta_color:
-     331   03:B560  (0720)              		incbin mship02_clr.bin
-     332   03:BC80                      		
-     333   03:BC80  (04)                		page 4
-     334   04:A000                      _tiles0:
-     335   04:A000  (2000)              		incbin "tiles.bin",0x0000,0x2000
-     336   04:C000  (05)                		page 5
-     337   05:A000  (2000)              		incbin "tiles.bin",0x2000,0x2000
-     338   05:C000  (06)                		page 6
-     339   06:A000  (2000)              		incbin "tiles.bin",0x4000,0x2000
-     340   06:C000  (07)                		page 7
-     341   07:A000  (2000)              		incbin "tiles.bin",0x6000,0x2000
-     342   07:C000  (08)                		page 8
-     343   08:A000  (2000)              		incbin "tiles.bin",0x8000,0x2000
-     344   08:C000  (09)                		page 9
-     345   09:A000  (2000)              		incbin "tiles.bin",0xA000,0x2000
-     346   09:C000  (0A)                		page 10
-     347   0A:A000  (2000)              		incbin "tiles.bin",0xC000,0x2000
-     348   0A:C000  (0B)                		page 11
-     349   0B:A000  (2000)              		incbin "tiles.bin",0xE000;,0x2000
-     350   0B:C000                      
-     351   0B:C000  (0E)                		page 14
-     352   0E:8000                      demo_song:
-     353   0E:8000                      		org 0x0040
-     354   0E:0040                      		include	"demosong.asm"
+     330   03:B560                      		
+     331   03:B560  (04)                		page 4
+     332   04:A000                      _tiles0:
+     333   04:A000  (2000)              		incbin "tiles.bin",0x0000,0x2000
+     334   04:C000  (05)                		page 5
+     335   05:A000  (2000)              		incbin "tiles.bin",0x2000,0x2000
+     336   05:C000  (06)                		page 6
+     337   06:A000  (2000)              		incbin "tiles.bin",0x4000,0x2000
+     338   06:C000  (07)                		page 7
+     339   07:A000  (2000)              		incbin "tiles.bin",0x6000,0x2000
+     340   07:C000  (08)                		page 8
+     341   08:A000  (2000)              		incbin "tiles.bin",0x8000,0x2000
+     342   08:C000  (09)                		page 9
+     343   09:A000  (2000)              		incbin "tiles.bin",0xA000,0x2000
+     344   09:C000  (0A)                		page 10
+     345   0A:A000  (2000)              		incbin "tiles.bin",0xC000,0x2000
+     346   0A:C000  (0B)                		page 11
+     347   0B:A000  (2000)              		incbin "tiles.bin",0xE000;,0x2000
+     348   0B:C000                      
+     349   0B:C000  (0E)                		page 14
+     350   0E:8000                      demo_song:
+     351   0E:8000                      		org 0x0040
+     352   0E:0040                      		include	"demosong.asm"
        1.  0E:0040                      ; Compiled using tt_compile.exe V0.3 [12-04-2015]
        2.  0E:0040                      ; Copyright 2015 Richard Cornelisse
        3.  0E:0040                      
@@ -10770,7 +10788,7 @@ Errors: 0
     2522.  0E:0C57                      .track_50:
     2523.  0E:0C57  BF                  	db $BF		;[End-Of-Track]
     2524.  0E:0C58                      ; [ Song sub-track data ]
-     355   0E:0C58                      		include	"..\TTplayer\code\ttreplayDAT.asm"
+     353   0E:0C58                      		include	"..\TTplayer\code\ttreplayDAT.asm"
        1.  0E:0C58                      
        2.  0E:0C58  00 (128)            	ds 8*16, 0
        3.  0E:0CD8                      _VOLUME_TABLE
@@ -10835,351 +10853,353 @@ Errors: 0
       41.  0E:0EE8                      	db      0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0	
       41.  0E:0EE8  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 
       42.  0E:0EF8                      	
-     356   0E:0EF8                      end_demo_song:	
-     357   0E:0EF8                      
-     358   0E:0EF8  (0F)                		page 15
-     359   0F:A000                      _level:
-     360   0F:A000  (0B00)              		incbin "datamap.bin"
-     361   0F:AB00                      	
-     362   0F:AB00  (10)                		page 16
-     363   10:A000                      _opening:
-     364   10:A000  (2000)              		incbin "opening.bin",0x0000,0x2000
-     365   10:C000  (11)                		page 17
-     366   11:A000  (2000)              		incbin "opening.bin",0x2000,0x2000
-     367   11:C000  (12)                		page 18
-     368   12:A000  (2000)              		incbin "opening.bin",0x4000,0x2000
-     369   12:C000  (13)                		page 19
-     370   13:A000  (2000)              		incbin "opening.bin",0x6000,0x2000
-     371   13:C000  (14)                		page 20
-     372   14:A000  (2000)              		incbin "opening.bin",0x8000,0x2000
-     373   14:C000  (15)                		page 21
-     374   15:A000  (2000)              		incbin "opening.bin",0xA000,0x2000
-     375   15:C000  (16)                		page 22
-     376   16:A000  (1400)              		incbin "opening.bin",0xC000;,0x2000
-     377   16:B400  (17)                		page 23
-     378   17:A000                      		; incbin "opening.bin",0xE000;,,0x2000
-     379   17:A000                      	
-     380   17:A000  (18)                		page 24
-     381   18:A000                      _scorebar:	
-     382   18:A000  (1800)              		incbin scorebar.bin
-     383   18:B800                      	
-     384   18:B800  (19)                		page 25
-     385   19:A000                      _animated:	
-     386   19:A000  (2000)              		incbin animated.bin,0x0000,0x2000
-     387   19:C000  (1A)                		page 26
-     388   1A:A000  (2000)              		incbin animated.bin,0x2000,0x2000
-     389   1A:C000                      
-     390   1A:C000  (1B)                		page 27
-     391   1B:A000                      sprtdata:
-     392   1B:A000  (0800)              		incbin 	uridium_revA.bin
-     393   1B:A800                      
-     394   1B:A800  (1C)                		page 28
-     395   1C:A000                      color_base:
-     396   1C:A000                      		repeat 4
-     397   1C:A000                    < 		ds	16,8
-     398   1C:A000                    < 		ds	16,10+64
-     399   1C:A000  08 (16)           < 		endrepeat
-     400   1C:A080                      		repeat 4
-     401   1C:A080                    < 		ds	16,8
-     402   1C:A080                    < 		ds	16,10+64
-     403   1C:A080  08 (16)           < 		endrepeat
-     404   1C:A100                      
-     405   1C:A100                      		repeat 4
-     406   1C:A100                    < 		ds	16,12
-     407   1C:A100                    < 		ds	16,6+64
-     408   1C:A100  0C (16)           < 		endrepeat
-     409   1C:A180                      		repeat 4
-     410   1C:A180                    < 		ds	16,10
-     411   1C:A180                    < 		ds	16,1+64
-     412   1C:A180  0A (16)           < 		endrepeat
-     413   1C:A200                      		repeat 4
-     414   1C:A200                    < 		ds	16,4
-     415   1C:A200                    < 		ds	16,9+64
-     416   1C:A200  04 (16)           < 		endrepeat
-     417   1C:A280                      		repeat 4
-     418   1C:A280                    < 		ds	16,12
-     419   1C:A280                    < 		ds	16,1+64
-     420   1C:A280  0C (16)           < 		endrepeat
-     421   1C:A300                      		repeat 4
-     422   1C:A300                    < 		ds	16,12
-     423   1C:A300                    < 		ds	16,5+64
-     424   1C:A300  0C (16)           < 		endrepeat
-     425   1C:A380                      		repeat 4
-     426   1C:A380                    < 		ds	16,10
-     427   1C:A380                    < 		ds	16,3+64
-     428   1C:A380  0A (16)           < 		endrepeat
-     429   1C:A400                      		
-     430   1C:A400                      
-     431   1C:A400                      FINISH:
-     432   1C:A400                      
-     433   1C:A400                      
-     434   1C:A400                      ;---------------------------------------------------------
-     435   1C:A400                      ; Variables
-     436   1C:A400                      ;---------------------------------------------------------
-     437   1C:A400  (0040)              	MAP 0x0040
-     438   1C:A400  (1C:0040)           musbuff:		#15*1024
-     439   1C:A400  (0000)              	ENDMAP
-     440   1C:A400                      	
-     441   1C:A400  (C000)              	MAP 0xC000
-     442   1C:A400  (1C:C000)           ttreplayRAM:		#0
-     443   1C:A400                      	include	"..\TTplayer\code\ttreplayRAM.asm"
-       1.  1C:A400                      ;================================
-       2.  1C:A400                      ; The new replayer.
-       3.  1C:A400                      ;
-       4.  1C:A400                      ; Persistent RAM unswappable
-       5.  1C:A400                      ;
-       6.  1C:A400                      ;================================
-       7.  1C:A400                      
-       8.  1C:A400  (1C:FFFFFFEF)       TRACK_Instrument		equ 0-17
-       9.  1C:A400  (1C:FFFFFFF0)       TRACK_Command		equ 1-17
-      10.  1C:A400  (1C:FFFFFFF1)       TRACK_MacroPointer	equ 2-17
-      11.  1C:A400  (1C:FFFFFFF3)       TRACK_MacroStart		equ 4-17
-      12.  1C:A400  (1C:FFFFFFF5)       TRACK_MacroRestart 	equ 6-17		; no longer needed
-      13.  1C:A400  (1C:FFFFFFF6)       TRACK_Note			equ 7-17
-      14.  1C:A400  (1C:FFFFFFF7)       TRACK_Volume		equ 8-17
-      15.  1C:A400  (1C:FFFFFFF8)       TRACK_Waveform		equ 9-17
-      16.  1C:A400  (1C:FFFFFFF9)       TRACK_Flags			equ 10-17
-      17.  1C:A400                      	; 0 = note trigger
-      18.  1C:A400                      	; 1 = note active
-      19.  1C:A400                      	; 4 = morph active		;-< for SCC when 1 then waveform is following morph buffer
-      20.  1C:A400                      	; 3 = command trigger
-      21.  1C:A400                      	; 2 = envelope trigger
-      22.  1C:A400                      	; 5 = instrument trigger
-      23.  1C:A400                      	; 6 = waveform trigger
-      24.  1C:A400                      	; 7 = PSG/SCC
-      25.  1C:A400  (1C:FFFFFFFA)       TRACK_empty			equ 11-17		; needed for pushing 0 at note start
-      26.  1C:A400  (1C:FFFFFFFB)       TRACK_ToneAdd		equ 12-17		; reset after note set
-      27.  1C:A400  (1C:FFFFFFFD)       TRACK_VolumeAdd		equ 14-17		; reset after note set
-      28.  1C:A400  (1C:FFFFFFFE)       TRACK_Noise			equ 15-17		; reset after note set
-      29.  1C:A400  (1C:FFFFFFFF)       TRACK_cmd_VolumeAdd	equ 16-17		; reset after note set
-      30.  1C:A400  (1C:0000)           TRACK_cmd_ToneSlideAdd	equ 17-17		; reset after note set
-      31.  1C:A400  (1C:0002)           TRACK_cmd_ToneAdd		equ 19-17		; reset after note set
-      32.  1C:A400                      
-      33.  1C:A400  (1C:0004)           TRACK_cmd_detune		equ 21-17
-      34.  1C:A400  (1C:0005)           TRACK_cmd_0			equ 22-17
-      35.  1C:A400  (1C:0006)           TRACK_cmd_1			equ 23-17
-      36.  1C:A400  (1C:0007)           TRACK_cmd_2			equ 24-17
-      37.  1C:A400  (1C:0008)           TRACK_cmd_3			equ 25-17
-      38.  1C:A400  (1C:0009)           TRACK_cmd_4_depth		equ 26-17
-      39.  1C:A400  (1C:000A)           TRACK_cmd_4_step		equ 27-17
-      40.  1C:A400  (1C:000B)           TRACK_cmd_NoteAdd		equ 28-17		;x reset after note set
-      41.  1C:A400  (1C:000C)           TRACK_cmd_A			equ 29-17		
-      42.  1C:A400  (1C:000D)           TRACK_cmd_B			equ 30-17		
-      43.  1C:A400  (1C:000E)           TRACK_cmd_E			equ 31-17
-      44.  1C:A400  (1C:000F)           TRACK_Timer			equ 32-17		; used for timing by all cmd's
-      45.  1C:A400  (1C:0010)           TRACK_Step			equ 33-17		; only for VIBRATO???
-      46.  1C:A400  (1C:0011)           TRACK_Delay			equ 34-17		; rows to wait till next data
-      47.  1C:A400  (1C:0012)           TRACK_Retrig		equ 35-17		; rows to retrigger command
-      48.  1C:A400  (1C:0013)           TRACK_prevDelay		equ 36-17
-      49.  1C:A400  (1C:0014)           TRACK_cmd_A_add		equ 37-17	;<< Still in use???
-      50.  1C:A400                      
-      51.  1C:A400  (1C:0026)           TRACK_REC_SIZE		equ 38
-      52.  1C:A400                      
-      53.  1C:A400                      
-      54.  1C:A400  (1C:0000)           B_TRGNOT			equ 0			; note trigger
-      55.  1C:A400  (1C:0001)           B_ACTNOT			equ 1			; note active
-      56.  1C:A400  (1C:0002)           B_TRGENV			equ 2			; envelope trigger
-      57.  1C:A400  (1C:0003)           B_TRGCMD			equ 3			; command active
-      58.  1C:A400  (1C:0004)           B_ACTMOR			equ 4			; morph active
-      59.  1C:A400  (1C:0005)           B_TRGINS			equ 5			; instrument trigger
-      60.  1C:A400  (1C:0006)           B_TRGWAV			equ 6			; waveform trigger
-      61.  1C:A400  (1C:0007)           B_PSGSCC			equ 7			; chip type (PSG or SCC)
-      62.  1C:A400                      
-      63.  1C:A400                      
-      64.  1C:A400  (1C:C000)           _SP_Storage			#1			; to store the SP
-      65.  1C:A400                      
-      66.  1C:A400  (1C:C001)           replay_trigger		#1			; trigger byte.
-      67.  1C:A400  (1C:C002)           replay_mainPSGvol		#2			; volume mixer for PSG SCC balance
-      68.  1C:A400  (1C:C004)           replay_mainSCCvol		#2			; volume mixer for PSG SCC balance
-      69.  1C:A400                      ;replay_songbase:		#2			; pointer to song data
-      70.  1C:A400  (1C:C006)           replay_wavebase:		#2			; pointer to waveform data
-      71.  1C:A400  (1C:C008)           replay_insbase:		#2			; pointer to instrument data
-      72.  1C:A400  (1C:C00A)           replay_orderpointer:	#2			; pointer to the order track list pointers
-      73.  1C:A400                      
-      74.  1C:A400  (1C:C00C)           replay_speed 		#1			; speed to replay (get from song)
-      75.  1C:A400  (1C:C00D)           replay_speed_subtimer 	#1			; counter for finer speed
-      76.  1C:A400  (1C:C00E)           replay_speed_timer 	#1 			; counter for speed
-      77.  1C:A400  (1C:C00F)           replay_mode 		#1			; Replayer status
-      78.  1C:A400                      ; mode 0  = no sound output
-      79.  1C:A400                      ; mode 1  = replay song 
-      80.  1C:A400  (1C:C010)           replay_fade			#1			; Fade active (value = fade speed)
-      81.  1C:A400  (1C:C011)           replay_fade_timer		#1			; Timer for fade
-      82.  1C:A400  (1C:C012)           replay_fade_vol		#1			; fade volume to lower the channel volume.
-      83.  1C:A400                      
-      84.  1C:A400                      
-      85.  1C:A400  (1C:C013)           replay_previous_note	#1			; previous note played
-      86.  1C:A400  (1C:C014)           replay_mainvol		#2			; the volume correction.
-      87.  1C:A400                      
-      88.  1C:A400  (1C:C016)           replay_vib_table		#2			; pointer to the vibrato table
-      89.  1C:A400  (1C:C018)           replay_Tonetable		#2			; ToneTable (affected by transpose);
-      90.  1C:A400                      
-      91.  1C:A400  (1C:C01A)           replay_morph_active	#1			; flag to indicate morphing is active
-      92.  1C:A400                      ;replay_morph_update	#1			; flag to indicate a new waveform is ready
-      93.  1C:A400  (1C:C01B)           replay_morph_timer	#1			; step timer between morphs
-      94.  1C:A400  (1C:C01C)           replay_morph_speed	#1 
-      95.  1C:A400  (1C:C01D)           replay_morph_counter	#1			; counter till end morph
-      96.  1C:A400  (1C:C01E)           replay_morph_buffer	#64			; interleaved buffer with morphed waveform and morph delta values
-      97.  1C:A400  (1C:C05E)           replay_morph_waveform	#1 			; waveform we are morphing to.
-      98.  1C:A400                      
-      99.  1C:A400                      
-     100.  1C:A400  (1C:C05F)           TRACK_Chan1			#TRACK_REC_SIZE
-     101.  1C:A400  (1C:C085)           TRACK_Chan2			#TRACK_REC_SIZE
-     102.  1C:A400  (1C:C0AB)           TRACK_Chan3			#TRACK_REC_SIZE
-     103.  1C:A400  (1C:C0D1)           TRACK_Chan4			#TRACK_REC_SIZE
-     104.  1C:A400  (1C:C0F7)           TRACK_Chan5			#TRACK_REC_SIZE
-     105.  1C:A400  (1C:C11D)           TRACK_Chan6			#TRACK_REC_SIZE
-     106.  1C:A400  (1C:C143)           TRACK_Chan7			#TRACK_REC_SIZE
-     107.  1C:A400  (1C:C169)           TRACK_Chan8			#TRACK_REC_SIZE
-     108.  1C:A400                      
-     109.  1C:A400  (1C:C18F)           TRACK_pointer1		#2
-     110.  1C:A400  (1C:C191)           TRACK_pointer2		#2
-     111.  1C:A400  (1C:C193)           TRACK_pointer3		#2
-     112.  1C:A400  (1C:C195)           TRACK_pointer4		#2
-     113.  1C:A400  (1C:C197)           TRACK_pointer5		#2
-     114.  1C:A400  (1C:C199)           TRACK_pointer6		#2
-     115.  1C:A400  (1C:C19B)           TRACK_pointer7		#2
-     116.  1C:A400  (1C:C19D)           TRACK_pointer8		#2
-     117.  1C:A400                      
-     118.  1C:A400                      
-     119.  1C:A400                      ;--- AY SPECIFIC
-     120.  1C:A400  (1C:C19F)           AY_registers		#0 
-     121.  1C:A400  (1C:C19F)           AY_regToneA 		#2	; Tone A freq low (8bit)
-     122.  1C:A400                      					; Tone A freq high (4bit)
-     123.  1C:A400  (1C:C1A1)           AY_regToneB 		#2	; Tone B freq low
-     124.  1C:A400                      					; Tone B freq high
-     125.  1C:A400  (1C:C1A3)           AY_regToneC 		#2	; Tone C freq low
-     126.  1C:A400                      					; Tone C freq high
-     127.  1C:A400  (1C:C1A5)           AY_regNOISE 		#1	; Noise freq (5bit)
-     128.  1C:A400  (1C:C1A6)           AY_regMIXER 		#1	;0x38	;x3f	; Mixer control (1 = off, 0 = on)
-     129.  1C:A400  (1C:C1A7)           AY_regVOLA 			#1	; Chan A volume
-     130.  1C:A400  (1C:C1A8)           AY_regVOLB 			#1	; Chan B volume
-     131.  1C:A400  (1C:C1A9)           AY_regVOLC  		#1	; Chan C volume
-     132.  1C:A400  (1C:C1AA)           AY_regEnvL 			#1	; Volume Env Freq low (8bit)	
-     133.  1C:A400  (1C:C1AB)           AY_regEnvH 			#1	; Volume Env Freq high (4bit)
-     134.  1C:A400  (1C:C1AC)           AY_regEnvShape 		#1	; Volume Env Shape (4bit)
-     135.  1C:A400                      
-     136.  1C:A400                      ;--- SCC SPECIFIC
-     137.  1C:A400                      
-     138.  1C:A400  (1C:C1AD)           _0x9800:	#32			; Waveform data
-     139.  1C:A400  (1C:C1CD)           _0x9820:	#32
-     140.  1C:A400  (1C:C1ED)           _0x9840:	#32
-     141.  1C:A400  (1C:C20D)           _0x9860:	#32
-     142.  1C:A400  (1C:C22D)           SCC_registers 		#0
-     143.  1C:A400  (1C:C22D)           SCC_regToneA 		#2	; Tone A freq low (8bit)
-     144.  1C:A400                      					; Tone A freq high (4bit)
-     145.  1C:A400  (1C:C22F)           SCC_regToneB 		#2	; Tone B freq low
-     146.  1C:A400                      					; Tone B freq high
-     147.  1C:A400  (1C:C231)           SCC_regToneC 		#2	; Tone C freq low
-     148.  1C:A400                      					; Tone C freq high
-     149.  1C:A400  (1C:C233)           SCC_regToneD 		#2	; Tone D freq low
-     150.  1C:A400                      					; Tone D freq high
-     151.  1C:A400  (1C:C235)           SCC_regToneE 		#2	; Tone E freq low
-     152.  1C:A400                      					; Tone E freq high
-     153.  1C:A400  (1C:C237)           SCC_regVOLA 		#1	; Chan A volume
-     154.  1C:A400  (1C:C238)           SCC_regVOLB 		#1	; Chan B volume
-     155.  1C:A400  (1C:C239)           SCC_regVOLC  		#1	; Chan C volume
-     156.  1C:A400  (1C:C23A)           SCC_regVOLD 		#1	; Chan D volume
-     157.  1C:A400  (1C:C23B)           SCC_regVOLE  		#1	; Chan E volume
-     158.  1C:A400  (1C:C23C)           SCC_regMIXER 		#1	; x3f	; Mixer control (1 = off, 0 = on)
-     159.  1C:A400                      
-     160.  1C:A400                      
-     161.  1C:A400                      ;/// see to remove this.
-     162.  1C:A400                      ;-- SCC registers
-     163.  1C:A400  (1C:C23D)           oldregs:	#(32*4)+(3*5)+1		; a way to int the SCC
-     164.  1C:A400                      
-     165.  1C:A400                      
-     444   1C:A400                      
-     445   1C:A400  (1C:C2CD)           _levelmap:			#mapWidth*mapHeight
-     446   1C:A400                      
-     447   1C:A400  (1C:CDCD)           slotvar				#1
-     448   1C:A400  (1C:CDCE)           slotram				#1
-     449   1C:A400  (1C:CDCF)           SEL_NTSC			#1
-     450   1C:A400                      
-     451   1C:A400  (1C:CDD0)           joystick			#1
-     452   1C:A400                      
-     453   1C:A400  (1C:CDD1)           _mcx				#2	; relative with in the frame on the screen
-     454   1C:A400  (1C:CDD3)           _mcy				#2
-     455   1C:A400                      
-     456   1C:A400  (1C:CDD5)           _mclx				#2	; absolute with the level in ram
-     457   1C:A400  (1C:CDD7)           _mcly				#2
-     458   1C:A400                      
-     459   1C:A400  (1C:CDD9)           _mcframe			#1
-     460   1C:A400  (1C:CDDA)           _mcstate			#1
-     461   1C:A400                      
-     462   1C:A400  (1C:CDDB)           _mcdx				#2
-     463   1C:A400  (1C:CDDD)           _mcdy				#2
-     464   1C:A400                      
-     465   1C:A400  (1C:CDDF)           _mcprobe:			#1
-     466   1C:A400  (1C:CDE0)           _mcprobeb:			#1
-     467   1C:A400                      
-     468   1C:A400  (1C:CDE1)           _ticxframe			#1
-     469   1C:A400                      
-     470   1C:A400  (1C:CDE2)           _buffer:			#16
-     471   1C:A400  (1C:CDF2)           _fps:				#2
-     472   1C:A400  (1C:CDF4)           _nframes:			#2
-     473   1C:A400  (1C:CDF6)           _vbit16:			#2
-     474   1C:A400                      
-     475   1C:A400  (1C:CDF8)           _ymappos:			#1
-     476   1C:A400  (1C:CDF9)           _xmappos:			#2
-     477   1C:A400  (1C:CDFB)           _levelmap_pos:		#2
-     478   1C:A400                      
-     479   1C:A400  (1C:CDFD)           _shadowbuff:		#2
-     480   1C:A400  (1C:CDFF)           _currentpage:		#1
-     481   1C:A400                      
-     482   1C:A400  (1C:CE00)           _displaypage:		#1
-     483   1C:A400                      
-     484   1C:A400  (1C:CE01)           _mccolorchange:		#1
-     485   1C:A400  (1C:CE02)           _xoffset:			#1
-     486   1C:A400  (1C:CE03)           _yoffset:			#1
-     487   1C:A400                      
-     488   1C:A400  (1C:CE04)           randSeed:			#2
-     489   1C:A400  (1C:CE06)           cur_level:			#1
-     490   1C:A400  (1C:CE07)           wave_count:			#1
-     491   1C:A400  (1C:CE08)           landing_permission:	#1
-     492   1C:A400  (1C:CE09)           assault_wave_timer:	#2
-     493   1C:A400  (1C:CE0B)           bullet_rate:		#1
-     494   1C:A400  (1C:CE0C)           _dxchng:			#1		; <>0 if direction changes
-     495   1C:A400  (1C:CE0D)           _dxmap:				#1		; previous dxmap
-     496   1C:A400  (1C:CE0E)           dxmap:				#1
-     497   1C:A400  (1C:CE0F)           xmap:				#2
-     498   1C:A400  (1C:CE11)           _xmapx4:			#2		; xmap x 4
-     499   1C:A400  (1C:CE13)           yship:				#1
-     500   1C:A400  (1C:CE14)           xship:				#2
-     501   1C:A400  (1C:CE16)           aniframe:			#1
-     502   1C:A400  (1C:CE17)           ms_state:			#1
-     503   1C:A400  (1C:CE18)           old_aniframe:		#1
-     504   1C:A400  (1C:CE19)           anispeed:			#1
-     505   1C:A400  (1C:CE1A)           already_dead:		#1
-     506   1C:A400  (1C:CE1B)           lives_bin:			#1
-     507   1C:A400                      
-     508   1C:A400  (1C:CE1C)           god_mode:			#1
-     509   1C:A400  (1C:CE1D)           visible_sprts:		#1
-     510   1C:A400  (1C:CE1E)           flip_flop:			#1
-     511   1C:A400                      
-     512   1C:A400  (1C:CE1F)           ram_sat:			#3*4
-     513   1C:A400                      
-     514   1C:A400                      	struct enemy_data
-     515   1C:A400                    < y				db	0
-     516   1C:A400                    < x				dw	0
-     517   1C:A400                    < xoff			db	0
-     518   1C:A400                    < yoff			db	0
-     519   1C:A400                    < xsize			db	0
-     520   1C:A400                    < ysize			db	0
-     521   1C:A400                    < status			db	0	; B7 = DWN/UP | B6 = RIGHT/LEFT | B5 = ok/wrong clr | B0 = Inactive/Active
-     522   1C:A400                    < cntr			db	0
-     523   1C:A400                    < kind			db	0
-     524   1C:A400                    < frame			db	0
-     525   1C:A400                    < color			db	0
-     526   1C:A400                    < color2			db	0
-     527   1C:A400                    < speed			dw	0
-     528   1C:A400                    < 	ends
-     529   1C:A400                      	
-     530   1C:A400  (1C:CE2B)           any_object:			#0
-     531   1C:A400  (1C:CE2B)           ms_bullets:			#enemy_data*max_bullets
-     532   1C:A400  (1C:CE49)           enem_bullets:		#enemy_data*max_enem_bullets
-     533   1C:A400  (1C:CE76)           enemies:			#enemy_data*max_enem
-     534   1C:A400  (1C:CF2A)           endram:				#1
-     535   1C:A400  (0000)              	ENDMAP
+     354   0E:0EF8                      end_demo_song:	
+     355   0E:0EF8                      
+     356   0E:0EF8  (0F)                		page 15
+     357   0F:A000                      _level:
+     358   0F:A000  (0B00)              		incbin "datamap.bin"
+     359   0F:AB00                      	
+     360   0F:AB00  (10)                		page 16
+     361   10:A000                      _opening:
+     362   10:A000  (2000)              		incbin "opening.bin",0x0000,0x2000
+     363   10:C000  (11)                		page 17
+     364   11:A000  (2000)              		incbin "opening.bin",0x2000,0x2000
+     365   11:C000  (12)                		page 18
+     366   12:A000  (2000)              		incbin "opening.bin",0x4000,0x2000
+     367   12:C000  (13)                		page 19
+     368   13:A000  (2000)              		incbin "opening.bin",0x6000,0x2000
+     369   13:C000  (14)                		page 20
+     370   14:A000  (2000)              		incbin "opening.bin",0x8000,0x2000
+     371   14:C000  (15)                		page 21
+     372   15:A000  (2000)              		incbin "opening.bin",0xA000,0x2000
+     373   15:C000  (16)                		page 22
+     374   16:A000  (1400)              		incbin "opening.bin",0xC000;,0x2000
+     375   16:B400  (17)                		page 23
+     376   17:A000                      		; incbin "opening.bin",0xE000;,,0x2000
+     377   17:A000                      	
+     378   17:A000  (18)                		page 24
+     379   18:A000                      _scorebar:	
+     380   18:A000  (1800)              		incbin scorebar.bin
+     381   18:B800                      	
+     382   18:B800  (19)                		page 25
+     383   19:A000                      _animated:	
+     384   19:A000  (2000)              		incbin animated.bin,0x0000,0x2000
+     385   19:C000  (1A)                		page 26
+     386   1A:A000  (2000)              		incbin animated.bin,0x2000,0x2000
+     387   1A:C000                      
+     388   1A:C000  (1B)                		page 27
+     389   1B:A000                      sprtdata:
+     390   1B:A000  (0800)              		incbin 	uridium_revA.bin
+     391   1B:A800                      
+     392   1B:A800  (1C)                		page 28
+     393   1C:A000                      color_base:
+     394   1C:A000                      		repeat 4
+     395   1C:A000                    < 		ds	16,8
+     396   1C:A000                    < 		ds	16,10+64
+     397   1C:A000  08 (16)           < 		endrepeat
+     398   1C:A080                      		repeat 4
+     399   1C:A080                    < 		ds	16,8
+     400   1C:A080                    < 		ds	16,10+64
+     401   1C:A080  08 (16)           < 		endrepeat
+     402   1C:A100                      
+     403   1C:A100                      		repeat 4
+     404   1C:A100                    < 		ds	16,12
+     405   1C:A100                    < 		ds	16,6+64
+     406   1C:A100  0C (16)           < 		endrepeat
+     407   1C:A180                      		repeat 4
+     408   1C:A180                    < 		ds	16,10
+     409   1C:A180                    < 		ds	16,1+64
+     410   1C:A180  0A (16)           < 		endrepeat
+     411   1C:A200                      		repeat 4
+     412   1C:A200                    < 		ds	16,4
+     413   1C:A200                    < 		ds	16,9+64
+     414   1C:A200  04 (16)           < 		endrepeat
+     415   1C:A280                      		repeat 4
+     416   1C:A280                    < 		ds	16,12
+     417   1C:A280                    < 		ds	16,1+64
+     418   1C:A280  0C (16)           < 		endrepeat
+     419   1C:A300                      		repeat 4
+     420   1C:A300                    < 		ds	16,12
+     421   1C:A300                    < 		ds	16,5+64
+     422   1C:A300  0C (16)           < 		endrepeat
+     423   1C:A380                      		repeat 4
+     424   1C:A380                    < 		ds	16,10
+     425   1C:A380                    < 		ds	16,3+64
+     426   1C:A380  0A (16)           < 		endrepeat
+     427   1C:A400                      		
+     428   1C:A400  (0D)                		page 13
+     429   0D:6000                      manta_color:
+     430   0D:6000  (0720)              		incbin mship02_clr.bin
+     431   0D:6720                      FINISH:
+     432   0D:6720                      
+     433   0D:6720                      
+     434   0D:6720                      ;---------------------------------------------------------
+     435   0D:6720                      ; Variables
+     436   0D:6720                      ;---------------------------------------------------------
+     437   0D:6720  (0040)              	MAP 0x0040
+     438   0D:6720  (0D:0040)           musbuff:		#15*1024
+     439   0D:6720  (0000)              	ENDMAP
+     440   0D:6720                      	
+     441   0D:6720  (C000)              	MAP 0xC000
+     442   0D:6720  (0D:C000)           ttreplayRAM:		#0
+     443   0D:6720                      	include	"..\TTplayer\code\ttreplayRAM.asm"
+       1.  0D:6720                      ;================================
+       2.  0D:6720                      ; The new replayer.
+       3.  0D:6720                      ;
+       4.  0D:6720                      ; Persistent RAM unswappable
+       5.  0D:6720                      ;
+       6.  0D:6720                      ;================================
+       7.  0D:6720                      
+       8.  0D:6720  (0D:FFFFFFEF)       TRACK_Instrument		equ 0-17
+       9.  0D:6720  (0D:FFFFFFF0)       TRACK_Command		equ 1-17
+      10.  0D:6720  (0D:FFFFFFF1)       TRACK_MacroPointer	equ 2-17
+      11.  0D:6720  (0D:FFFFFFF3)       TRACK_MacroStart		equ 4-17
+      12.  0D:6720  (0D:FFFFFFF5)       TRACK_MacroRestart 	equ 6-17		; no longer needed
+      13.  0D:6720  (0D:FFFFFFF6)       TRACK_Note			equ 7-17
+      14.  0D:6720  (0D:FFFFFFF7)       TRACK_Volume		equ 8-17
+      15.  0D:6720  (0D:FFFFFFF8)       TRACK_Waveform		equ 9-17
+      16.  0D:6720  (0D:FFFFFFF9)       TRACK_Flags			equ 10-17
+      17.  0D:6720                      	; 0 = note trigger
+      18.  0D:6720                      	; 1 = note active
+      19.  0D:6720                      	; 4 = morph active		;-< for SCC when 1 then waveform is following morph buffer
+      20.  0D:6720                      	; 3 = command trigger
+      21.  0D:6720                      	; 2 = envelope trigger
+      22.  0D:6720                      	; 5 = instrument trigger
+      23.  0D:6720                      	; 6 = waveform trigger
+      24.  0D:6720                      	; 7 = PSG/SCC
+      25.  0D:6720  (0D:FFFFFFFA)       TRACK_empty			equ 11-17		; needed for pushing 0 at note start
+      26.  0D:6720  (0D:FFFFFFFB)       TRACK_ToneAdd		equ 12-17		; reset after note set
+      27.  0D:6720  (0D:FFFFFFFD)       TRACK_VolumeAdd		equ 14-17		; reset after note set
+      28.  0D:6720  (0D:FFFFFFFE)       TRACK_Noise			equ 15-17		; reset after note set
+      29.  0D:6720  (0D:FFFFFFFF)       TRACK_cmd_VolumeAdd	equ 16-17		; reset after note set
+      30.  0D:6720  (0D:0000)           TRACK_cmd_ToneSlideAdd	equ 17-17		; reset after note set
+      31.  0D:6720  (0D:0002)           TRACK_cmd_ToneAdd		equ 19-17		; reset after note set
+      32.  0D:6720                      
+      33.  0D:6720  (0D:0004)           TRACK_cmd_detune		equ 21-17
+      34.  0D:6720  (0D:0005)           TRACK_cmd_0			equ 22-17
+      35.  0D:6720  (0D:0006)           TRACK_cmd_1			equ 23-17
+      36.  0D:6720  (0D:0007)           TRACK_cmd_2			equ 24-17
+      37.  0D:6720  (0D:0008)           TRACK_cmd_3			equ 25-17
+      38.  0D:6720  (0D:0009)           TRACK_cmd_4_depth		equ 26-17
+      39.  0D:6720  (0D:000A)           TRACK_cmd_4_step		equ 27-17
+      40.  0D:6720  (0D:000B)           TRACK_cmd_NoteAdd		equ 28-17		;x reset after note set
+      41.  0D:6720  (0D:000C)           TRACK_cmd_A			equ 29-17		
+      42.  0D:6720  (0D:000D)           TRACK_cmd_B			equ 30-17		
+      43.  0D:6720  (0D:000E)           TRACK_cmd_E			equ 31-17
+      44.  0D:6720  (0D:000F)           TRACK_Timer			equ 32-17		; used for timing by all cmd's
+      45.  0D:6720  (0D:0010)           TRACK_Step			equ 33-17		; only for VIBRATO???
+      46.  0D:6720  (0D:0011)           TRACK_Delay			equ 34-17		; rows to wait till next data
+      47.  0D:6720  (0D:0012)           TRACK_Retrig		equ 35-17		; rows to retrigger command
+      48.  0D:6720  (0D:0013)           TRACK_prevDelay		equ 36-17
+      49.  0D:6720  (0D:0014)           TRACK_cmd_A_add		equ 37-17	;<< Still in use???
+      50.  0D:6720                      
+      51.  0D:6720  (0D:0026)           TRACK_REC_SIZE		equ 38
+      52.  0D:6720                      
+      53.  0D:6720                      
+      54.  0D:6720  (0D:0000)           B_TRGNOT			equ 0			; note trigger
+      55.  0D:6720  (0D:0001)           B_ACTNOT			equ 1			; note active
+      56.  0D:6720  (0D:0002)           B_TRGENV			equ 2			; envelope trigger
+      57.  0D:6720  (0D:0003)           B_TRGCMD			equ 3			; command active
+      58.  0D:6720  (0D:0004)           B_ACTMOR			equ 4			; morph active
+      59.  0D:6720  (0D:0005)           B_TRGINS			equ 5			; instrument trigger
+      60.  0D:6720  (0D:0006)           B_TRGWAV			equ 6			; waveform trigger
+      61.  0D:6720  (0D:0007)           B_PSGSCC			equ 7			; chip type (PSG or SCC)
+      62.  0D:6720                      
+      63.  0D:6720                      
+      64.  0D:6720  (0D:C000)           _SP_Storage			#1			; to store the SP
+      65.  0D:6720                      
+      66.  0D:6720  (0D:C001)           replay_trigger		#1			; trigger byte.
+      67.  0D:6720  (0D:C002)           replay_mainPSGvol		#2			; volume mixer for PSG SCC balance
+      68.  0D:6720  (0D:C004)           replay_mainSCCvol		#2			; volume mixer for PSG SCC balance
+      69.  0D:6720                      ;replay_songbase:		#2			; pointer to song data
+      70.  0D:6720  (0D:C006)           replay_wavebase:		#2			; pointer to waveform data
+      71.  0D:6720  (0D:C008)           replay_insbase:		#2			; pointer to instrument data
+      72.  0D:6720  (0D:C00A)           replay_orderpointer:	#2			; pointer to the order track list pointers
+      73.  0D:6720                      
+      74.  0D:6720  (0D:C00C)           replay_speed 		#1			; speed to replay (get from song)
+      75.  0D:6720  (0D:C00D)           replay_speed_subtimer 	#1			; counter for finer speed
+      76.  0D:6720  (0D:C00E)           replay_speed_timer 	#1 			; counter for speed
+      77.  0D:6720  (0D:C00F)           replay_mode 		#1			; Replayer status
+      78.  0D:6720                      ; mode 0  = no sound output
+      79.  0D:6720                      ; mode 1  = replay song 
+      80.  0D:6720  (0D:C010)           replay_fade			#1			; Fade active (value = fade speed)
+      81.  0D:6720  (0D:C011)           replay_fade_timer		#1			; Timer for fade
+      82.  0D:6720  (0D:C012)           replay_fade_vol		#1			; fade volume to lower the channel volume.
+      83.  0D:6720                      
+      84.  0D:6720                      
+      85.  0D:6720  (0D:C013)           replay_previous_note	#1			; previous note played
+      86.  0D:6720  (0D:C014)           replay_mainvol		#2			; the volume correction.
+      87.  0D:6720                      
+      88.  0D:6720  (0D:C016)           replay_vib_table		#2			; pointer to the vibrato table
+      89.  0D:6720  (0D:C018)           replay_Tonetable		#2			; ToneTable (affected by transpose);
+      90.  0D:6720                      
+      91.  0D:6720  (0D:C01A)           replay_morph_active	#1			; flag to indicate morphing is active
+      92.  0D:6720                      ;replay_morph_update	#1			; flag to indicate a new waveform is ready
+      93.  0D:6720  (0D:C01B)           replay_morph_timer	#1			; step timer between morphs
+      94.  0D:6720  (0D:C01C)           replay_morph_speed	#1 
+      95.  0D:6720  (0D:C01D)           replay_morph_counter	#1			; counter till end morph
+      96.  0D:6720  (0D:C01E)           replay_morph_buffer	#64			; interleaved buffer with morphed waveform and morph delta values
+      97.  0D:6720  (0D:C05E)           replay_morph_waveform	#1 			; waveform we are morphing to.
+      98.  0D:6720                      
+      99.  0D:6720                      
+     100.  0D:6720  (0D:C05F)           TRACK_Chan1			#TRACK_REC_SIZE
+     101.  0D:6720  (0D:C085)           TRACK_Chan2			#TRACK_REC_SIZE
+     102.  0D:6720  (0D:C0AB)           TRACK_Chan3			#TRACK_REC_SIZE
+     103.  0D:6720  (0D:C0D1)           TRACK_Chan4			#TRACK_REC_SIZE
+     104.  0D:6720  (0D:C0F7)           TRACK_Chan5			#TRACK_REC_SIZE
+     105.  0D:6720  (0D:C11D)           TRACK_Chan6			#TRACK_REC_SIZE
+     106.  0D:6720  (0D:C143)           TRACK_Chan7			#TRACK_REC_SIZE
+     107.  0D:6720  (0D:C169)           TRACK_Chan8			#TRACK_REC_SIZE
+     108.  0D:6720                      
+     109.  0D:6720  (0D:C18F)           TRACK_pointer1		#2
+     110.  0D:6720  (0D:C191)           TRACK_pointer2		#2
+     111.  0D:6720  (0D:C193)           TRACK_pointer3		#2
+     112.  0D:6720  (0D:C195)           TRACK_pointer4		#2
+     113.  0D:6720  (0D:C197)           TRACK_pointer5		#2
+     114.  0D:6720  (0D:C199)           TRACK_pointer6		#2
+     115.  0D:6720  (0D:C19B)           TRACK_pointer7		#2
+     116.  0D:6720  (0D:C19D)           TRACK_pointer8		#2
+     117.  0D:6720                      
+     118.  0D:6720                      
+     119.  0D:6720                      ;--- AY SPECIFIC
+     120.  0D:6720  (0D:C19F)           AY_registers		#0 
+     121.  0D:6720  (0D:C19F)           AY_regToneA 		#2	; Tone A freq low (8bit)
+     122.  0D:6720                      					; Tone A freq high (4bit)
+     123.  0D:6720  (0D:C1A1)           AY_regToneB 		#2	; Tone B freq low
+     124.  0D:6720                      					; Tone B freq high
+     125.  0D:6720  (0D:C1A3)           AY_regToneC 		#2	; Tone C freq low
+     126.  0D:6720                      					; Tone C freq high
+     127.  0D:6720  (0D:C1A5)           AY_regNOISE 		#1	; Noise freq (5bit)
+     128.  0D:6720  (0D:C1A6)           AY_regMIXER 		#1	;0x38	;x3f	; Mixer control (1 = off, 0 = on)
+     129.  0D:6720  (0D:C1A7)           AY_regVOLA 			#1	; Chan A volume
+     130.  0D:6720  (0D:C1A8)           AY_regVOLB 			#1	; Chan B volume
+     131.  0D:6720  (0D:C1A9)           AY_regVOLC  		#1	; Chan C volume
+     132.  0D:6720  (0D:C1AA)           AY_regEnvL 			#1	; Volume Env Freq low (8bit)	
+     133.  0D:6720  (0D:C1AB)           AY_regEnvH 			#1	; Volume Env Freq high (4bit)
+     134.  0D:6720  (0D:C1AC)           AY_regEnvShape 		#1	; Volume Env Shape (4bit)
+     135.  0D:6720                      
+     136.  0D:6720                      ;--- SCC SPECIFIC
+     137.  0D:6720                      
+     138.  0D:6720  (0D:C1AD)           _0x9800:	#32			; Waveform data
+     139.  0D:6720  (0D:C1CD)           _0x9820:	#32
+     140.  0D:6720  (0D:C1ED)           _0x9840:	#32
+     141.  0D:6720  (0D:C20D)           _0x9860:	#32
+     142.  0D:6720  (0D:C22D)           SCC_registers 		#0
+     143.  0D:6720  (0D:C22D)           SCC_regToneA 		#2	; Tone A freq low (8bit)
+     144.  0D:6720                      					; Tone A freq high (4bit)
+     145.  0D:6720  (0D:C22F)           SCC_regToneB 		#2	; Tone B freq low
+     146.  0D:6720                      					; Tone B freq high
+     147.  0D:6720  (0D:C231)           SCC_regToneC 		#2	; Tone C freq low
+     148.  0D:6720                      					; Tone C freq high
+     149.  0D:6720  (0D:C233)           SCC_regToneD 		#2	; Tone D freq low
+     150.  0D:6720                      					; Tone D freq high
+     151.  0D:6720  (0D:C235)           SCC_regToneE 		#2	; Tone E freq low
+     152.  0D:6720                      					; Tone E freq high
+     153.  0D:6720  (0D:C237)           SCC_regVOLA 		#1	; Chan A volume
+     154.  0D:6720  (0D:C238)           SCC_regVOLB 		#1	; Chan B volume
+     155.  0D:6720  (0D:C239)           SCC_regVOLC  		#1	; Chan C volume
+     156.  0D:6720  (0D:C23A)           SCC_regVOLD 		#1	; Chan D volume
+     157.  0D:6720  (0D:C23B)           SCC_regVOLE  		#1	; Chan E volume
+     158.  0D:6720  (0D:C23C)           SCC_regMIXER 		#1	; x3f	; Mixer control (1 = off, 0 = on)
+     159.  0D:6720                      
+     160.  0D:6720                      
+     161.  0D:6720                      ;/// see to remove this.
+     162.  0D:6720                      ;-- SCC registers
+     163.  0D:6720  (0D:C23D)           oldregs:	#(32*4)+(3*5)+1		; a way to int the SCC
+     164.  0D:6720                      
+     165.  0D:6720                      
+     444   0D:6720                      
+     445   0D:6720  (0D:C2CD)           _levelmap:			#mapWidth*mapHeight
+     446   0D:6720                      
+     447   0D:6720  (0D:CDCD)           slotvar				#1
+     448   0D:6720  (0D:CDCE)           slotram				#1
+     449   0D:6720  (0D:CDCF)           SEL_NTSC			#1
+     450   0D:6720                      
+     451   0D:6720  (0D:CDD0)           joystick			#1
+     452   0D:6720                      
+     453   0D:6720  (0D:CDD1)           _mcx				#2	; relative with in the frame on the screen
+     454   0D:6720  (0D:CDD3)           _mcy				#2
+     455   0D:6720                      
+     456   0D:6720  (0D:CDD5)           _mclx				#2	; absolute with the level in ram
+     457   0D:6720  (0D:CDD7)           _mcly				#2
+     458   0D:6720                      
+     459   0D:6720  (0D:CDD9)           _mcframe			#1
+     460   0D:6720  (0D:CDDA)           _mcstate			#1
+     461   0D:6720                      
+     462   0D:6720  (0D:CDDB)           _mcdx				#2
+     463   0D:6720  (0D:CDDD)           _mcdy				#2
+     464   0D:6720                      
+     465   0D:6720  (0D:CDDF)           _mcprobe:			#1
+     466   0D:6720  (0D:CDE0)           _mcprobeb:			#1
+     467   0D:6720                      
+     468   0D:6720  (0D:CDE1)           _ticxframe			#1
+     469   0D:6720                      
+     470   0D:6720  (0D:CDE2)           _buffer:			#16
+     471   0D:6720  (0D:CDF2)           _fps:				#2
+     472   0D:6720  (0D:CDF4)           _nframes:			#2
+     473   0D:6720  (0D:CDF6)           _vbit16:			#2
+     474   0D:6720                      
+     475   0D:6720  (0D:CDF8)           _ymappos:			#1
+     476   0D:6720  (0D:CDF9)           _xmappos:			#2
+     477   0D:6720  (0D:CDFB)           _levelmap_pos:		#2
+     478   0D:6720                      
+     479   0D:6720  (0D:CDFD)           _shadowbuff:		#2
+     480   0D:6720  (0D:CDFF)           _currentpage:		#1
+     481   0D:6720                      
+     482   0D:6720  (0D:CE00)           _displaypage:		#1
+     483   0D:6720                      
+     484   0D:6720  (0D:CE01)           _mccolorchange:		#1
+     485   0D:6720  (0D:CE02)           _xoffset:			#1
+     486   0D:6720  (0D:CE03)           _yoffset:			#1
+     487   0D:6720                      
+     488   0D:6720  (0D:CE04)           randSeed:			#2
+     489   0D:6720  (0D:CE06)           cur_level:			#1
+     490   0D:6720  (0D:CE07)           wave_count:			#1
+     491   0D:6720  (0D:CE08)           landing_permission:	#1
+     492   0D:6720  (0D:CE09)           assault_wave_timer:	#2
+     493   0D:6720  (0D:CE0B)           bullet_rate:		#1
+     494   0D:6720  (0D:CE0C)           _dxchng:			#1		; <>0 if direction changes
+     495   0D:6720  (0D:CE0D)           _dxmap:				#1		; previous dxmap
+     496   0D:6720  (0D:CE0E)           dxmap:				#1
+     497   0D:6720  (0D:CE0F)           xmap:				#2
+     498   0D:6720  (0D:CE11)           _xmapx4:			#2		; xmap x 4
+     499   0D:6720  (0D:CE13)           yship:				#1
+     500   0D:6720  (0D:CE14)           xship:				#2
+     501   0D:6720  (0D:CE16)           aniframe:			#1
+     502   0D:6720  (0D:CE17)           ms_state:			#1
+     503   0D:6720  (0D:CE18)           old_aniframe:		#1
+     504   0D:6720  (0D:CE19)           anispeed:			#1
+     505   0D:6720  (0D:CE1A)           already_dead:		#1
+     506   0D:6720  (0D:CE1B)           lives_bin:			#1
+     507   0D:6720                      
+     508   0D:6720  (0D:CE1C)           god_mode:			#1
+     509   0D:6720  (0D:CE1D)           visible_sprts:		#1
+     510   0D:6720  (0D:CE1E)           flip_flop:			#1
+     511   0D:6720                      
+     512   0D:6720  (0D:CE1F)           ram_sat:			#3*4
+     513   0D:6720                      
+     514   0D:6720                      	struct enemy_data
+     515   0D:6720                    < y				db	0
+     516   0D:6720                    < x				dw	0
+     517   0D:6720                    < xoff			db	0
+     518   0D:6720                    < yoff			db	0
+     519   0D:6720                    < xsize			db	0
+     520   0D:6720                    < ysize			db	0
+     521   0D:6720                    < status			db	0	; B7 = DWN/UP | B6 = RIGHT/LEFT | B5 = ok/wrong clr | B0 = Inactive/Active
+     522   0D:6720                    < cntr			db	0
+     523   0D:6720                    < kind			db	0
+     524   0D:6720                    < frame			db	0
+     525   0D:6720                    < color			db	0
+     526   0D:6720                    < color2			db	0
+     527   0D:6720                    < speed			dw	0
+     528   0D:6720                    < 	ends
+     529   0D:6720                      	
+     530   0D:6720  (0D:CE2B)           any_object:			#0
+     531   0D:6720  (0D:CE2B)           ms_bullets:			#enemy_data*max_bullets
+     532   0D:6720  (0D:CE49)           enem_bullets:		#enemy_data*max_enem_bullets
+     533   0D:6720  (0D:CE76)           enemies:			#enemy_data*max_enem
+     534   0D:6720  (0D:CF2A)           endram:				#1
+     535   0D:6720  (0000)              	ENDMAP
 
     LABELS
 -------------------------------------------------
@@ -11287,18 +11307,21 @@ Errors: 0
 00:00004495   checkkbd
 00:000044A2   _hw_sprite_init
 00:000044BE   load_colors
-00:000044E0   set_manta
-00:000044E9   plot_enemy
-00:000044F4 X directplot_enemy
-00:00004543   directplot_enemy.next1
-00:0000458C   directplot_enemy.next2
-00:00004598   directplot_enemy.spriteoff1
-00:000045A5   directplot_enemy.spriteoff2
-00:000045BA   reverseplot_enemy
-00:00004611   reverseplot_enemy.next2
-00:0000464F   reverseplot_enemy.next1
-00:0000465E   reverseplot_enemy.spriteoff1
-00:0000466B   reverseplot_enemy.spriteoff2
+00:000044E1   ship_color
+00:000044E9   bull_color
+00:000044F2   enem_color
+00:000044FF   set_manta
+00:00004508   plot_enemy
+00:00004513 X directplot_enemy
+00:00004562   directplot_enemy.next1
+00:000045AB   directplot_enemy.next2
+00:000045B7   directplot_enemy.spriteoff1
+00:000045C4   directplot_enemy.spriteoff2
+00:000045D9   reverseplot_enemy
+00:00004630   reverseplot_enemy.next2
+00:0000466E   reverseplot_enemy.next1
+00:0000467D   reverseplot_enemy.spriteoff1
+00:0000468A   reverseplot_enemy.spriteoff2
 00:00004700   sprite_collision_windows
 00:0000470C X sprite_0
 00:0000470C X sprite_1
@@ -11489,11 +11512,11 @@ Errors: 0
 00:00005912   out48
 00:00005932   out32
 00:00005973   set_manta_color
-00:000059C3   color_enemy
-00:000059CE X directcolor_enemy
-00:00005A4F   directcolor_enemy.next
-00:00005A5E   reversecolor_enemy
-00:00005AD9   reversecolor_enemy.next
+00:000059A8   color_enemy
+00:000059B3 X directcolor_enemy
+00:00005A34   directcolor_enemy.next
+00:00005A43   reversecolor_enemy
+00:00005ABE   reversecolor_enemy.next
 01:00006000   replay_init
 01:0000600F   replay_pause
 01:00006024   _replay_pause_r
@@ -11761,7 +11784,6 @@ Errors: 0
 02:00008000   probe_level
 02:00008012   test_star
 03:0000A000   ms_spt
-03:0000B560   manta_color
 04:0000A000   _tiles0
 0E:00008000   demo_song
 0E:00000055   demo_song.restart
@@ -11873,172 +11895,173 @@ Errors: 0
 19:0000A000   _animated
 1B:0000A000   sprtdata
 1C:0000A000   color_base
-1C:0000A400 X FINISH
-1C:00000040   musbuff
-1C:0000C000   ttreplayRAM
-1C:FFFFFFEF   TRACK_Instrument
-1C:FFFFFFF0   TRACK_Command
-1C:FFFFFFF1   TRACK_MacroPointer
-1C:FFFFFFF3   TRACK_MacroStart
-1C:FFFFFFF5 X TRACK_MacroRestart
-1C:FFFFFFF6   TRACK_Note
-1C:FFFFFFF7   TRACK_Volume
-1C:FFFFFFF8   TRACK_Waveform
-1C:FFFFFFF9   TRACK_Flags
-1C:FFFFFFFA X TRACK_empty
-1C:FFFFFFFB   TRACK_ToneAdd
-1C:FFFFFFFD   TRACK_VolumeAdd
-1C:FFFFFFFE   TRACK_Noise
-1C:FFFFFFFF   TRACK_cmd_VolumeAdd
-1C:00000000   TRACK_cmd_ToneSlideAdd
-1C:00000002   TRACK_cmd_ToneAdd
-1C:00000004   TRACK_cmd_detune
-1C:00000005   TRACK_cmd_0
-1C:00000006   TRACK_cmd_1
-1C:00000007   TRACK_cmd_2
-1C:00000008   TRACK_cmd_3
-1C:00000009   TRACK_cmd_4_depth
-1C:0000000A   TRACK_cmd_4_step
-1C:0000000B   TRACK_cmd_NoteAdd
-1C:0000000C   TRACK_cmd_A
-1C:0000000D   TRACK_cmd_B
-1C:0000000E   TRACK_cmd_E
-1C:0000000F   TRACK_Timer
-1C:00000010   TRACK_Step
-1C:00000011   TRACK_Delay
-1C:00000012   TRACK_Retrig
-1C:00000013   TRACK_prevDelay
-1C:00000014 X TRACK_cmd_A_add
-1C:00000026   TRACK_REC_SIZE
-1C:00000000   B_TRGNOT
-1C:00000001   B_ACTNOT
-1C:00000002   B_TRGENV
-1C:00000003   B_TRGCMD
-1C:00000004   B_ACTMOR
-1C:00000005 X B_TRGINS
-1C:00000006   B_TRGWAV
-1C:00000007   B_PSGSCC
-1C:0000C000   _SP_Storage
-1C:0000C001   replay_trigger
-1C:0000C002   replay_mainPSGvol
-1C:0000C004   replay_mainSCCvol
-1C:0000C006   replay_wavebase
-1C:0000C008   replay_insbase
-1C:0000C00A   replay_orderpointer
-1C:0000C00C   replay_speed
-1C:0000C00D   replay_speed_subtimer
-1C:0000C00E   replay_speed_timer
-1C:0000C00F   replay_mode
-1C:0000C010   replay_fade
-1C:0000C011   replay_fade_timer
-1C:0000C012   replay_fade_vol
-1C:0000C013   replay_previous_note
-1C:0000C014   replay_mainvol
-1C:0000C016   replay_vib_table
-1C:0000C018   replay_Tonetable
-1C:0000C01A   replay_morph_active
-1C:0000C01B   replay_morph_timer
-1C:0000C01C   replay_morph_speed
-1C:0000C01D   replay_morph_counter
-1C:0000C01E   replay_morph_buffer
-1C:0000C05E   replay_morph_waveform
-1C:0000C05F   TRACK_Chan1
-1C:0000C085   TRACK_Chan2
-1C:0000C0AB   TRACK_Chan3
-1C:0000C0D1   TRACK_Chan4
-1C:0000C0F7   TRACK_Chan5
-1C:0000C11D   TRACK_Chan6
-1C:0000C143   TRACK_Chan7
-1C:0000C169   TRACK_Chan8
-1C:0000C18F   TRACK_pointer1
-1C:0000C191   TRACK_pointer2
-1C:0000C193   TRACK_pointer3
-1C:0000C195   TRACK_pointer4
-1C:0000C197   TRACK_pointer5
-1C:0000C199   TRACK_pointer6
-1C:0000C19B   TRACK_pointer7
-1C:0000C19D   TRACK_pointer8
-1C:0000C19F   AY_registers
-1C:0000C19F   AY_regToneA
-1C:0000C1A1   AY_regToneB
-1C:0000C1A3   AY_regToneC
-1C:0000C1A5   AY_regNOISE
-1C:0000C1A6   AY_regMIXER
-1C:0000C1A7   AY_regVOLA
-1C:0000C1A8   AY_regVOLB
-1C:0000C1A9   AY_regVOLC
-1C:0000C1AA   AY_regEnvL
-1C:0000C1AB   AY_regEnvH
-1C:0000C1AC   AY_regEnvShape
-1C:0000C1AD   _0x9800
-1C:0000C1CD X _0x9820
-1C:0000C1ED X _0x9840
-1C:0000C20D X _0x9860
-1C:0000C22D   SCC_registers
-1C:0000C22D   SCC_regToneA
-1C:0000C22F   SCC_regToneB
-1C:0000C231   SCC_regToneC
-1C:0000C233   SCC_regToneD
-1C:0000C235   SCC_regToneE
-1C:0000C237   SCC_regVOLA
-1C:0000C238   SCC_regVOLB
-1C:0000C239   SCC_regVOLC
-1C:0000C23A   SCC_regVOLD
-1C:0000C23B   SCC_regVOLE
-1C:0000C23C   SCC_regMIXER
-1C:0000C23D   oldregs
-1C:0000C2CD   _levelmap
-1C:0000CDCD   slotvar
-1C:0000CDCE   slotram
-1C:0000CDCF   SEL_NTSC
-1C:0000CDD0   joystick
-1C:0000CDD1 X _mcx
-1C:0000CDD3 X _mcy
-1C:0000CDD5 X _mclx
-1C:0000CDD7 X _mcly
-1C:0000CDD9   _mcframe
-1C:0000CDDA X _mcstate
-1C:0000CDDB   _mcdx
-1C:0000CDDD X _mcdy
-1C:0000CDDF X _mcprobe
-1C:0000CDE0   _mcprobeb
-1C:0000CDE1   _ticxframe
-1C:0000CDE2   _buffer
-1C:0000CDF2   _fps
-1C:0000CDF4   _nframes
-1C:0000CDF6 X _vbit16
-1C:0000CDF8   _ymappos
-1C:0000CDF9   _xmappos
-1C:0000CDFB   _levelmap_pos
-1C:0000CDFD X _shadowbuff
-1C:0000CDFF   _currentpage
-1C:0000CE00   _displaypage
-1C:0000CE01   _mccolorchange
-1C:0000CE02   _xoffset
-1C:0000CE03   _yoffset
-1C:0000CE04   randSeed
-1C:0000CE06   cur_level
-1C:0000CE07   wave_count
-1C:0000CE08   landing_permission
-1C:0000CE09   assault_wave_timer
-1C:0000CE0B   bullet_rate
-1C:0000CE0C   _dxchng
-1C:0000CE0D   _dxmap
-1C:0000CE0E   dxmap
-1C:0000CE0F   xmap
-1C:0000CE11   _xmapx4
-1C:0000CE13   yship
-1C:0000CE14   xship
-1C:0000CE16   aniframe
-1C:0000CE17   ms_state
-1C:0000CE18   old_aniframe
-1C:0000CE19   anispeed
-1C:0000CE1A   already_dead
-1C:0000CE1B   lives_bin
-1C:0000CE1C   god_mode
-1C:0000CE1D X visible_sprts
-1C:0000CE1E   flip_flop
-1C:0000CE1F   ram_sat
+0D:00006000   manta_color
+0D:00006720 X FINISH
+0D:00000040   musbuff
+0D:0000C000   ttreplayRAM
+0D:FFFFFFEF   TRACK_Instrument
+0D:FFFFFFF0   TRACK_Command
+0D:FFFFFFF1   TRACK_MacroPointer
+0D:FFFFFFF3   TRACK_MacroStart
+0D:FFFFFFF5 X TRACK_MacroRestart
+0D:FFFFFFF6   TRACK_Note
+0D:FFFFFFF7   TRACK_Volume
+0D:FFFFFFF8   TRACK_Waveform
+0D:FFFFFFF9   TRACK_Flags
+0D:FFFFFFFA X TRACK_empty
+0D:FFFFFFFB   TRACK_ToneAdd
+0D:FFFFFFFD   TRACK_VolumeAdd
+0D:FFFFFFFE   TRACK_Noise
+0D:FFFFFFFF   TRACK_cmd_VolumeAdd
+0D:00000000   TRACK_cmd_ToneSlideAdd
+0D:00000002   TRACK_cmd_ToneAdd
+0D:00000004   TRACK_cmd_detune
+0D:00000005   TRACK_cmd_0
+0D:00000006   TRACK_cmd_1
+0D:00000007   TRACK_cmd_2
+0D:00000008   TRACK_cmd_3
+0D:00000009   TRACK_cmd_4_depth
+0D:0000000A   TRACK_cmd_4_step
+0D:0000000B   TRACK_cmd_NoteAdd
+0D:0000000C   TRACK_cmd_A
+0D:0000000D   TRACK_cmd_B
+0D:0000000E   TRACK_cmd_E
+0D:0000000F   TRACK_Timer
+0D:00000010   TRACK_Step
+0D:00000011   TRACK_Delay
+0D:00000012   TRACK_Retrig
+0D:00000013   TRACK_prevDelay
+0D:00000014 X TRACK_cmd_A_add
+0D:00000026   TRACK_REC_SIZE
+0D:00000000   B_TRGNOT
+0D:00000001   B_ACTNOT
+0D:00000002   B_TRGENV
+0D:00000003   B_TRGCMD
+0D:00000004   B_ACTMOR
+0D:00000005 X B_TRGINS
+0D:00000006   B_TRGWAV
+0D:00000007   B_PSGSCC
+0D:0000C000   _SP_Storage
+0D:0000C001   replay_trigger
+0D:0000C002   replay_mainPSGvol
+0D:0000C004   replay_mainSCCvol
+0D:0000C006   replay_wavebase
+0D:0000C008   replay_insbase
+0D:0000C00A   replay_orderpointer
+0D:0000C00C   replay_speed
+0D:0000C00D   replay_speed_subtimer
+0D:0000C00E   replay_speed_timer
+0D:0000C00F   replay_mode
+0D:0000C010   replay_fade
+0D:0000C011   replay_fade_timer
+0D:0000C012   replay_fade_vol
+0D:0000C013   replay_previous_note
+0D:0000C014   replay_mainvol
+0D:0000C016   replay_vib_table
+0D:0000C018   replay_Tonetable
+0D:0000C01A   replay_morph_active
+0D:0000C01B   replay_morph_timer
+0D:0000C01C   replay_morph_speed
+0D:0000C01D   replay_morph_counter
+0D:0000C01E   replay_morph_buffer
+0D:0000C05E   replay_morph_waveform
+0D:0000C05F   TRACK_Chan1
+0D:0000C085   TRACK_Chan2
+0D:0000C0AB   TRACK_Chan3
+0D:0000C0D1   TRACK_Chan4
+0D:0000C0F7   TRACK_Chan5
+0D:0000C11D   TRACK_Chan6
+0D:0000C143   TRACK_Chan7
+0D:0000C169   TRACK_Chan8
+0D:0000C18F   TRACK_pointer1
+0D:0000C191   TRACK_pointer2
+0D:0000C193   TRACK_pointer3
+0D:0000C195   TRACK_pointer4
+0D:0000C197   TRACK_pointer5
+0D:0000C199   TRACK_pointer6
+0D:0000C19B   TRACK_pointer7
+0D:0000C19D   TRACK_pointer8
+0D:0000C19F   AY_registers
+0D:0000C19F   AY_regToneA
+0D:0000C1A1   AY_regToneB
+0D:0000C1A3   AY_regToneC
+0D:0000C1A5   AY_regNOISE
+0D:0000C1A6   AY_regMIXER
+0D:0000C1A7   AY_regVOLA
+0D:0000C1A8   AY_regVOLB
+0D:0000C1A9   AY_regVOLC
+0D:0000C1AA   AY_regEnvL
+0D:0000C1AB   AY_regEnvH
+0D:0000C1AC   AY_regEnvShape
+0D:0000C1AD   _0x9800
+0D:0000C1CD X _0x9820
+0D:0000C1ED X _0x9840
+0D:0000C20D X _0x9860
+0D:0000C22D   SCC_registers
+0D:0000C22D   SCC_regToneA
+0D:0000C22F   SCC_regToneB
+0D:0000C231   SCC_regToneC
+0D:0000C233   SCC_regToneD
+0D:0000C235   SCC_regToneE
+0D:0000C237   SCC_regVOLA
+0D:0000C238   SCC_regVOLB
+0D:0000C239   SCC_regVOLC
+0D:0000C23A   SCC_regVOLD
+0D:0000C23B   SCC_regVOLE
+0D:0000C23C   SCC_regMIXER
+0D:0000C23D   oldregs
+0D:0000C2CD   _levelmap
+0D:0000CDCD   slotvar
+0D:0000CDCE   slotram
+0D:0000CDCF   SEL_NTSC
+0D:0000CDD0   joystick
+0D:0000CDD1 X _mcx
+0D:0000CDD3 X _mcy
+0D:0000CDD5 X _mclx
+0D:0000CDD7 X _mcly
+0D:0000CDD9   _mcframe
+0D:0000CDDA X _mcstate
+0D:0000CDDB   _mcdx
+0D:0000CDDD X _mcdy
+0D:0000CDDF X _mcprobe
+0D:0000CDE0   _mcprobeb
+0D:0000CDE1   _ticxframe
+0D:0000CDE2   _buffer
+0D:0000CDF2   _fps
+0D:0000CDF4   _nframes
+0D:0000CDF6 X _vbit16
+0D:0000CDF8   _ymappos
+0D:0000CDF9   _xmappos
+0D:0000CDFB   _levelmap_pos
+0D:0000CDFD X _shadowbuff
+0D:0000CDFF   _currentpage
+0D:0000CE00   _displaypage
+0D:0000CE01   _mccolorchange
+0D:0000CE02   _xoffset
+0D:0000CE03   _yoffset
+0D:0000CE04   randSeed
+0D:0000CE06   cur_level
+0D:0000CE07   wave_count
+0D:0000CE08   landing_permission
+0D:0000CE09   assault_wave_timer
+0D:0000CE0B   bullet_rate
+0D:0000CE0C   _dxchng
+0D:0000CE0D   _dxmap
+0D:0000CE0E   dxmap
+0D:0000CE0F   xmap
+0D:0000CE11   _xmapx4
+0D:0000CE13   yship
+0D:0000CE14   xship
+0D:0000CE16   aniframe
+0D:0000CE17   ms_state
+0D:0000CE18   old_aniframe
+0D:0000CE19   anispeed
+0D:0000CE1A   already_dead
+0D:0000CE1B   lives_bin
+0D:0000CE1C   god_mode
+0D:0000CE1D X visible_sprts
+0D:0000CE1E   flip_flop
+0D:0000CE1F   ram_sat
 00:00000000   enemy_data.y
 00:00000001   enemy_data.x
 00:00000003   enemy_data.xoff
@@ -12053,11 +12076,11 @@ Errors: 0
 00:0000000C   enemy_data.color2
 00:0000000D   enemy_data.speed
 00:0000000F   enemy_data
-1C:0000CE2B   any_object
-1C:0000CE2B   ms_bullets
-1C:0000CE49   enem_bullets
-1C:0000CE76   enemies
-1C:0000CF2A X endram
+0D:0000CE2B   any_object
+0D:0000CE2B   ms_bullets
+0D:0000CE49   enem_bullets
+0D:0000CE76   enemies
+0D:0000CF2A X endram
 
 
  Output: main.out
@@ -12072,11 +12095,11 @@ Errors: 0
 -------------------------------------------------
 
  Page: 00
-  Org: 00004000  Size: 00002000  Used: 00001AED
+  Org: 00004000  Size: 00002000  Used: 00001AD2
 
    Address   Length Align   Label
-   00004000    6893         search_slot
-   00005AED    1299       <empty>
+   00004000    6866         search_slot
+   00005AD2    1326       <empty>
 
  Page: 01
   Org: 00006000  Size: 00002000  Used: 00001203
@@ -12093,11 +12116,11 @@ Errors: 0
    00008063    8093       <empty>
 
  Page: 03
-  Org: 0000A000  Size: 00002000  Used: 00001C80
+  Org: 0000A000  Size: 00002000  Used: 00001560
 
    Address   Length Align   Label
-   0000A000    7296         ms_spt
-   0000BC80     896       <empty>
+   0000A000    5472         ms_spt
+   0000B560    2720       <empty>
 
  Page: 04
   Org: 0000A000  Size: 00002000  Used: 00002000
@@ -12153,9 +12176,11 @@ Errors: 0
    00004000    8192       <empty>
 
  Page: 0D
-  Org: 00006000  Size: 00002000  Used: 00000000
+  Org: 00006000  Size: 00002000  Used: 00000720
 
-   00006000    8192       <empty>
+   Address   Length Align   Label
+   00006000    1824         manta_color
+   00006720    6368       <empty>
 
  Page: 0E
   Org: 00008000  Size: 00002000  Used: 00000EB8

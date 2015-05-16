@@ -43,7 +43,7 @@ set_manta_color
 	ld	a,(_mccolorchange)
 	and	a
 	ret z
-
+	di
 	ld a,e 					; set bits 0-7
 	out (0x99),a
 	ld a,d 					; set bits 8-13 with write access
@@ -53,7 +53,7 @@ set_manta_color
 	ld	(_mccolorchange),a
 	
 	ld	a, :manta_color
-	ld	(_kBank4),a
+	ld	(_kBank2),a
 	
 	ld	bc,(aniframe)
 	ld	b,0
@@ -66,8 +66,8 @@ set_manta_color
 	add	hl,bc
 	ld	c,0x98
 	call	out32
-	xor	a
-[16]	out	(0x98),a
+	ld	a,1
+	ld	(_kBank2),a
 	ret
 		
 
@@ -184,8 +184,10 @@ reversecolor_enemy:
 	ex de,hl
 	
 	djnz	1b
-
+		
+	
 	ld	de,07C00h+16*(2*max_enem+max_bullets + max_enem_bullets)	; FC00h 6 positions for bullets
 
 	jp	set_manta_color
-	
+
+

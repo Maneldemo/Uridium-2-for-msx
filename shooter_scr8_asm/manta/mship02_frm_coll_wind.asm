@@ -1,4 +1,4 @@
-ms_demo_coll_wind:
+mship02_coll_wind:
     defb 1,15,3,12 
     defb 1,15,5,10 
     defb 1,15,4,13 
@@ -6,6 +6,7 @@ ms_demo_coll_wind:
     defb 1,15,5,11 
     defb 1,15,3,13 
     defb 1,15,3,13 
+    defb 1,14,1,14 
     defb 1,15,2,14 
     defb 1,15,1,15 
     defb 1,15,1,15 
@@ -14,6 +15,8 @@ ms_demo_coll_wind:
     defb 1,15,6,11 
     defb 1,15,5,11 
     defb 1,15,1,15 
+    defb 1,14,1,14 
+    defb 1,14,2,15 
     defb 1,15,6,11 
     defb 1,15,2,14 
     defb 1,15,5,10 
@@ -22,6 +25,8 @@ ms_demo_coll_wind:
     defb 1,15,2,14 
     defb 1,15,3,12 
     defb 1,15,3,13 
+    defb 1,14,2,15 
+    defb 1,14,2,15 
     defb 1,15,1,15 
     defb 1,15,3,13 
     defb 1,15,1,15 
@@ -30,15 +35,25 @@ ms_demo_coll_wind:
     defb 1,15,2,14 
     defb 1,15,2,14 
     defb 1,15,6,11 
+    defb 2,13,2,13 
+    defb 2,15,1,13 
+    defb 2,13,1,12 
+    defb 2,13,4,13 
     defb 2,14,1,15 
+    defb 2,15,2,15 
     defb 2,14,1,15 
     defb 2,13,1,15 
+    defb 3,13,2,12 
     defb 3,11,1,15 
     defb 3,14,1,15 
+    defb 3,12,3,12 
+    defb 3,14,1,12 
+    defb 3,11,3,11 
     defb 4,10,1,15 
     defb 5,13,1,15 
     defb 5,11,1,15 
     defb 5,11,1,15 
+    defb 5,9,5,9 
+    defb 5,11,4,10 
     defb 6,12,1,15 
-    defb 1,15,1,15 
 

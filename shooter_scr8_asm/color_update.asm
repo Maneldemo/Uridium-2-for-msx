@@ -29,11 +29,13 @@ _plot_spt:
 	ld	de,ms_spt
 	add hl,de
 	ld	c,0x98
-[3*16]	outi
+	call	out48
 	ld	a,-1
 	ld	(_mccolorchange),a
 out48:
-[3*16]	outi
+[16]	outi
+out32:
+[2*16]	outi
 	ret
 	
 
@@ -50,14 +52,24 @@ set_manta_color
 	xor	a
 	ld	(_mccolorchange),a
 	
+	ld	a, :manta_color
+	ld	(_kBank4),a
+	
+	ld	bc,(aniframe)
+	ld	b,0
+	ld	hl,ms_ani
+	add	hl,bc
+	ld	l,(hl)
+	ld	h,b
+[5]	add hl,hl
+	ld  bc,manta_color
+	add	hl,bc
 	ld	c,0x98
-	ld  hl,manta_color
-	jp	out48
+	call	out32
+	xor	a
+[16]	out	(0x98),a
+	ret
 		
-manta_color
-		ds	16,13
-		ds	16,5+64
-		ds	16,0
 
 color_enemy:
 	call 	_plot_spt

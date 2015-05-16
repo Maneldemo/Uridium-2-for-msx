@@ -325,8 +325,11 @@ outvram:
 	
 		page 3
 ms_spt:
-		incbin ms_demo_frm.bin
-	
+		; incbin ms_demo_frm.bin
+		incbin mship02_frm.bin
+manta_color:
+		incbin mship02_clr.bin
+		
 		page 4
 _tiles0:
 		incbin "tiles.bin",0x0000,0x2000

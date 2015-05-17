@@ -324,9 +324,10 @@ outvram:
 		include probe_level.asm
 	
 		page 3
+manta_color:
+		incbin mship03_clr.bin
 ms_spt:
-		; incbin ms_demo_frm.bin
-		incbin mship02_frm.bin
+		incbin mship03_frm.bin
 		
 		page 4
 _tiles0:
@@ -425,9 +426,6 @@ color_base:
 		ds	16,3+64
 		endrepeat
 		
-		page 13
-manta_color:
-		incbin mship02_clr.bin
 FINISH:
 
 
@@ -449,6 +447,8 @@ slotram				#1
 SEL_NTSC			#1
 
 joystick			#1
+
+_mcdivider			#1
 
 _mcx				#2	; relative with in the frame on the screen
 _mcy				#2

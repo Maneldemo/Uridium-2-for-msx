@@ -18,6 +18,11 @@ ms_reset					equ	12
 
 ;%%%%%%%%%%%%%%%%%%%%%%
 ms_ctrl:
+		ld	a,(_mcdivider)
+		inc	a
+		ld	(_mcdivider),a
+		and	1
+		ret	nz
 		ld	a,(ms_state)
 		cp	ms_explode-1		; ms cannot move while exploding landing or at level reset
 		call	c,.ms_directions

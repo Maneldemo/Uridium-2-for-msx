@@ -51,9 +51,9 @@ set_manta_color
 
 	xor	a
 	ld	(_mccolorchange),a
-	
+	di
 	ld	a, :manta_color
-	ld	(_kBank2),a
+	ld	(_kBank4),a
 	
 	ld	bc,(aniframe)
 	ld	b,0
@@ -66,8 +66,8 @@ set_manta_color
 	add	hl,bc
 	ld	c,0x98
 	call	out32
-	ld	a,1
-	ld	(_kBank2),a
+	; ld	a,1
+	; ld	(_kBank2),a
 	ret
 		
 

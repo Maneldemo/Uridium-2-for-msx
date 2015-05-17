@@ -1,52 +1,43 @@
-mship02_coll_wind:
-    defb 1,15,2,12 
-    defb 1,15,3,13 
+mship03_coll_wind:
     defb 1,15,4,13 
-    defb 1,15,4,10 
+    defb 1,15,3,13 
     defb 1,15,1,15 
+    defb 1,14,1,14 
     defb 1,15,3,15 
+    defb 1,15,6,11 
+    defb 1,15,1,15 
+    defb 1,15,4,14 
+    defb 1,15,5,11 
+    defb 1,15,6,11 
+    defb 1,15,6,12 
+    defb 1,15,5,11 
     defb 1,14,1,14 
     defb 1,15,6,11 
     defb 1,15,5,10 
-    defb 1,15,6,11 
-    defb 1,15,6,12 
-    defb 1,15,6,12 
-    defb 1,15,4,14 
-    defb 1,15,4,14 
-    defb 1,15,5,11 
-    defb 1,15,1,15 
-    defb 1,15,6,11 
-    defb 1,15,2,13 
-    defb 1,15,5,10 
-    defb 1,14,1,14 
+    defb 1,14,2,15 
     defb 1,15,2,14 
-    defb 1,15,5,11 
-    defb 1,15,5,11 
     defb 1,15,3,13 
-    defb 1,15,3,13 
-    defb 1,15,3,12 
     defb 1,15,6,11 
-    defb 1,14,2,15 
+    defb 1,15,1,15 
+    defb 1,15,2,14 
+    defb 1,15,4,12 
     defb 1,15,4,14 
     defb 1,15,1,15 
-    defb 1,15,1,13 
-    defb 1,15,1,15 
-    defb 1,15,1,13 
     defb 1,14,2,15 
     defb 1,14,2,15 
     defb 1,15,2,14 
+    defb 1,15,3,15 
     defb 1,15,2,14 
     defb 1,15,6,12 
-    defb 1,15,2,14 
     defb 1,15,6,11 
     defb 2,13,2,13 
     defb 2,15,1,13 
     defb 2,13,1,12 
-    defb 2,13,4,13 
     defb 2,14,1,15 
     defb 2,13,1,15 
-    defb 2,14,1,15 
+    defb 2,13,4,13 
     defb 2,15,2,15 
+    defb 2,14,1,15 
     defb 3,14,1,15 
     defb 3,13,2,12 
     defb 3,11,1,15 

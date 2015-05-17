@@ -1,10 +1,8 @@
 
 ms_ani:
-	; include ms_demo_ani.asm
-	include mship02_ani.asm
+	include mship03_ani.asm
 ms_col_win:
-	; include ms_demo_frm_coll_wind.asm
-	include mship02_frm_coll_wind.asm
+	include mship03_frm_coll_wind.asm
 
 ;--------------------------------------------------------------------
 ;--------------------------------------------------------------------

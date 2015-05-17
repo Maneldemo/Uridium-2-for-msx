@@ -40,7 +40,7 @@ AA(find(AA==19))=17;
 
 MMAP = MMAP(1:16,:);
 MAP = sprtpalrgb;
-MAP(18,:) = [6 0 6]/7;
+MAP(18,:) = [3 3 3]/7;
 
 Y = AA;
 figure
@@ -126,17 +126,21 @@ YY = Y;
 for i = 1:Nframes
     img = zeros(16);
     for j = 1:16
-        line = bitor(frame1{j,i}*color1{j,i},frame2{j,i}*bitand(color2{j,i},15));
-        line(find(bitand(frame1{j,i}==0,frame2{j,i}==0))) = 17;
-        img(j,:) = line;
+        line = bitor(frame1{j,i}*color1{j,i},
+%         [s1,s2,c1,c2] = convert_line2(line);
+%         frame1{j,i} = s1;
+%         frame2{j,i} = s2;
+%         color1{j,i} = c1;
+%         color2{j,i} = c2;
+         img(j,:) = line - 1;
     end
+    
     YY(h+[1:16],k+[1:16]) = img ;
 
     for j = 1:16
-        s = frame3{j,i};
-        line = s*0;
-        line(find(s==0)) = 17;
-        img(j,:) = line;
+         s = frame3{j,i};
+         line = s*1;
+         img(j,:) = line - 1;
     end
     YY(h+[17:32],k+[1:16]) = img;
 

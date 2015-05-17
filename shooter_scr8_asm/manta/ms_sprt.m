@@ -35,7 +35,7 @@ grid
 
 name = 'mship02';
 
-[AA,MMAP] = imread([name '.png']);
+[AA,MMAP] = imread([name '_.png']);
 AA(find(AA==19))=17;
 
 MMAP = MMAP(1:16,:);

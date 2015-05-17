@@ -327,8 +327,6 @@ outvram:
 ms_spt:
 		; incbin ms_demo_frm.bin
 		incbin mship02_frm.bin
-manta_color:
-		incbin mship02_clr.bin
 		
 		page 4
 _tiles0:
@@ -427,7 +425,9 @@ color_base:
 		ds	16,3+64
 		endrepeat
 		
-
+		page 13
+manta_color:
+		incbin mship02_clr.bin
 FINISH:
 
 

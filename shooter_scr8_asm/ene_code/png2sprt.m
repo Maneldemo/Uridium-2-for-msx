@@ -1,94 +1,198 @@
 clear
 close all
 
-name = 'uridium_revA';
+
+      %  green red blue
+sprtpalgrb =  [ 0 0 0
+                0 0 2
+                0 3 0
+                0 3 2
+                3 0 0
+                3 0 2
+                3 3 0
+                3 3 2
+                4 7 2
+                0 0 7
+                0 7 0
+                0 7 7
+                7 0 0
+                7 0 7
+                7 7 0
+                7 7 7];
+        
+sprtpalrgb = sprtpalgrb(:,[2 1 3])/7;
+
+
+name = 'enemies_scr8';
 [AA,MAP] = imread([name '.bmp']);
 
-Y = AA>0;
+MAP = sprtpalrgb;
+MAP(18,:) = [6 0 6]/7;
+
+Y = AA;
+figure
+image(Y)
+axis equal
+colormap(MAP)
+
+Y = [Y(1:16,:)  Y(17:32,:)  Y(33:48,:) Y(49:64,:)  Y(65:80,:) Y(81:96,:)];
+
+Frames = im2col(Y,[16 16],'distinct');
+Nframes = size(Frames,2);
 
 
-frames = cell(32,64);
+frame1 = cell(16,Nframes);
+frame2 = cell(16,Nframes);
+color1 = cell(16,Nframes);
+color2 = cell(16,Nframes);
+
+figure
+axis equal
+colormap(MAP)
 
 k = 0;
 h = 0;
-for i = 1:size(frames,2)
+for i = 1:Nframes 
+    img = Y(h+[1:16],k+[1:16]);
+    image(img);
+    drawnow;
+    i
+
     for j = 1:16
-        frames{j,i} = Y(h+j,k+[1:8]);
+        line = double(img(j,:))+1;
+        [s1,s2,c1,c2] = convert_line2(line);
+        frame1{j,i} = s1;
+        frame2{j,i} = s2;
+        color1{j,i} = c1;
+        color2{j,i} = c2;
     end
-    for j=17:32
-        frames{j,i} = Y(h+j-16,k+8+[1:8]);
-    end
+        
     k = k + 16;
     if (k>=size(Y,2))
         k = 0;
-        h=h+16;
+        h = h + 32;
+    end
+
+end
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% save converted sprite data
+k = 0;
+h = 0;
+YY = Y;
+
+for i = 1:Nframes
+    img = zeros(16);
+    for j = 1:16
+        line = bitor(frame1{j,i}*color1{j,i},frame2{j,i}*bitand(color2{j,i},15));
+        line(find(bitand(frame1{j,i}==0,frame2{j,i}==0))) = 17;
+        img(j,:) = line;
+    end
+    YY(h+[1:16],k+[1:16]) = img ;
+    k = k + 16;
+    if (k>=size(YY,2))
+        k = 0;
+        h = h + 32;
     end
 end
+imwrite(YY,MAP,['grpx\' name '_scr8.png'],'png', 'BitDepth',8)
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % save sprite data
 
-fid = fopen([ name '.bin'],'w');
-for i=1:size(frames,2)
-    for j=1:32
-        fwrite(fid,bi2de(frames{j,i},'left-msb'),'uint8');
+
+fid = fopen([name '_frm.bin'],'w');
+fid2 = fopen([name '_clr.bin'],'w');
+
+for i = 1:Nframes
+    for j = 1:16
+        s = frame1{j,i};
+        t = dec2hex(bi2de(s(1:8),'left-msb'),2);
+        fwrite (fid,hex2dec(t));
     end
+    for j = 1:16
+        s = frame1{j,i};    
+        t = dec2hex(bi2de(s(9:16),'left-msb'),2);
+        fwrite (fid,hex2dec(t));
+    end
+    for j = 1:16
+        s = frame2{j,i};
+        t = dec2hex(bi2de(s(1:8),'left-msb'),2);
+        fwrite (fid,hex2dec(t));
+    end
+    for j = 1:16
+        s = frame2{j,i};    
+        t = dec2hex(bi2de(s(9:16),'left-msb'),2);
+        fwrite (fid,hex2dec(t));
+    end
+    for j = 1:16
+        s = color1{j,i};
+        fwrite (fid2,s);
+    end
+    for j = 1:16
+        s = color2{j,i};
+        fwrite (fid2,s);
+    end
+
 end
 fclose(fid);
+fclose(fid2);
 
-%system(['miz\MSX-O-Mizer -r data_bin\' [name '.bin'] ' data_miz\' [name '.miz'] ]);
 
-% store collision data for tile tests (only for MS bullets)
-
-Y = Y(17:32,:);
-
-minx = zeros(size(Y,2),1);
-maxx = zeros(size(Y,2),1);
-miny = zeros(size(Y,2),1);
-maxy = zeros(size(Y,2),1);
-
-h = 1;
-for k = 1:16:size(Y,2)
-    
-    A = Y(:,k:(k+15));
-       
-    for x = 1:16
-        if any(A(:,x))
-            minx(h) = x;
-            break;
-        end
-    end
-    for x = 16:-1:1
-        if any(A(:,x))
-            maxx(h) = x;
-            break;
-        end
-    end
-    for x = 1:16
-        if any(A(x,:))
-            miny(h) = x;
-            break;
-        end
-    end
-    for x = 16:-1:1
-        if any(A(x,:))
-            maxy(h) = x;
-            break;
-        end
-    end
-    [h minx(h) maxx(h) miny(h) maxy(h)]
-    h = h+1;
-end
-
-name = 'ms_bllts';
-
-fid = fopen([name '_frm_coll_wind.asm'],'w');
-fprintf (fid,[name '_coll_wind:\n']);
-for h = 1:size(Y,2)/16
-     fprintf (fid,'    defb %d,%d,%d,%d \n',[minx(h) maxx(h)-1 miny(h) maxy(h)-1] );
-end
-fprintf (fid,'\n');
-fclose(fid);
+% %system(['miz\MSX-O-Mizer -r data_bin\' [name '.bin'] ' data_miz\' [name '.miz'] ]);
+% 
+% % store collision data for tile tests (only for MS bullets)
+% 
+% Y = Y(17:32,:);
+% 
+% minx = zeros(size(Y,2),1);
+% maxx = zeros(size(Y,2),1);
+% miny = zeros(size(Y,2),1);
+% maxy = zeros(size(Y,2),1);
+% 
+% h = 1;
+% for k = 1:16:size(Y,2)
+%     
+%     A = Y(:,k:(k+15));
+%        
+%     for x = 1:16
+%         if any(A(:,x))
+%             minx(h) = x;
+%             break;
+%         end
+%     end
+%     for x = 16:-1:1
+%         if any(A(:,x))
+%             maxx(h) = x;
+%             break;
+%         end
+%     end
+%     for x = 1:16
+%         if any(A(x,:))
+%             miny(h) = x;
+%             break;
+%         end
+%     end
+%     for x = 16:-1:1
+%         if any(A(x,:))
+%             maxy(h) = x;
+%             break;
+%         end
+%     end
+%     [h minx(h) maxx(h) miny(h) maxy(h)]
+%     h = h+1;
+% end
+% 
+% name = 'ms_bllts';
+% 
+% fid = fopen([name '_frm_coll_wind.asm'],'w');
+% fprintf (fid,[name '_coll_wind:\n']);
+% for h = 1:size(Y,2)/16
+%      fprintf (fid,'    defb %d,%d,%d,%d \n',[minx(h) maxx(h)-1 miny(h) maxy(h)-1] );
+% end
+% fprintf (fid,'\n');
+% fclose(fid);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % save sprite data
@@ -116,7 +220,7 @@ fclose(fid);
 % ; ysize			db	0
 
 
-Y = AA>0;
+Y = AA~=17;
 fid = fopen(['sprite_collision_window.asm'],'w');
 
 text = [ '\n ; xoff			db	0 \n ; yoff			db	0 \n ; xsize		db	0 \n ; ysize		db	0 \n\n'];

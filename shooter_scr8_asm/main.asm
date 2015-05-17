@@ -388,7 +388,8 @@ _animated:
 
 		page 27
 sprtdata:
-		incbin 	uridium_revA.bin
+		incbin 	uridium_revA.bin,,16*32
+		incbin 	enemies_scr8_frm.bin
 
 		page 28
 color_base:
@@ -401,30 +402,32 @@ color_base:
 		ds	16,10+64
 		endrepeat
 
-		repeat 4
-		ds	16,12
-		ds	16,6+64
-		endrepeat
-		repeat 4
-		ds	16,10
-		ds	16,1+64
-		endrepeat
-		repeat 4
-		ds	16,4
-		ds	16,9+64
-		endrepeat
-		repeat 4
-		ds	16,12
-		ds	16,1+64
-		endrepeat
-		repeat 4
-		ds	16,12
-		ds	16,5+64
-		endrepeat
-		repeat 4
-		ds	16,10
-		ds	16,3+64
-		endrepeat
+		
+		incbin 	enemies_scr8_clr.bin
+		; repeat 4
+		; ds	16,12
+		; ds	16,6+64
+		; endrepeat
+		; repeat 4
+		; ds	16,10
+		; ds	16,1+64
+		; endrepeat
+		; repeat 4
+		; ds	16,4
+		; ds	16,9+64
+		; endrepeat
+		; repeat 4
+		; ds	16,12
+		; ds	16,1+64
+		; endrepeat
+		; repeat 4
+		; ds	16,12
+		; ds	16,5+64
+		; endrepeat
+		; repeat 4
+		; ds	16,10
+		; ds	16,3+64
+		; endrepeat
 		
 FINISH:
 

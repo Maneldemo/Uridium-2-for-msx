@@ -117,6 +117,7 @@ for i = 1:Nframes
         h = h + 32;
     end
 end
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % save converted sprite data
 k = 0;

@@ -109,13 +109,6 @@ set_scr:
 	or		00000010B
 	ld		(RG1SAV),a
 
-	// border color
-	xor		a
-	ld		(RG7SAV),a
-	out		(0x99),a
-	ld		a,7+128
-	out		(0x99),a
-		
 	// enable sprites + TP
 	ld		a,(RG8SAV)
 	or		00100010B
@@ -135,8 +128,15 @@ set_scr:
 2:	ld		(RG9SAV),a
 
 	ld  	a,8
-	jp		chgmod
+	call		chgmod
 
+	// border color
+	xor		a
+	ld		(RG7SAV),a
+	out		(0x99),a
+	ld		a,7+128
+	out		(0x99),a
+	ret
 
 
 

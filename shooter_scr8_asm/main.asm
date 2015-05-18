@@ -291,7 +291,10 @@ AFXPLAY:
 	include plot_line.asm
 	include plot_line2.asm
 	include color_update.asm
-	
+ms_bllts_col_win:
+	include ms_bllts_frm_coll_wind.asm
+	include	ms_bllts.asm
+		
 ;-------------------------------------
 
 	
@@ -299,10 +302,7 @@ AFXPLAY:
 
 		include	"..\TTplayer\code\ttreplay.asm"
 		include	"ms_crtl.asm"
-		include	"ms_bllts.asm"
 		include	"put_ms_sprt.asm"
-ms_bllts_col_win:
-		include ms_bllts_frm_coll_wind.asm
 				
 		
 outvram:

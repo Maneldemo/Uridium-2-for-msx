@@ -1,6 +1,5 @@
 	align 0x100
 sprite_collision_windows:
-	ds	3*4				; first 3 frames are missing
 	include sprite_collision_window.asm
 
 ;	in: 
@@ -12,8 +11,10 @@ sprite_collision_windows:
 set_size:
  	ex	af,af'
 	ld	a,(ix+enemy_data.frame)
+	sub	a,16*4
+	rrca
 	exx
-	and	%11111100
+	and	%01111100
 	ld	l,a
 	ld	h,high sprite_collision_windows		
 	ld	a,(hl)
@@ -40,8 +41,10 @@ set_size:
 set_size2:
  	ex	af,af'
 	ld	a,(iy+enemy_data.frame)
+	sub	a,16*4
+	rrca
 	exx
-	and	%11111100
+	and	%01111100
 	ld	l,a
 	ld	h,high sprite_collision_windows		
 	ld	a,(hl)
@@ -59,6 +62,52 @@ set_size2:
 	ex		af,af'
 	ret
 	
+bullet_sprite_collision_windows:
+.sprite_8:
+    defb  4, 1, 8,14 
+.sprite_9:
+    defb  4, 3, 8,11 
+.sprite_10:
+    defb  4, 5, 8, 7 
+.sprite_11:
+    defb  4, 6, 8, 5 
+.sprite_12:
+    defb  4, 7, 8, 2 
+.sprite_13:
+    defb  4, 6, 8, 5 
+.sprite_14:
+    defb  4, 5, 8, 7 
+.sprite_15:
+    defb  4, 3, 8,11 
+
+;	in: 
+;		IX-> current sprite
+;		(ix+enemy_data.frame) = frame in the SPT
+;	out;
+;		IX -> xoff,yoff,xsize,ysize are set
+	
+bullet_set_size:
+	sub	a,8*4
+	exx
+	and	%11111100
+	ld	c,a
+	ld	b,0
+	ld	hl,bullet_sprite_collision_windows
+	add	hl,bc
+	ld	a,(hl)
+	ld	(ix+enemy_data.xoff),a
+	inc	hl
+	ld	a,(hl)
+	ld	(ix+enemy_data.yoff),a
+	inc	hl
+	ld	a,(hl)
+	ld	(ix+enemy_data.xsize),a
+	inc	hl
+	ld	a,(hl)
+	ld	(ix+enemy_data.ysize),a
+	exx
+	ret
+
 
 ;	in: 
 ;		IX-> current bullet

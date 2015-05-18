@@ -35,7 +35,9 @@ _plot_spt:
 out48:
 [16]	outi
 out32:
-[2*16]	outi
+[16]	outi
+out16:
+[16]	outi
 	ret
 	
 
@@ -119,7 +121,7 @@ directcolor_enemy:
 	ld a,d 					; set bits 8-13 with write access
 	out (0x99),a
 	ld	a,b
-[32]	outi
+	call out32
 	ld b,a
 
 .next
@@ -171,7 +173,7 @@ reversecolor_enemy:
 	ld a,d 					; set bits 8-13 with write access
 	out (0x99),a
 	ld	a,b
-[32]	outi
+	call out32
 	ld b,a
 
 .next

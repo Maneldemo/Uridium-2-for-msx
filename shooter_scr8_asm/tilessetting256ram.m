@@ -19,7 +19,7 @@ end
 %[A2,MAP] = imread('NUMBERS.bmp');
 
 %[A2,MAP] = imread('GNG2048x176.PNG');
-[A2,MAP] = imread('graphics\lmap6.png');
+[A2,MAP] = imread('graphics\lmap6.bmp');
 
 
 [ A2 MAP] = imapprox(A2,MAP,pal, 'nodither');

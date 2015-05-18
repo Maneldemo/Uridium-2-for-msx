@@ -46,7 +46,7 @@ ms_shoot:
 	add a,a
 	ld	(ix+enemy_data.frame),a
 
-	call	set_size	; set  xoff,yoff,xsize,ysize for sprite collision
+	call	bullet_set_size	; set  xoff,yoff,xsize,ysize for sprite collision
 
 	ld	a,(dxmap)
 [2] sra a

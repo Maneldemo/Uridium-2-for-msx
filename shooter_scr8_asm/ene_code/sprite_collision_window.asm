@@ -27,7 +27,7 @@ sprite_9:
 sprite_10:
     defb  0, 0,16,16 
 sprite_11:
-    defb  1, 0,12,16 
+    defb  0, 0,16,16 
 sprite_12:
     defb  0, 0,16,16 
 sprite_13:

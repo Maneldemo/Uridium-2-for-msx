@@ -27,29 +27,16 @@ teller:=teller+1
 	; load static colors 
 load_colors:
 		ld		c,0
-		ld		de,0F800h			;	0FA00h-512
+		ld		de,0F830h			;	0FA00h-512+3*16
 		call	_vdpsetvramwr
-
-		call	ship_color
 		call	bull_color
-		call	enem_color
 		
 		ld		c,0
-		ld		de,0FE00h-512
+		ld		de,0FD80h		   ;	0FE00h-512+max_enem*16
 		call	_vdpsetvramwr
-				
-		call	enem_color
 		call	bull_color
-		call	ship_color
 		ret
 		
-ship_color:
-		ld	b,16*3
-		xor	a
-1:
-		out	(0x98),a
-		djnz 1b		
-		ret
 
 bull_color:	
 		ld	b,16*(max_bullets+max_enem_bullets)
@@ -59,13 +46,3 @@ bull_color:
 		djnz 1b		
 		ret
 		
-enem_color:	
-		ld	c,2*max_enem
-		ld	b,16
-		xor	a
-1:
-		out	(0x98),a
-		djnz 1b	
-		dec	c
-		jr	nz,1b
-		ret

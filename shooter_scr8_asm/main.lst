@@ -1,4 +1,4 @@
-Sjasm Z80 Assembler v0.42c - www.xl2s.tk             [2015.05.19 - 01:23:27]
+Sjasm Z80 Assembler v0.42c - www.xl2s.tk             [2015.05.19 - 23:39:48]
 
 main.asm
 Errors: 0
@@ -1032,7 +1032,7 @@ Errors: 0
      381.  00:43A3                      
      382.  00:43A3                      ;-------------------------------------
      383.  00:43A3                      newxmap
-     384.  00:43A3  CD 3C 45            		call 	plot_enemy		
+     384.  00:43A3  CD 1B 45            		call 	plot_enemy		
      385.  00:43A6  CD A4 59            		call	color_enemy
      386.  00:43A9                      
      387.  00:43A9  2A 12 CE            		ld		hl,(_xmapx4)
@@ -1225,304 +1225,281 @@ Errors: 0
       27.  00:44F2                      	; load static colors 
       28.  00:44F2                      load_colors:
       29.  00:44F2  0E 00               		ld		c,0
-      30.  00:44F4  11 00 F8            		ld		de,0F800h			;	0FA00h-512
+      30.  00:44F4  11 30 F8            		ld		de,0F830h			;	0FA00h-512+3*16
       31.  00:44F7  CD 90 41            		call	_vdpsetvramwr
-      32.  00:44FA                      
-      33.  00:44FA  CD 15 45            		call	ship_color
-      34.  00:44FD  CD 1D 45            		call	bull_color
-      35.  00:4500  CD 26 45            		call	enem_color
-      36.  00:4503                      		
-      37.  00:4503  0E 00               		ld		c,0
-      38.  00:4505  11 00 FC            		ld		de,0FE00h-512
-      39.  00:4508  CD 90 41            		call	_vdpsetvramwr
-      40.  00:450B                      				
-      41.  00:450B  CD 26 45            		call	enem_color
-      42.  00:450E  CD 1D 45            		call	bull_color
-      43.  00:4511  CD 15 45            		call	ship_color
-      44.  00:4514  C9                  		ret
-      45.  00:4515                      		
-      46.  00:4515                      ship_color:
-      47.  00:4515  06 30               		ld	b,16*3
-      48.  00:4517  AF                  		xor	a
-      49.  00:4518                      1:
-      50.  00:4518  D3 98               		out	(0x98),a
-      51.  00:451A  10 FC               		djnz 1b		
-      52.  00:451C  C9                  		ret
-      53.  00:451D                      
-      54.  00:451D                      bull_color:	
-      55.  00:451D  06 50               		ld	b,16*(max_bullets+max_enem_bullets)
-      56.  00:451F  3E 0F               		ld	a,15
-      57.  00:4521                      1:
-      58.  00:4521  D3 98               		out	(0x98),a
-      59.  00:4523  10 FC               		djnz 1b		
-      60.  00:4525  C9                  		ret
-      61.  00:4526                      		
-      62.  00:4526                      enem_color:	
-      63.  00:4526  0E 18               		ld	c,2*max_enem
-      64.  00:4528  06 10               		ld	b,16
-      65.  00:452A  AF                  		xor	a
-      66.  00:452B                      1:
-      67.  00:452B  D3 98               		out	(0x98),a
-      68.  00:452D  10 FC               		djnz 1b	
-      69.  00:452F  0D                  		dec	c
-      70.  00:4530  20 F9               		jr	nz,1b
-      71.  00:4532  C9                  		ret
-      60   00:4533                      		include sat_update.asm
-       1.  00:4533                      
-       2.  00:4533                      ; _plot_enemy:
-       3.  00:4533                      
-       4.  00:4533                      ; __sat_update
-       5.  00:4533                      	; ld		c,0
-       6.  00:4533                      	; ld		de,0FA00h
-       7.  00:4533                      	; call	_vdpsetvramwr
-       8.  00:4533                      	; ld		hl,_sat
-       9.  00:4533                      	; ld		bc,0x8098
-      10.  00:4533                      ; 1:	outi
-      11.  00:4533                      	; ld	a,(_xoffset)		; set R#18 only if not scrolling
-      12.  00:4533                      	; add	a,(hl)
-      13.  00:4533                      	; out (0x98),a
-      14.  00:4533                      	; inc hl
-      15.  00:4533                      ; [2]	outi
-      16.  00:4533                      	; djnz 1b
-      17.  00:4533                      	; ret
-      18.  00:4533                      	
-      19.  00:4533                      set_manta:	
-      20.  00:4533  01 98 0C            	ld	bc,0x98+4*3*256
-      21.  00:4536  21 20 CE            	ld  hl,ram_sat
-      22.  00:4539  ED B3               	otir
-      23.  00:453B  C9                  	ret
-      24.  00:453C                      	
-      25.  00:453C                      plot_enemy:
-      26.  00:453C  3A 1F CE            	ld	a,(flip_flop)
-      27.  00:453F  EE 01               	xor	1
-      28.  00:4541  32 1F CE            	ld	(flip_flop),a
-      29.  00:4544  C2 0D 46            	jp nz, reverseplot_enemy
-      30.  00:4547                      	
-      31.  00:4547                      directplot_enemy:
-      32.  00:4547                      	; R#5=0xF7 -> sat = FA000
-      33.  00:4547  3E F7               	ld 		a,0xF7
-      34.  00:4549  D3 99               	out (0x99),a
-      35.  00:454B  3E 85               	ld 		a,128+5
-      36.  00:454D  D3 99               	out (0x99),a
-      37.  00:454F                      	
-      38.  00:454F  0E 00               	ld		c,0
-      39.  00:4551  11 00 FA            	ld		de,0FA00h	; 3 positions for main ship and its shadow
-      40.  00:4554  CD 90 41            	call	_vdpsetvramwr
-      41.  00:4557  CD 33 45            	call	set_manta	
-      42.  00:455A                      
-      43.  00:455A  DD 21 2C CE         	ld	ix,any_object
-      44.  00:455E                      
-      45.  00:455E                      ; process MS bullets and enemy bullets
-      46.  00:455E                      
-      47.  00:455E  01 98 05            	ld	bc,0x98+256*(max_bullets + max_enem_bullets)
-      48.  00:4561                      	
-      49.  00:4561  DD CB 07 46         1:	bit 0,(ix+enemy_data.status)
-      50.  00:4565  CA EB 45            	jp	z,.spriteoff1
-      51.  00:4568                      	
-      52.  00:4568  DD 6E 01            	ld	l,(ix+enemy_data.x+0)
-      53.  00:456B  DD 66 02            	ld	h,(ix+enemy_data.x+1)
-      54.  00:456E  ED 5B 10 CE         	ld	de,(xmap)
-      55.  00:4572  AF                  	xor a
-      56.  00:4573  ED 52               	sbc hl,de				; dx = enemy.x - xmap
-      57.  00:4575  FA EB 45            	jp	m,.spriteoff1		; dx <0
-      58.  00:4578                      
-      59.  00:4578  B4                  	or	h
-      60.  00:4579  C2 EB 45            	jp	nz,.spriteoff1		; dx >255
-      61.  00:457C                      
-      62.  00:457C  3A 03 CE            	ld	a,(_xoffset)		; compensate R#18 
-      63.  00:457F  85                  	add	a,l
-      64.  00:4580  DA EB 45            	jp	c,.spriteoff1		; remove if off screen i.e. dx + _xoffset > 255
-      65.  00:4583  FE F0               	cp	240
-      66.  00:4585  D2 EB 45            	jp	nc,.spriteoff1		; remove if dx + _xoffset > 240
-      67.  00:4588                      	
-      68.  00:4588  DD 56 00            	ld	d,(ix+enemy_data.y)	; write Y
-      69.  00:458B  ED 51               	out (c),d
-      70.  00:458D  ED 79               	out (c),a				; write X
-      71.  00:458F  DD 7E 0A            	ld	a,(ix+enemy_data.frame)
-      72.  00:4592  D3 98               	out (0x98),a			; write shape
-      73.  00:4594  ED 79               	out (c),a				; write crap
-      74.  00:4596                      	
-      75.  00:4596                      .next1
-      76.  00:4596  11 0F 00            	ld	de,enemy_data
-      77.  00:4599  DD 19               	add ix,de
-      78.  00:459B  10 C4               	djnz	1b
-      79.  00:459D                      
-      80.  00:459D                      ; process two layer enemies
-      81.  00:459D                      
-      82.  00:459D  06 0C               	ld	b,max_enem 
-      83.  00:459F  DD CB 07 46         1:	bit 0,(ix+enemy_data.status)
-      84.  00:45A3  CA F8 45            	jp	z,.spriteoff2
-      85.  00:45A6                      
-      86.  00:45A6  DD 6E 01            	ld	l,(ix+enemy_data.x+0)
-      87.  00:45A9  DD 66 02            	ld	h,(ix+enemy_data.x+1)
-      88.  00:45AC  ED 5B 10 CE         	ld	de,(xmap)
-      89.  00:45B0  AF                  	xor a
-      90.  00:45B1  ED 52               	sbc hl,de				; dx = enemy.x - xmap
-      91.  00:45B3  FA F8 45            	jp	m,.spriteoff2		; dx <0
-      92.  00:45B6                      
-      93.  00:45B6  B4                  	or	h
-      94.  00:45B7  C2 F8 45            	jp	nz,.spriteoff2		; dx >255
-      95.  00:45BA                      
-      96.  00:45BA  3A 03 CE            	ld	a,(_xoffset)		; compensate R#18 
-      97.  00:45BD  85                  	add	a,l
-      98.  00:45BE  DA F8 45            	jp	c,.spriteoff2		; remove if off screen i.e. dx + _xoffset > 255
-      99.  00:45C1  FE F0               	cp	240
-     100.  00:45C3  D2 F8 45            	jp	nc,.spriteoff2		; remove if dx + _xoffset > 240
-     101.  00:45C6                      	
-     102.  00:45C6  DD 56 00            	ld	d,(ix+enemy_data.y)	
-     103.  00:45C9  ED 51               	out (c),d				; write Y
-     104.  00:45CB  6F                  	ld  l,a
-     105.  00:45CC  D3 98               	out (0x98),a			; write X
-     106.  00:45CE                      
-     107.  00:45CE  DD 7E 0A            	ld	a,(ix+enemy_data.frame)
-     108.  00:45D1  D3 98               	out (0x98),a			; write shape
-     109.  00:45D3  ED 79               	out (c),a				; write crap
-     110.  00:45D5                      
-     111.  00:45D5  ED 51               	out (c),d				; write Y
-     112.  00:45D7  ED 69               	out (c),l				; write X
-     113.  00:45D9  C6 04               	add	a,4
-     114.  00:45DB  D3 98               	out (0x98),a			; write shape
-     115.  00:45DD  ED 79               	out (c),a				; write crap
-     116.  00:45DF                      	
-     117.  00:45DF                      .next2
-     118.  00:45DF  11 0F 00            	ld	de,enemy_data
-     119.  00:45E2  DD 19               	add ix,de
-     120.  00:45E4  10 B9               	djnz	1b
-     121.  00:45E6                      	
-     122.  00:45E6  3E D8               	ld	a,0xD8
-     123.  00:45E8  D3 98               	out (0x98),a			; SAT terminator
-     124.  00:45EA  C9                  	ret
-     125.  00:45EB                      
-     126.  00:45EB                      ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-     127.  00:45EB                      	
-     128.  00:45EB                      .spriteoff1
-     129.  00:45EB  3E D9               	ld	a,0xD9
-     130.  00:45ED                      [4]	out (c),a				; write crap
-     130.  00:45ED  ED 79 ED 79 ED 79 ED 79 
-     131.  00:45F5  C3 96 45            	jp	.next1
-     132.  00:45F8                      
-     133.  00:45F8                      .spriteoff2
-     134.  00:45F8  3E D9               	ld	a,0xD9
-     135.  00:45FA                      [8]	out (c),a				; write crap
-     135.  00:45FA  ED 79 ED 79 ED 79 ED 79 ED 79 ED 79 ED 79 ED 79 
-     136.  00:460A  C3 DF 45            	jp	.next2
-     137.  00:460D                      
-     138.  00:460D                      ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-     139.  00:460D                      
-     140.  00:460D                      reverseplot_enemy:
-     141.  00:460D                      	; R#5=0xFF -> sat = FE000
-     142.  00:460D  3E FF               	ld 		a,0xFF
-     143.  00:460F  D3 99               	out (0x99),a
-     144.  00:4611  3E 85               	ld 		a,128+5
-     145.  00:4613  D3 99               	out (0x99),a
-     146.  00:4615                      
-     147.  00:4615  0E 00               	ld		c,0
-     148.  00:4617  11 00 FE            	ld		de,0FE00h	; 3 positions for main ship and its shadow
-     149.  00:461A  CD 90 41            	call	_vdpsetvramwr
-     150.  00:461D                      
-     151.  00:461D  DD 21 1C CF         	ld	ix,enemies+(max_enem-1)*enemy_data
-     152.  00:4621                      
-     153.  00:4621                      ; process two layer enemies
-     154.  00:4621                      
-     155.  00:4621  01 98 0C            	ld	bc,0x98+256*max_enem
-     156.  00:4624                      	
-     157.  00:4624  DD CB 07 46         1:	bit 0,(ix+enemy_data.status)
-     158.  00:4628  CA BE 46            	jp	z,.spriteoff2
-     159.  00:462B                      	
-     160.  00:462B  DD 6E 01            	ld	l,(ix+enemy_data.x+0)
-     161.  00:462E  DD 66 02            	ld	h,(ix+enemy_data.x+1)
-     162.  00:4631  ED 5B 10 CE         	ld	de,(xmap)
-     163.  00:4635  AF                  	xor a
-     164.  00:4636  ED 52               	sbc hl,de				; dx = enemy.x - xmap
-     165.  00:4638  FA BE 46            	jp	m,.spriteoff2		; dx <0
-     166.  00:463B                      
-     167.  00:463B  B4                  	or	h
-     168.  00:463C  C2 BE 46            	jp	nz,.spriteoff2		; dx >255
-     169.  00:463F                      
-     170.  00:463F  3A 03 CE            	ld	a,(_xoffset)		; compensate R#18 
-     171.  00:4642  85                  	add	a,l
-     172.  00:4643  DA BE 46            	jp	c,.spriteoff2		; remove if off screen i.e. dx + _xoffset > 255
-     173.  00:4646  FE F0               	cp	240
-     174.  00:4648  D2 BE 46            	jp	nc,.spriteoff2		; remove if dx + _xoffset > 240
-     175.  00:464B  DD 56 00            	ld	d,(ix+enemy_data.y)	
-     176.  00:464E  ED 51               	out (c),d				; write Y
-     177.  00:4650  6F                  	ld  l,a
-     178.  00:4651  D3 98               	out (0x98),a			; write X
-     179.  00:4653                      
-     180.  00:4653  DD 7E 0A            	ld	a,(ix+enemy_data.frame)
-     181.  00:4656  D3 98               	out (0x98),a			; write shape
-     182.  00:4658  ED 79               	out (c),a				; write crap
-     183.  00:465A                      
-     184.  00:465A  ED 51               	out (c),d				; write Y
-     185.  00:465C  ED 69               	out (c),l				; write X
-     186.  00:465E  C6 04               	add	a,4
-     187.  00:4660  D3 98               	out (0x98),a			; write shape
-     188.  00:4662  ED 79               	out (c),a				; write crap
-     189.  00:4664                      	
-     190.  00:4664                      .next2
-     191.  00:4664  11 F1 FF            	ld	de,-enemy_data
-     192.  00:4667  DD 19               	add ix,de
-     193.  00:4669  10 B9               	djnz	1b
-     194.  00:466B                      
-     195.  00:466B                      ; process one layer enemies
-     196.  00:466B                      
-     197.  00:466B  06 05               	ld	b,max_bullets + max_enem_bullets 
-     198.  00:466D  DD CB 07 46         1:	bit 0,(ix+enemy_data.status)
-     199.  00:4671  CA B1 46            	jp	z,.spriteoff1
-     200.  00:4674                      
-     201.  00:4674  DD 6E 01            	ld	l,(ix+enemy_data.x+0)
-     202.  00:4677  DD 66 02            	ld	h,(ix+enemy_data.x+1)
-     203.  00:467A  ED 5B 10 CE         	ld	de,(xmap)
-     204.  00:467E  AF                  	xor a
-     205.  00:467F  ED 52               	sbc hl,de				; dx = enemy.x - xmap
-     206.  00:4681  FA B1 46            	jp	m,.spriteoff1		; dx <0
-     207.  00:4684                      
-     208.  00:4684  B4                  	or	h
-     209.  00:4685  C2 B1 46            	jp	nz,.spriteoff1		; dx >255
-     210.  00:4688                      
-     211.  00:4688  3A 03 CE            	ld	a,(_xoffset)		; compensate R#18 
-     212.  00:468B  85                  	add	a,l
-     213.  00:468C  DA B1 46            	jp	c,.spriteoff1		; remove if off screen i.e. dx + _xoffset > 255
-     214.  00:468F  FE F0               	cp	240
-     215.  00:4691  D2 B1 46            	jp	nc,.spriteoff1		; remove if dx + _xoffset > 240
-     216.  00:4694                      	
-     217.  00:4694  DD 56 00            	ld	d,(ix+enemy_data.y)	
-     218.  00:4697  ED 51               	out (c),d				; write Y
-     219.  00:4699  ED 79               	out (c),a				; write X
-     220.  00:469B                      
-     221.  00:469B  DD 7E 0A            	ld	a,(ix+enemy_data.frame)
-     222.  00:469E  D3 98               	out (0x98),a			; write shape
-     223.  00:46A0  ED 79               	out (c),a				; write crap
-     224.  00:46A2                      
-     225.  00:46A2                      .next1
-     226.  00:46A2  11 F1 FF            	ld	de,-enemy_data
-     227.  00:46A5  DD 19               	add ix,de
-     228.  00:46A7  10 C4               	djnz	1b
-     229.  00:46A9                      
-     230.  00:46A9  CD 33 45            	call	set_manta	
-     231.  00:46AC                      	
-     232.  00:46AC  3E D8               	ld	a,0xD8
-     233.  00:46AE  D3 98               	out (0x98),a			; SAT terminator
-     234.  00:46B0  C9                  	ret
-     235.  00:46B1                      	
-     236.  00:46B1                      	
-     237.  00:46B1                      ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-     238.  00:46B1                      	
-     239.  00:46B1                      .spriteoff1
-     240.  00:46B1  3E D9               	ld	a,0xD9
-     241.  00:46B3                      [4]	out (c),a				; write crap
-     241.  00:46B3  ED 79 ED 79 ED 79 ED 79 
-     242.  00:46BB  C3 A2 46            	jp	.next1
-     243.  00:46BE                      
-     244.  00:46BE                      .spriteoff2
-     245.  00:46BE  3E D9               	ld	a,0xD9
-     246.  00:46C0                      [8]	out (c),a				; write crap
-     246.  00:46C0  ED 79 ED 79 ED 79 ED 79 ED 79 ED 79 ED 79 ED 79 
-     247.  00:46D0  C3 64 46            	jp	.next2
-     248.  00:46D3                      
-     249.  00:46D3                      ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-      61   00:46D3                      		include collision_tst.asm
-       1.  00:46D3  (002D)              	align 0x100
+      32.  00:44FA  CD 09 45            		call	bull_color
+      33.  00:44FD                      		
+      34.  00:44FD  0E 00               		ld		c,0
+      35.  00:44FF  11 80 FD            		ld		de,0FD80h		   ;	0FE00h-512+max_enem*16
+      36.  00:4502  CD 90 41            		call	_vdpsetvramwr
+      37.  00:4505  CD 09 45            		call	bull_color
+      38.  00:4508  C9                  		ret
+      39.  00:4509                      		
+      40.  00:4509                      
+      41.  00:4509                      bull_color:	
+      42.  00:4509  06 50               		ld	b,16*(max_bullets+max_enem_bullets)
+      43.  00:450B  3E 0F               		ld	a,15
+      44.  00:450D                      1:
+      45.  00:450D  D3 98               		out	(0x98),a
+      46.  00:450F  10 FC               		djnz 1b		
+      47.  00:4511  C9                  		ret
+      48.  00:4512                      		
+      60   00:4512                      		include sat_update.asm
+       1.  00:4512                      
+       2.  00:4512                      ; _plot_enemy:
+       3.  00:4512                      
+       4.  00:4512                      ; __sat_update
+       5.  00:4512                      	; ld		c,0
+       6.  00:4512                      	; ld		de,0FA00h
+       7.  00:4512                      	; call	_vdpsetvramwr
+       8.  00:4512                      	; ld		hl,_sat
+       9.  00:4512                      	; ld		bc,0x8098
+      10.  00:4512                      ; 1:	outi
+      11.  00:4512                      	; ld	a,(_xoffset)		; set R#18 only if not scrolling
+      12.  00:4512                      	; add	a,(hl)
+      13.  00:4512                      	; out (0x98),a
+      14.  00:4512                      	; inc hl
+      15.  00:4512                      ; [2]	outi
+      16.  00:4512                      	; djnz 1b
+      17.  00:4512                      	; ret
+      18.  00:4512                      	
+      19.  00:4512                      set_manta:	
+      20.  00:4512  01 98 0C            	ld	bc,0x98+4*3*256
+      21.  00:4515  21 20 CE            	ld  hl,ram_sat
+      22.  00:4518  ED B3               	otir
+      23.  00:451A  C9                  	ret
+      24.  00:451B                      	
+      25.  00:451B                      plot_enemy:
+      26.  00:451B  3A 1F CE            	ld	a,(flip_flop)
+      27.  00:451E  EE 01               	xor	1
+      28.  00:4520  32 1F CE            	ld	(flip_flop),a
+      29.  00:4523  C2 EC 45            	jp nz, reverseplot_enemy
+      30.  00:4526                      	
+      31.  00:4526                      directplot_enemy:
+      32.  00:4526                      	; R#5=0xF7 -> sat = FA000
+      33.  00:4526  3E F7               	ld 		a,0xF7
+      34.  00:4528  D3 99               	out (0x99),a
+      35.  00:452A  3E 85               	ld 		a,128+5
+      36.  00:452C  D3 99               	out (0x99),a
+      37.  00:452E                      	
+      38.  00:452E  0E 00               	ld		c,0
+      39.  00:4530  11 00 FA            	ld		de,0FA00h	; 3 positions for main ship and its shadow
+      40.  00:4533  CD 90 41            	call	_vdpsetvramwr
+      41.  00:4536  CD 12 45            	call	set_manta	
+      42.  00:4539                      
+      43.  00:4539  DD 21 2C CE         	ld	ix,any_object
+      44.  00:453D                      
+      45.  00:453D                      ; process MS bullets and enemy bullets
+      46.  00:453D                      
+      47.  00:453D  01 98 05            	ld	bc,0x98+256*(max_bullets + max_enem_bullets)
+      48.  00:4540                      	
+      49.  00:4540  DD CB 07 46         1:	bit 0,(ix+enemy_data.status)
+      50.  00:4544  CA CA 45            	jp	z,.spriteoff1
+      51.  00:4547                      	
+      52.  00:4547  DD 6E 01            	ld	l,(ix+enemy_data.x+0)
+      53.  00:454A  DD 66 02            	ld	h,(ix+enemy_data.x+1)
+      54.  00:454D  ED 5B 10 CE         	ld	de,(xmap)
+      55.  00:4551  AF                  	xor a
+      56.  00:4552  ED 52               	sbc hl,de				; dx = enemy.x - xmap
+      57.  00:4554  FA CA 45            	jp	m,.spriteoff1		; dx <0
+      58.  00:4557                      
+      59.  00:4557  B4                  	or	h
+      60.  00:4558  C2 CA 45            	jp	nz,.spriteoff1		; dx >255
+      61.  00:455B                      
+      62.  00:455B  3A 03 CE            	ld	a,(_xoffset)		; compensate R#18 
+      63.  00:455E  85                  	add	a,l
+      64.  00:455F  DA CA 45            	jp	c,.spriteoff1		; remove if off screen i.e. dx + _xoffset > 255
+      65.  00:4562  FE F0               	cp	240
+      66.  00:4564  D2 CA 45            	jp	nc,.spriteoff1		; remove if dx + _xoffset > 240
+      67.  00:4567                      	
+      68.  00:4567  DD 56 00            	ld	d,(ix+enemy_data.y)	; write Y
+      69.  00:456A  ED 51               	out (c),d
+      70.  00:456C  ED 79               	out (c),a				; write X
+      71.  00:456E  DD 7E 0A            	ld	a,(ix+enemy_data.frame)
+      72.  00:4571  D3 98               	out (0x98),a			; write shape
+      73.  00:4573  ED 79               	out (c),a				; write crap
+      74.  00:4575                      	
+      75.  00:4575                      .next1
+      76.  00:4575  11 0F 00            	ld	de,enemy_data
+      77.  00:4578  DD 19               	add ix,de
+      78.  00:457A  10 C4               	djnz	1b
+      79.  00:457C                      
+      80.  00:457C                      ; process two layer enemies
+      81.  00:457C                      
+      82.  00:457C  06 0C               	ld	b,max_enem 
+      83.  00:457E  DD CB 07 46         1:	bit 0,(ix+enemy_data.status)
+      84.  00:4582  CA D7 45            	jp	z,.spriteoff2
+      85.  00:4585                      
+      86.  00:4585  DD 6E 01            	ld	l,(ix+enemy_data.x+0)
+      87.  00:4588  DD 66 02            	ld	h,(ix+enemy_data.x+1)
+      88.  00:458B  ED 5B 10 CE         	ld	de,(xmap)
+      89.  00:458F  AF                  	xor a
+      90.  00:4590  ED 52               	sbc hl,de				; dx = enemy.x - xmap
+      91.  00:4592  FA D7 45            	jp	m,.spriteoff2		; dx <0
+      92.  00:4595                      
+      93.  00:4595  B4                  	or	h
+      94.  00:4596  C2 D7 45            	jp	nz,.spriteoff2		; dx >255
+      95.  00:4599                      
+      96.  00:4599  3A 03 CE            	ld	a,(_xoffset)		; compensate R#18 
+      97.  00:459C  85                  	add	a,l
+      98.  00:459D  DA D7 45            	jp	c,.spriteoff2		; remove if off screen i.e. dx + _xoffset > 255
+      99.  00:45A0  FE F0               	cp	240
+     100.  00:45A2  D2 D7 45            	jp	nc,.spriteoff2		; remove if dx + _xoffset > 240
+     101.  00:45A5                      	
+     102.  00:45A5  DD 56 00            	ld	d,(ix+enemy_data.y)	
+     103.  00:45A8  ED 51               	out (c),d				; write Y
+     104.  00:45AA  6F                  	ld  l,a
+     105.  00:45AB  D3 98               	out (0x98),a			; write X
+     106.  00:45AD                      
+     107.  00:45AD  DD 7E 0A            	ld	a,(ix+enemy_data.frame)
+     108.  00:45B0  D3 98               	out (0x98),a			; write shape
+     109.  00:45B2  ED 79               	out (c),a				; write crap
+     110.  00:45B4                      
+     111.  00:45B4  ED 51               	out (c),d				; write Y
+     112.  00:45B6  ED 69               	out (c),l				; write X
+     113.  00:45B8  C6 04               	add	a,4
+     114.  00:45BA  D3 98               	out (0x98),a			; write shape
+     115.  00:45BC  ED 79               	out (c),a				; write crap
+     116.  00:45BE                      	
+     117.  00:45BE                      .next2
+     118.  00:45BE  11 0F 00            	ld	de,enemy_data
+     119.  00:45C1  DD 19               	add ix,de
+     120.  00:45C3  10 B9               	djnz	1b
+     121.  00:45C5                      	
+     122.  00:45C5  3E D8               	ld	a,0xD8
+     123.  00:45C7  D3 98               	out (0x98),a			; SAT terminator
+     124.  00:45C9  C9                  	ret
+     125.  00:45CA                      
+     126.  00:45CA                      ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+     127.  00:45CA                      	
+     128.  00:45CA                      .spriteoff1
+     129.  00:45CA  3E D9               	ld	a,0xD9
+     130.  00:45CC                      [4]	out (c),a				; write crap
+     130.  00:45CC  ED 79 ED 79 ED 79 ED 79 
+     131.  00:45D4  C3 75 45            	jp	.next1
+     132.  00:45D7                      
+     133.  00:45D7                      .spriteoff2
+     134.  00:45D7  3E D9               	ld	a,0xD9
+     135.  00:45D9                      [8]	out (c),a				; write crap
+     135.  00:45D9  ED 79 ED 79 ED 79 ED 79 ED 79 ED 79 ED 79 ED 79 
+     136.  00:45E9  C3 BE 45            	jp	.next2
+     137.  00:45EC                      
+     138.  00:45EC                      ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+     139.  00:45EC                      
+     140.  00:45EC                      reverseplot_enemy:
+     141.  00:45EC                      	; R#5=0xFF -> sat = FE000
+     142.  00:45EC  3E FF               	ld 		a,0xFF
+     143.  00:45EE  D3 99               	out (0x99),a
+     144.  00:45F0  3E 85               	ld 		a,128+5
+     145.  00:45F2  D3 99               	out (0x99),a
+     146.  00:45F4                      
+     147.  00:45F4  0E 00               	ld		c,0
+     148.  00:45F6  11 00 FE            	ld		de,0FE00h	; 3 positions for main ship and its shadow
+     149.  00:45F9  CD 90 41            	call	_vdpsetvramwr
+     150.  00:45FC                      
+     151.  00:45FC  DD 21 1C CF         	ld	ix,enemies+(max_enem-1)*enemy_data
+     152.  00:4600                      
+     153.  00:4600                      ; process two layer enemies
+     154.  00:4600                      
+     155.  00:4600  01 98 0C            	ld	bc,0x98+256*max_enem
+     156.  00:4603                      	
+     157.  00:4603  DD CB 07 46         1:	bit 0,(ix+enemy_data.status)
+     158.  00:4607  CA 9D 46            	jp	z,.spriteoff2
+     159.  00:460A                      	
+     160.  00:460A  DD 6E 01            	ld	l,(ix+enemy_data.x+0)
+     161.  00:460D  DD 66 02            	ld	h,(ix+enemy_data.x+1)
+     162.  00:4610  ED 5B 10 CE         	ld	de,(xmap)
+     163.  00:4614  AF                  	xor a
+     164.  00:4615  ED 52               	sbc hl,de				; dx = enemy.x - xmap
+     165.  00:4617  FA 9D 46            	jp	m,.spriteoff2		; dx <0
+     166.  00:461A                      
+     167.  00:461A  B4                  	or	h
+     168.  00:461B  C2 9D 46            	jp	nz,.spriteoff2		; dx >255
+     169.  00:461E                      
+     170.  00:461E  3A 03 CE            	ld	a,(_xoffset)		; compensate R#18 
+     171.  00:4621  85                  	add	a,l
+     172.  00:4622  DA 9D 46            	jp	c,.spriteoff2		; remove if off screen i.e. dx + _xoffset > 255
+     173.  00:4625  FE F0               	cp	240
+     174.  00:4627  D2 9D 46            	jp	nc,.spriteoff2		; remove if dx + _xoffset > 240
+     175.  00:462A  DD 56 00            	ld	d,(ix+enemy_data.y)	
+     176.  00:462D  ED 51               	out (c),d				; write Y
+     177.  00:462F  6F                  	ld  l,a
+     178.  00:4630  D3 98               	out (0x98),a			; write X
+     179.  00:4632                      
+     180.  00:4632  DD 7E 0A            	ld	a,(ix+enemy_data.frame)
+     181.  00:4635  D3 98               	out (0x98),a			; write shape
+     182.  00:4637  ED 79               	out (c),a				; write crap
+     183.  00:4639                      
+     184.  00:4639  ED 51               	out (c),d				; write Y
+     185.  00:463B  ED 69               	out (c),l				; write X
+     186.  00:463D  C6 04               	add	a,4
+     187.  00:463F  D3 98               	out (0x98),a			; write shape
+     188.  00:4641  ED 79               	out (c),a				; write crap
+     189.  00:4643                      	
+     190.  00:4643                      .next2
+     191.  00:4643  11 F1 FF            	ld	de,-enemy_data
+     192.  00:4646  DD 19               	add ix,de
+     193.  00:4648  10 B9               	djnz	1b
+     194.  00:464A                      
+     195.  00:464A                      ; process one layer enemies
+     196.  00:464A                      
+     197.  00:464A  06 05               	ld	b,max_bullets + max_enem_bullets 
+     198.  00:464C  DD CB 07 46         1:	bit 0,(ix+enemy_data.status)
+     199.  00:4650  CA 90 46            	jp	z,.spriteoff1
+     200.  00:4653                      
+     201.  00:4653  DD 6E 01            	ld	l,(ix+enemy_data.x+0)
+     202.  00:4656  DD 66 02            	ld	h,(ix+enemy_data.x+1)
+     203.  00:4659  ED 5B 10 CE         	ld	de,(xmap)
+     204.  00:465D  AF                  	xor a
+     205.  00:465E  ED 52               	sbc hl,de				; dx = enemy.x - xmap
+     206.  00:4660  FA 90 46            	jp	m,.spriteoff1		; dx <0
+     207.  00:4663                      
+     208.  00:4663  B4                  	or	h
+     209.  00:4664  C2 90 46            	jp	nz,.spriteoff1		; dx >255
+     210.  00:4667                      
+     211.  00:4667  3A 03 CE            	ld	a,(_xoffset)		; compensate R#18 
+     212.  00:466A  85                  	add	a,l
+     213.  00:466B  DA 90 46            	jp	c,.spriteoff1		; remove if off screen i.e. dx + _xoffset > 255
+     214.  00:466E  FE F0               	cp	240
+     215.  00:4670  D2 90 46            	jp	nc,.spriteoff1		; remove if dx + _xoffset > 240
+     216.  00:4673                      	
+     217.  00:4673  DD 56 00            	ld	d,(ix+enemy_data.y)	
+     218.  00:4676  ED 51               	out (c),d				; write Y
+     219.  00:4678  ED 79               	out (c),a				; write X
+     220.  00:467A                      
+     221.  00:467A  DD 7E 0A            	ld	a,(ix+enemy_data.frame)
+     222.  00:467D  D3 98               	out (0x98),a			; write shape
+     223.  00:467F  ED 79               	out (c),a				; write crap
+     224.  00:4681                      
+     225.  00:4681                      .next1
+     226.  00:4681  11 F1 FF            	ld	de,-enemy_data
+     227.  00:4684  DD 19               	add ix,de
+     228.  00:4686  10 C4               	djnz	1b
+     229.  00:4688                      
+     230.  00:4688  CD 12 45            	call	set_manta	
+     231.  00:468B                      	
+     232.  00:468B  3E D8               	ld	a,0xD8
+     233.  00:468D  D3 98               	out (0x98),a			; SAT terminator
+     234.  00:468F  C9                  	ret
+     235.  00:4690                      	
+     236.  00:4690                      	
+     237.  00:4690                      ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+     238.  00:4690                      	
+     239.  00:4690                      .spriteoff1
+     240.  00:4690  3E D9               	ld	a,0xD9
+     241.  00:4692                      [4]	out (c),a				; write crap
+     241.  00:4692  ED 79 ED 79 ED 79 ED 79 
+     242.  00:469A  C3 81 46            	jp	.next1
+     243.  00:469D                      
+     244.  00:469D                      .spriteoff2
+     245.  00:469D  3E D9               	ld	a,0xD9
+     246.  00:469F                      [8]	out (c),a				; write crap
+     246.  00:469F  ED 79 ED 79 ED 79 ED 79 ED 79 ED 79 ED 79 ED 79 
+     247.  00:46AF  C3 43 46            	jp	.next2
+     248.  00:46B2                      
+     249.  00:46B2                      ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+      61   00:46B2                      		include collision_tst.asm
+       1.  00:46B2  (004E)              	align 0x100
        2.  00:4700                      sprite_collision_windows:
        3.  00:4700                      	include sprite_collision_window.asm
        1:  00:4700                      
@@ -11285,21 +11262,19 @@ Errors: 0
 00:000044A9   _hw_sprite_init
 00:00000004 S teller
 00:000044F2   load_colors
-00:00004515   ship_color
-00:0000451D   bull_color
-00:00004526   enem_color
-00:00004533   set_manta
-00:0000453C   plot_enemy
-00:00004547 X directplot_enemy
-00:00004596   directplot_enemy.next1
-00:000045DF   directplot_enemy.next2
-00:000045EB   directplot_enemy.spriteoff1
-00:000045F8   directplot_enemy.spriteoff2
-00:0000460D   reverseplot_enemy
-00:00004664   reverseplot_enemy.next2
-00:000046A2   reverseplot_enemy.next1
-00:000046B1   reverseplot_enemy.spriteoff1
-00:000046BE   reverseplot_enemy.spriteoff2
+00:00004509   bull_color
+00:00004512   set_manta
+00:0000451B   plot_enemy
+00:00004526 X directplot_enemy
+00:00004575   directplot_enemy.next1
+00:000045BE   directplot_enemy.next2
+00:000045CA   directplot_enemy.spriteoff1
+00:000045D7   directplot_enemy.spriteoff2
+00:000045EC   reverseplot_enemy
+00:00004643   reverseplot_enemy.next2
+00:00004681   reverseplot_enemy.next1
+00:00004690   reverseplot_enemy.spriteoff1
+00:0000469D   reverseplot_enemy.spriteoff2
 00:00004700   sprite_collision_windows
 00:00004700 X sprite_0
 00:00004704 X sprite_1

@@ -4,30 +4,33 @@ close all
 
       %  green red blue
 sprtpalgrb =  [ 0 0 0
-                0 0 2
-                0 3 0
-                0 3 2
-                3 0 0
-                3 0 2
-                3 3 0
-                3 3 2
-                4 7 2
-                0 0 7
-                0 7 0
-                0 7 7
-                7 0 0
-                7 0 7
-                7 7 0
-                7 7 7];
+0 0 2
+0 3 0
+0 3 2
+3 0 0
+3 0 2
+3 3 0
+3 3 2
+4 7 2
+0 0 7
+0 7 0
+0 7 7
+7 0 0
+7 0 7
+7 7 0
+7 7 7];
         
+
+
 sprtpalrgb = sprtpalgrb(:,[2 1 3])/7;
 
 
-name = 'enemies_scr8';
+name = 'enemies';
 [AA,MAP] = imread([name '.bmp']);
 
-MAP = sprtpalrgb;
-MAP(18,:) = [6 0 6]/7;
+% MAP = sprtpalrgb;
+% MAP(18,:) = [6 0 6]/7;
+sprtpalrgb = [ sprtpalrgb ; MAP(18,:)];
 
 Y = AA;
 figure
@@ -52,15 +55,17 @@ colormap(MAP)
 
 k = 0;
 h = 0;
+Template = [];
 for i = 1:Nframes 
     img = Y(h+[1:16],k+[1:16]);
     image(img);
     drawnow;
+    Template = [Template img];
     i
 
     for j = 1:16
         line = double(img(j,:))+1;
-        [s1,s2,c1,c2] = convert_line2(line);
+        [s1,s2,c1,c2] = convert_line2(line,MAP,sprtpalrgb);
         frame1{j,i} = s1;
         frame2{j,i} = s2;
         color1{j,i} = c1;
@@ -74,6 +79,12 @@ for i = 1:Nframes
     end
 
 end
+imwrite(Template,MAP,['grpx\' name '_org.png'],'png', 'BitDepth',8)
+
+org = MAP(1+Template);
+
+
+MAP = sprtpalrgb;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % save converted sprite data
@@ -85,7 +96,7 @@ for i = 1:Nframes
     img = zeros(16);
     for j = 1:16
         line = bitor(frame1{j,i}*color1{j,i},frame2{j,i}*bitand(color2{j,i},15));
-        line(find(bitand(frame1{j,i}==0,frame2{j,i}==0))) = 17;
+        line(find(bitand(frame1{j,i}==0,frame2{j,i}==0))) = 16;
         img(j,:) = line;
     end
     YY(h+[1:16],k+[1:16]) = img ;
@@ -96,6 +107,8 @@ for i = 1:Nframes
     end
 end
 imwrite(YY,MAP,['grpx\' name '_scr8.png'],'png', 'BitDepth',8)
+
+imwrite(abs(org-sprtpalrgb(1+YY)),['grpx\' name '_comp.bmp'],'bmp')
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

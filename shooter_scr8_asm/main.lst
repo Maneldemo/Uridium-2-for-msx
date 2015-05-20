@@ -1,4 +1,4 @@
-Sjasm Z80 Assembler v0.42c - www.xl2s.tk             [2015.05.19 - 23:39:48]
+Sjasm Z80 Assembler v0.42c - www.xl2s.tk             [2015.05.21 - 00:11:14]
 
 main.asm
 Errors: 0
@@ -1531,7 +1531,7 @@ Errors: 0
       27:  00:4728                      sprite_10:
       28:  00:4728  00 00 10 10             defb  0, 0,16,16 
       29:  00:472C                      sprite_11:
-      30:  00:472C  00 00 10 10             defb  0, 0,16,16 
+      30:  00:472C  01 00 0C 10             defb  1, 0,12,16 
       31:  00:4730                      sprite_12:
       32:  00:4730  00 00 10 10             defb  0, 0,16,16 
       33:  00:4734                      sprite_13:

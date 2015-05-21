@@ -1,26 +1,28 @@
 clear
 close all
- 
 
       %  green red blue
-sprtpalgrb =  [ 0 0 0
-                0 0 2
-                0 3 0
-                0 3 2
-                3 0 0
-                3 0 2
-                3 3 0
-                3 3 2
-                4 7 2
-                0 0 7
-                0 7 0
-                0 7 7
-                7 0 0
-                7 0 7
-                7 7 0
-                7 7 7];
+t =  [ 0 0 0
+    0 0 2
+    0 3 0
+    0 3 2
+    3 0 0
+    3 0 2
+    3 3 0
+    3 3 2
+    4 7 2
+    0 0 7
+    0 7 0
+    0 7 7
+    7 0 0
+    7 0 7
+    7 7 0
+    7 7 7];
         
-sprtpalrgb = sprtpalgrb(:,[2 1 3])/7;
+
+
+sprtpalrgb = t(:,[2 1 3])/7;
+
         
 figure;
 r = uint8(kron(0:15,ones(16,1)));
@@ -35,12 +37,9 @@ grid
 
 name = 'mship03';
 
-[AA,MMAP] = imread([name '_.png']);
-AA(find(AA==19))=17;
+[AA,MAP] = imread([name '_.png']);
 
-MMAP = MMAP(1:16,:);
-MAP = sprtpalrgb;
-MAP(18,:) = [6 0 6]/7;
+sprtpalrgb = [ sprtpalrgb ; MAP(18,:)];
 
 Y = AA;
 figure
@@ -73,7 +72,7 @@ fprintf (fid,[name '_ani:\n']);
 fprintf (fid,'    defb %d \n',IC-1);
 fclose(fid);
 
-Y=A;
+Y = A;
 Nframes = size(CC,2);
 
 frame1 = cell(16,Nframes);
@@ -82,14 +81,13 @@ frame3 = cell(16,Nframes);
 color1 = cell(16,Nframes);
 color2 = cell(16,Nframes);
 
-
-
 figure
 axis equal
 colormap(MAP)
 
 k = 0;
 h = 0;
+Template = [];
 for i = 1:Nframes
     img = Y(h+[1:16],k+[1:16]);
     image(img);
@@ -97,7 +95,7 @@ for i = 1:Nframes
     i
     for j = 1:16
         line = double(img(j,:))+1;
-        [s1,s2,c1,c2] = convert_line2(line);
+        [s1,s2,c1,c2] = convert_line2(line,MAP,sprtpalrgb);
         frame1{j,i} = s1;
         frame2{j,i} = s2;
         color1{j,i} = c1;
@@ -107,9 +105,11 @@ for i = 1:Nframes
     img = Y(h+[17:32],k+[1:16]);
     for j = 1:16
         line = double(img(j,:))+1;
-        [s,c] = convert_line(line);
+        [s,c] = convert_line(line,MAP,sprtpalrgb);
         frame3{j,i} = s;
     end
+    
+    Template = [Template Y(h+[1:32],k+[1:16]);];
     
     k = k + 16;
     if (k>=size(Y,2))
@@ -117,6 +117,9 @@ for i = 1:Nframes
         h = h + 32;
     end
 end
+imwrite(Template,MAP,['grpx\' name '_org.png'],'png', 'BitDepth',8)
+
+org = MAP(1+Template);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % save converted sprite data
@@ -128,7 +131,7 @@ for i = 1:Nframes
     img = zeros(16);
     for j = 1:16
         line = bitor(frame1{j,i}*color1{j,i},frame2{j,i}*bitand(color2{j,i},15));
-        line(find(bitand(frame1{j,i}==0,frame2{j,i}==0))) = 17;
+        line(find(bitand(frame1{j,i}==0,frame2{j,i}==0))) = 16;
         img(j,:) = line;
     end
     YY(h+[1:16],k+[1:16]) = img ;
@@ -136,7 +139,7 @@ for i = 1:Nframes
     for j = 1:16
         s = frame3{j,i};
         line = s*0;
-        line(find(s==0)) = 17;
+        line(find(s==0)) = 16;
         img(j,:) = line;
     end
     YY(h+[17:32],k+[1:16]) = img;
@@ -147,7 +150,9 @@ for i = 1:Nframes
         h = h + 32;
     end
 end
-imwrite(YY,MAP,['grpx\' name '_scr8.png'],'png', 'BitDepth',8)
+imwrite(YY,sprtpalrgb,['grpx\' name '_scr8.png'],'png', 'BitDepth',8)
+
+imwrite(abs(org-sprtpalrgb(1+YY)),['grpx\' name '_comp.bmp'],'bmp')
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % save sprite data

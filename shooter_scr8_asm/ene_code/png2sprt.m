@@ -1,7 +1,6 @@
 clear
 close all
 
-
       %  green red blue
 sprtpalgrb =  [ 0 0 0
 0 0 2
@@ -62,7 +61,6 @@ for i = 1:Nframes
     drawnow;
     Template = [Template img];
     i
-
     for j = 1:16
         line = double(img(j,:))+1;
         [s1,s2,c1,c2] = convert_line2(line,MAP,sprtpalrgb);

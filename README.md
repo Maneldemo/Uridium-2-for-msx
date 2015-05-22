@@ -3,7 +3,7 @@ Uridium 2 demake for msx 2
 
 
 The project is aimed to prove that also a poor msx2 can have fine horizontal scrolling with 256 colors on screen.
-The game shows multidirectional scrolling (even if the level height is limited to 208 pixels) at difefrent speeds.
+The game shows multidirectional scrolling (even if the level height is limited to 208 pixels) at different speeds.
 
 Planned features
 - two layer scrolling (starfield backplane)

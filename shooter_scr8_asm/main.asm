@@ -257,16 +257,21 @@ main_loop:
 		and	32
 		; call	z,_plot_distrucable
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+		ld		a,4
+		out		(0x99),a
+		ld		a,7+128
+		out		(0x99),a
+		
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+		call	test_star
+
 		xor		a
 		out		(0x99),a
 		ld		a,7+128
 		out		(0x99),a
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-		di
-		ld	a,:test_star
-		ld	(_kBank3),a
-		call	test_star
-		ei
 		
 1:		ld	a,(_jiffy)		; wait for vblank (and not for linit)
 		or	a
@@ -302,7 +307,7 @@ ms_bllts_col_win:
 		include	"..\TTplayer\code\ttreplay.asm"
 		include	"ms_crtl.asm"
 		include	"put_ms_sprt.asm"
-				
+		include probe_level.asm				
 		
 outvram:
 2:		ld	a,d
@@ -320,7 +325,7 @@ outvram:
 		
 		page 2
 	; include mainhero_LMMM.asm
-		include probe_level.asm
+
 	
 		page 3
 manta_color:
@@ -485,6 +490,9 @@ _displaypage:		#1
 _mccolorchange:		#1
 _xoffset:			#1
 _yoffset:			#1
+
+__xoffset:			#1
+__r18:				#1
 
 randSeed:			#2
 cur_level:			#1

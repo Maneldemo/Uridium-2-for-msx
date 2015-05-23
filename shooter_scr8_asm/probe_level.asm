@@ -25,38 +25,84 @@ add	dw	0
 	ends
 	
 starlist:
-	star_data	234,62,234/16+(64/16)*256
-	star_data	39,10,39/16+(10/16)*256
-	star_data	211,50,211/16+(50/16)*256
-	star_data	138,52,138/16+(52/16)*256
-	star_data	240,56,240/16+(56/16)*256
-    star_data	20,5,20/16+(5/16)*256
-	star_data	113,26,113/16+(26/16)*256
-    star_data	27,17,27/16+(17/16)*256
+	star_data	 32,64+10, 32/16+(10/16)*256
+	star_data	208,64+50,208/16+(50/16)*256
+	star_data	128,64+52,128/16+(52/16)*256
+starlist2:
+    star_data	 16,64+5,  16/16+((64+ 5)/16)*256
+    star_data	 48,64+17, 48/16+((64+17)/16)*256
+	star_data	112,64+26,112/16+((64+26)/16)*256
+starlist3:
+    star_data	 48,64+17, 48/16+((128+17)/16)*256
+	star_data	112,64+26,112/16+((128+26)/16)*256
+	star_data	224,64+56,224/16+((128+56)/16)*256
 	
 test_star:
-	ld	ix,starlist
+
+	ld	a,(_xoffset)
+[4]	add	a,a
+	ld  c,a
 	
-	ld	b,8
-1:
-	ld	e,(ix+star_data.add)
+	ld	a,(_displaypage)
+[2]	add	a,a
+	ld	(__r18),a
+	
+	ld	ix,starlist
+	call	.star_loop	
+
+	ld	a,(__r18)
+	inc	a
+	ld	(__r18),a
+
+	ld	ix,starlist2
+	call	.star_loop
+
+	ld	a,(__r18)
+	inc	a
+
+	ld	ix,starlist3
+	call	.star_loop
+
+	ld	a,(_xoffset)		
+	ld	(__xoffset),a
+	ret
+	
+.star_loop
+	out (0x99),a ;set bits 14-16
+	ld a,14+128
+	out (0x99),a
+
+
+	ld	b,3
+1:	ld	e,(ix+star_data.add)
 	ld	d,(ix+star_data.add+1)
 	ld	hl,(_levelmap_pos)
 	add	hl,de
 	ld	a,(hl)
 	and	a
-	call	z,plot
-	ld	de,star_data
+	jp	nz,2f
+	ld	a,(__xoffset)		; compensate R#18 
+	add	a,(ix+star_data.x)
+	out (0x99),a
+	ld a,(ix+star_data.y) 	;	set bits 8-13
+	out (0x99),a
+	xor	a
+	out	(0x98),a
+	call	.set_star
+2:	ld	de,star_data
 	add	ix,de
 	djnz	1b
 	ret
 	
-	
-plot:
-	ld	a,(_displaypage)
-	ld	d,(ix+star_data.y)
-	ld	e,(ix+star_data.x)
-	call	_vdpsetvramwr2
+.set_star:
+	ld	a,c
+	cp	(ix+star_data.x)
+	ret	z
+	ld	a,(_xoffset)		; compensate R#18 
+	add	a,(ix+star_data.x)
+	out (0x99),a
+	ld a,(ix+star_data.y) 	;	set bits 8-13
+	out (0x99),a
 	ld	a,255
 	out	(0x98),a
 	ret

@@ -88,9 +88,15 @@ bullet_loop:
 	add hl,de
 	ld	(ix+enemy_data.x),l
 	ld	(ix+enemy_data.x+1),h
+
+	ld	a,(ix+enemy_data.y)
+
 	call	.test_obstacles
+	jr		z,.blocked
+	
 	dec	(ix+enemy_data.cntr)
 	jr	nz,1f
+.blocked
 	res 0,(ix+enemy_data.status)
 1:
 	ld	de,enemy_data
@@ -99,31 +105,44 @@ bullet_loop:
 	endrepeat
 	ret
 
-
+; hl  = X, a = Y
+; de = x_speed
+;
+; return Z is an obstacle is found
 .test_obstacles:
-	ld	e,(ix+enemy_data.frame)
-	ld	d,0
-	ld	iy,ms_bllts_col_win-32
-	add	iy,de			; here iy points to the collision window of the current frame of the bullet
+	ld	c,(ix+enemy_data.frame)
+	ld	b,0
+	ld	iy,ms_bllts_col_win-32	; bullet frames go from 32 to 60 step 4
+	add	iy,bc					; here iy points to the collision window of the current frame of the bullet
 
-	bit	7,(ix+enemy_data.speed+1)
-	jr	z,2f			;.x_positive
-	ld	e,(iy+0)		;.x_negative:
+	bit	7,d						; test direction of the bullet
+	jr	z,2f					
+	ld	e,(iy+0)				; direction x negative -> take xmin of the frame
 	jp	3f
 
-2:	ld	e,(iy+1)		;.x_positive:
+2:	ld	e,(iy+1)				; direction x positive  -> take xmax of the frame
 	
-3:	ld	l,(ix+enemy_data.x)
-	ld	h,(ix+enemy_data.x+1)
+3:	ld	d,0
 	add hl,de
-	ld	a,(ix+enemy_data.y)
-	add	a,(iy+2)
-	push	hl
-	push	af
-	call	.tst_block
-	pop		de
-	pop		hl
-	ret	z				; skip the rest if already hit
+	
+	add	a,(iy+2)				; add ymin to y
+	
+	ld	d,a						; HL is x, A is y
+	
+	ld	bc,_levelmap
+[4]	rrca
+	and 15
+[4]	add	hl,hl
+	ld	l,h
+	ld	h,a
+	add	hl,bc
+	ld	a,(hl)
+	;XXXXXXX add actual test for obstacles
+	cp 	234
+	ret	z
+	cp 	235
+	ret	z						; skip the rest if already hit
+
 	ld	a,d
 	and	0xF0
 	ld	d,a
@@ -131,19 +150,25 @@ bullet_loop:
 	add	a,(iy+3)
 	and	0xF0
 	cp	d
-	ret	z				; avoid testing twice the same 16x16 tile
-	jp	.tst_block
-
-.tst_block:			; x=hl,y=a
-	di
-	ld	a,:test_star
-	ld	(_kBank3),a
-	call probe_level
-	ei
-	xor	a
+	jp	z,1f					; avoid testing twice the same 16x16 tile
+	inc	h
+	ld	a,(hl)
+	;XXXXXXX add actual test for obstacles
+	cp 	234
+	ret	z
+	cp 	235
+	ret
+1:	
+	inc	a
+	cp	d				; ret with nz
 	ret
 	
 
+	
+
+
+	
+	
 ; .tst_block:
 	; call test_obstacles.meta_tile_peek
 	; ld	e,a

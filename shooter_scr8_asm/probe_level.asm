@@ -17,9 +17,51 @@ probe_level:
 	add	hl,bc
 	ld	a,(hl)
 	ret
-
+	
+	struct star_data
+x	db	0
+y	db	0
+add	dw	0
+	ends
+	
+starlist:
+	star_data	234,62,234/16+(64/16)*256
+	star_data	39,10,39/16+(10/16)*256
+	star_data	211,50,211/16+(50/16)*256
+	star_data	138,52,138/16+(52/16)*256
+	star_data	240,56,240/16+(56/16)*256
+    star_data	20,5,20/16+(5/16)*256
+	star_data	113,26,113/16+(26/16)*256
+    star_data	27,17,27/16+(17/16)*256
 	
 test_star:
+	ld	ix,starlist
+	
+	ld	b,8
+1:
+	ld	e,(ix+star_data.add)
+	ld	d,(ix+star_data.add+1)
+	ld	hl,(_levelmap_pos)
+	add	hl,de
+	ld	a,(hl)
+	and	a
+	call	z,plot
+	ld	de,star_data
+	add	ix,de
+	djnz	1b
+	ret
+	
+	
+plot:
+	ld	a,(_displaypage)
+	ld	d,(ix+star_data.y)
+	ld	e,(ix+star_data.x)
+	call	_vdpsetvramwr2
+	ld	a,255
+	out	(0x98),a
+	ret
+	
+other:
 	ld	hl,(xship)
 	ld	a,(yship)
 	call	probe_level

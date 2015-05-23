@@ -43,6 +43,7 @@ vdpport2 equ 0x9A
 
 _vdpsetvramwr:
 		ld a,c
+_vdpsetvramwr2:
 ;Set VDP for writing at address ADE (17-bit) ;
 		rlc d
 		rla

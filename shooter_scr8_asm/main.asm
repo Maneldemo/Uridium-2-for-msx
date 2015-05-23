@@ -181,7 +181,6 @@ _ntsc:	ld	(SEL_NTSC),a	; if set NSTC, if reset PAL
 		ld		(_xmappos),hl
 		
 		ld		(_nframes),hl
-		ld		(_currentpage),a
 		ld		(_mcdx),hl
 		ld		(_mcframe),a
 		
@@ -480,7 +479,6 @@ _xmappos:			#2
 _levelmap_pos:		#2
 
 _shadowbuff:		#2
-_currentpage:		#1
 
 _displaypage:		#1
 

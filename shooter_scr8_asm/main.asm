@@ -257,20 +257,20 @@ main_loop:
 		and	32
 		; call	z,_plot_distrucable
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-		ld		a,4
-		out		(0x99),a
-		ld		a,7+128
-		out		(0x99),a
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+		; ld		a,3
+		; out		(0x99),a
+		; ld		a,7+128
+		; out		(0x99),a
 		
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-		call	test_star
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+		; call	test_star
 
-		xor		a
-		out		(0x99),a
-		ld		a,7+128
-		out		(0x99),a
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+		; xor		a
+		; out		(0x99),a
+		; ld		a,7+128
+		; out		(0x99),a
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 		
 1:		ld	a,(_jiffy)		; wait for vblank (and not for linit)

@@ -35,36 +35,34 @@ starlist2:
 starlist3:
     star_data	 48,64+17, 48/16+((128+17)/16)*256
 	star_data	112,64+26,112/16+((128+26)/16)*256
-	star_data	224,64+56,224/16+((128+56)/16)*256
+	star_data	224,64+42,224/16+((128+42)/16)*256
 	
 test_star:
-
+	di
 	ld	a,(_xoffset)
 [4]	add	a,a
 	ld  c,a
 	
 	ld	a,(_displaypage)
 [2]	add	a,a
-	ld	(__r18),a
+	ld	b,a
 	
 	ld	ix,starlist
 	call	.star_loop	
 
-	ld	a,(__r18)
-	inc	a
-	ld	(__r18),a
+	inc	b
+	ld	a,b
 
-	ld	ix,starlist2
 	call	.star_loop
 
-	ld	a,(__r18)
-	inc	a
+	inc	b
+	ld	a,b
 
-	ld	ix,starlist3
 	call	.star_loop
 
 	ld	a,(_xoffset)		
 	ld	(__xoffset),a
+	ei
 	ret
 	
 .star_loop
@@ -73,7 +71,7 @@ test_star:
 	out (0x99),a
 
 
-	ld	b,3
+	repeat 3
 1:	ld	e,(ix+star_data.add)
 	ld	d,(ix+star_data.add+1)
 	ld	hl,(_levelmap_pos)
@@ -91,7 +89,7 @@ test_star:
 	call	.set_star
 2:	ld	de,star_data
 	add	ix,de
-	djnz	1b
+	endrepeat
 	ret
 	
 .set_star:

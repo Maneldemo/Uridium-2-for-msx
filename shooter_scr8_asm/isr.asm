@@ -198,6 +198,20 @@ lint:
 		jp	 c,_blank_line_rgt		; <0 == sx
 1:		pop	hl
 .exit:
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+		ld		a,00001000B
+		out		(0x99),a
+		ld		a,7+128
+		out		(0x99),a
+		
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+		call	test_star
+
+		xor		a
+		out		(0x99),a
+		ld		a,7+128
+		out		(0x99),a
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 		
 		pop    ix         
 		pop    iy         

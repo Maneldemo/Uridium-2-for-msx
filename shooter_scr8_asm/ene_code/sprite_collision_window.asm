@@ -17,25 +17,25 @@ sprite_4:
 sprite_5:
     defb  0, 0,16,16 
 sprite_6:
-    defb  0, 1,15,15 
+    defb  0, 0,16,16 
 sprite_7:
-    defb  1, 1,15,15 
+    defb  0, 0,16,16 
 sprite_8:
-    defb  0, 0,16,16 
+    defb  0, 3,16,11 
 sprite_9:
-    defb  0, 0,16,16 
+    defb  0, 3,16,11 
 sprite_10:
     defb  0, 0,16,16 
 sprite_11:
-    defb  1, 0,12,16 
+    defb  0, 0,16,16 
 sprite_12:
     defb  0, 0,16,16 
 sprite_13:
     defb  0, 0,16,16 
 sprite_14:
-    defb  2, 2,12,12 
+    defb  0, 0,16,16 
 sprite_15:
-    defb  1, 1,14,14 
+    defb  0, 0,16,16 
 sprite_16:
     defb  0, 1,16,14 
 sprite_17:

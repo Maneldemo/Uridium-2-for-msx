@@ -393,7 +393,7 @@ _animated:
 		page 27
 sprtdata:
 		incbin 	uridium_revA.bin,,16*32
-		incbin 	enemies_scr8_frm.bin
+		incbin 	enemies_frm.bin
 
 		page 28
 color_base:
@@ -407,7 +407,7 @@ color_base:
 		endrepeat
 
 		
-		incbin 	enemies_scr8_clr.bin
+		incbin 	enemies_clr.bin
 		; repeat 4
 		; ds	16,12
 		; ds	16,6+64

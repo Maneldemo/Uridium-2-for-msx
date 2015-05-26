@@ -161,9 +161,9 @@ wave_timer:
 
 	call	land_now_test
 	
-	; call	rand8
-	; and	7			
-	call 	manual_wave_ctrl
+	call	rand8
+	and	7			
+	; call 	manual_wave_ctrl
 	
 	jp	z,wave0
 	dec	a
@@ -467,19 +467,21 @@ wave3:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 wave4:
 	ld	a,(dxmap)
-	sra a			; de' = player speed x 2
-	or  1
+	sra a			; de' = player speed x 1.5
 	ld	e,a
-	rla
+	RLCA
 	sbc a,a
 	ld	d,a
+	ld	a,(dxmap)
+	add	a,e
+	ld	e,a
 	exx
 	
 _wave4_cont:
 
-	jr	z,.pos				
+	jp	p,.pos				
 .neg
-	ld	de,256+32
+	ld	de,256+96
 	ld	c,+1+64		; enemies going left
 	
 	call	rand8
@@ -492,7 +494,7 @@ _wave4_cont:
 
 	jr	1f
 .pos
-	ld	de,-64
+	ld	de,-128
 	ld	c,+1		; enemies going right
 
 	call	rand8
@@ -673,21 +675,23 @@ wave6:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 wave7:
 	ld	a,(dxmap)
-	sra a			; de' = player speed x 2
-	or  1
+	sra a			; de' = player speed x 1.5
 	ld	e,a
-	rla
+	RLCA
 	sbc a,a
 	ld	d,a
+	ld	a,(dxmap)
+	add	a,e
+	ld	e,a
 	exx
 
-	jr	z,.pos				
+	jp	p,.pos				
 .neg
-	ld	de,256+32
+	ld	de,256+112
 	ld	c,1+64				; enemies going left
 	jr	1f
 .pos
-	ld	de,-64
+	ld	de,-128
 	ld	c,+1				; enemies going right
 	
 1:

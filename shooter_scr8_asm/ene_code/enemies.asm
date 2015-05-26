@@ -108,6 +108,31 @@ bull_init:
 
 	ret
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; for debug only
+
+manual_wave_ctrl:
+	ld e,6
+	call	checkkbd
+	rrc	l				; shift
+	jp	nc,levels_8_16
+levels_0_8:
+	ld	d,0
+	jr	1f
+levels_8_16
+	ld	d,8
+1:
+	ld e,0
+	call	checkkbd
+	ld	a,d
+	repeat 8
+11:	rrc	l				 ; <- '0','1','2','3','4','5','6','7'
+	jr	nc,1f
+	inc	a
+	endrepeat
+1:	ret
+	
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;
@@ -136,8 +161,9 @@ wave_timer:
 
 	call	land_now_test
 	
-	call	rand8
-	and	7			
+	; call	rand8
+	; and	7			
+	call 	manual_wave_ctrl
 	
 	jp	z,wave0
 	dec	a
@@ -152,7 +178,9 @@ wave_timer:
 	jp	z,wave5
 	dec	a
 	jp	z,wave6
-	jp	wave7
+	dec	a
+	jp	z,wave7
+	ret		; no wave at all
 	
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -625,7 +653,7 @@ wave5:
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;
-;	enemies n#4 coming from back double speed
+;	fixed enemies n#4 coming from back double speed
 ;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 wave6:
@@ -640,7 +668,7 @@ wave6:
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;
-;  enemies n#7 (spinning)
+;  enemies n#7 (spinning)  coming from back double speed
 ;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 wave7:
@@ -944,7 +972,7 @@ enemy4:
 ;;;;;;;;;;;;;;;;;;;;
 	align 0x100
 rotation:
-	db 0,16,32,48,48,32,16,0
+	db 0,16,32,48;,48,32,16,0
 ;;;;;;;;;;
 rotate:
 	ld	a,(ix+enemy_data.cntr)
@@ -952,8 +980,8 @@ rotate:
 	ld	(ix+enemy_data.cntr),a
 	exx
 	ld h, high rotation
-[2]	rrca
-	and 7
+[4]	rrca
+	and 3
 	ld	l,a
 	ld a,(hl)
 	exx

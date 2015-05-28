@@ -138,9 +138,9 @@ bullet_loop:
 	add	hl,bc
 	ld	a,(hl)
 	;XXXXXXX add actual test for obstacles
-	cp 	234
+	cp 	240
 	ret	z
-	cp 	235
+	cp 	241
 	ret	z						; skip the rest if already hit
 
 	ld	a,d
@@ -154,9 +154,9 @@ bullet_loop:
 	inc	h
 	ld	a,(hl)
 	;XXXXXXX add actual test for obstacles
-	cp 	234
+	cp 	240
 	ret	z
-	cp 	235
+	cp 	241
 	ret
 1:	
 	inc	a

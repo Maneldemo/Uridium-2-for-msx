@@ -6,6 +6,8 @@
 		incdir ene_code
 		incdir music
 		incdir manta
+		incdir sources
+		incdir databin
 
 		defpage	 0,0x4000, 0x2000		; page 0 main code + far call routines
 		defpage	 1,0x6000, 0x2000		; page 1 main code + far call routines

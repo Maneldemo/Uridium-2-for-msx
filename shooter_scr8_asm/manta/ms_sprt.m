@@ -37,7 +37,8 @@ grid
 
 name = 'mship03';
 
-[AA,MAP] = imread([name '_.png']);
+%[AA,MAP] = imread([name '_gold.png']);
+[AA,MAP] = imread([name '_silver.png']);
 
 sprtpalrgb = [ sprtpalrgb ; MAP(18,:)];
 

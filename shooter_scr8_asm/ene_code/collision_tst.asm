@@ -38,15 +38,14 @@ set_size:
 ;	out;
 ;		IY -> xoff,yoff,xsize,ysize are set
 	
-set_size2:
- 	ex	af,af'
-	ld	a,(iy+enemy_data.frame)
-	sub	a,16*4
-	rrca
+bullet_set_size2:
+	sub	a,8*4
 	exx
 	and	%01111100
-	ld	l,a
-	ld	h,high sprite_collision_windows		
+	ld	c,a
+	ld	b,0
+	ld	hl,bullet_sprite_collision_windows
+	add	hl,bc
 	ld	a,(hl)
 	ld	(iy+enemy_data.xoff),a
 	inc	hl
@@ -59,7 +58,6 @@ set_size2:
 	ld	a,(hl)
 	ld	(iy+enemy_data.ysize),a
 	exx
-	ex		af,af'
 	ret
 	
 bullet_sprite_collision_windows:
@@ -120,14 +118,14 @@ test_collision_enemy_bullets:
 	
 	ld  a,(ix+enemy_data.y)
 	add a,(ix+enemy_data.yoff)
-	ld  b,a
-	ld  c,(ix+enemy_data.ysize)
+	ld  b,a						; b = y+yoffset
+	ld  c,(ix+enemy_data.ysize) ; c = ysize
 	
 	;[minx(h) maxx(h) miny(h) maxy(h)]
 	
 	ld  a,(yship)
 	add	a,(iy+2)
-	ld  d,a
+	ld  d,a				; d = y+ymin
 	
 	ld	a,(iy+3)
 	sub	a,(iy+2)

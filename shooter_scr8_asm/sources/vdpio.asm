@@ -16,8 +16,20 @@ _cls:
 		dec	e
 		jp		nz,1b
 		ret
+_cls0:
+		ld		c,0
+		ld		d,c
+		ld		e,c
+		di
+		call	_vdpsetvramwr
+		ei
+		ld		bc,mapHeight*16*256
+		xor		a
+1:		out		(0x98),a
+        cpi
+        jp   	pe,1b
+		ret
 		
-
 ;-------------------------------------
 		
 vdpport1 equ 0x99
@@ -73,16 +85,16 @@ _vdpsetvramrd:
 		rla
 		rlc d
 		rla
-		srl d ; primo shift, il secondo dopo la out
+		srl d 			; primo shift, il secondo dopo la out
 
-		out (0x99),a ;set bits 14-16
+		out (0x99),a 	; set bits 14-16
 		ld a,14+128
 		out (0x99),a
 
-		srl d ; secondo shift.            
-		ld a,e ;set bits 0-7
+		srl d 	; secondo shift.            
+		ld a,e 	; set bits 0-7
 		out (0x99),a
-		ld a,d ;set bits 8-13
+		ld a,d 	; set bits 8-13
 		and 0x3F
 		out (0x99),a
 		ret

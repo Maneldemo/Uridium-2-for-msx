@@ -1284,7 +1284,7 @@ book_enemy_shoot:
 	ld  a,12*4			; it could depend on enemy ship
 	ld  (iy+enemy_data.frame),a
 
-	call	set_size2	; set  xoff,yoff,xsize,ysize for sprite collision
+	call	bullet_set_size2	; set  xoff,yoff,xsize,ysize for sprite collision
 
 	ld	l,(ix+enemy_data.x)
 	ld	h,(ix+enemy_data.x+1)
@@ -1363,4 +1363,18 @@ enemy_bullet_loop:
 
 
 test_obstacles.found
+.found:
+	ld	a,(ms_state)
+	cp	ms_explode
+	ret	z
+	ld	a,ms_explode
+	ld	(ms_state),a
+	ld	a,64
+	ld	(aniframe),a
+	xor	a
+	ld	(dxmap),a
+
+	ld	a,9			; ms explosion
+	call AFXPLAY
+
 	ret

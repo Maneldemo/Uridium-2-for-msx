@@ -160,10 +160,10 @@ _ntsc:	ld	(SEL_NTSC),a	; if set NSTC, if reset PAL
 		ld		hl,musbuff
 		call	replay_loadsong
 
+
 		ld		e,0
         call	_setpage
-		
-		
+				
 		ld	a, :_level
 		ld	(_kBank4),a
 		
@@ -172,6 +172,17 @@ _ntsc:	ld	(SEL_NTSC),a	; if set NSTC, if reset PAL
 		ld		bc,mapWidth*mapHeight
 		ldir
 
+
+		; call	init_page0
+
+		ld		a,6
+		ld		(cur_level),a
+
+restart:
+		call	_intreset
+		xor		a
+		ld		(_displaypage),a		
+		call 	_cls0
 		ld		hl,_levelmap
 		ld		(_levelmap_pos),hl
 		
@@ -179,6 +190,7 @@ _ntsc:	ld	(SEL_NTSC),a	; if set NSTC, if reset PAL
 		ld		h,a
 		ld		l,a
 		ld		(flip_flop),a
+		ld		(god_mode),a
 		ld		(_ymappos),a
 		ld		(_xmappos),hl
 		
@@ -187,6 +199,7 @@ _ntsc:	ld	(SEL_NTSC),a	; if set NSTC, if reset PAL
 		ld		(_mcframe),a
 		
 		ld		(_yoffset),a		;  0 tutto su
+		ld		(_xoffset),a		;  0 tutto su
 								
 		ld	(aniframe),a
 		ld	(anispeed),a
@@ -207,16 +220,9 @@ _ntsc:	ld	(SEL_NTSC),a	; if set NSTC, if reset PAL
 
 		call 	npc_init								
 		call 	load_colors
-		
-		xor		a
-		ld		(_displaypage),a		
-		call	init_page0
-
-		ld		a,6
-		ld		(cur_level),a
 
 		call	_isrinit
-		
+
 main_loop: 
 				
 		ld	hl,0
@@ -225,7 +231,12 @@ main_loop:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; run ms FSM and place its sprites in the SAT in RAM
 		call	ms_ctrl
-		
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; test for game restart
+		ld	a,(ms_state)
+		cp	ms_reset
+		jp	z,restart
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; place MS in the SAT and test for collision
 		call	put_ms_sprt

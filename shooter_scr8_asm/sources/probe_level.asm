@@ -105,7 +105,7 @@ test_star:
 	out	(0x98),a
 	ret
 	
-other:
+unused_other:
 	ld	hl,(xship)
 	ld	a,(yship)
 	call	probe_level

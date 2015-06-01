@@ -58,32 +58,38 @@ put_ms_sprt:
 	ld	a,(yship)
 	ld	(hl),a
 	inc hl
-	ld	(hl),xship_rel
+	ld	a,(_xoffset)		; compensate R#18 
+	add	a,xship_rel
+	ld	(hl),a
 	inc hl
 	ld	(hl),0		; shape 0 hard wired
 	inc hl
-	ld	(hl),10
+;	ld	(hl),10
 	inc hl
 
 	ld	a,(yship)
 	ld	(hl),a
 	inc hl
-	ld	(hl),xship_rel
+	ld	a,(_xoffset)		; compensate R#18 
+	add	a,xship_rel
+	ld	(hl),a
 	inc hl
 	ld	(hl),4		; shape 4 hard wired
 	ld	c,a
 	inc hl
-	ld	(hl),11
+;	ld	(hl),11
 	inc hl
 
 	ld	a,(yship)
 	ld	(hl),a
 	inc hl
-	ld	(hl),xship_rel
+	ld	a,(_xoffset)		; compensate R#18 
+	add	a,xship_rel
+	ld	(hl),a
 	inc hl
 	ld	(hl),8		; shape 8 hard wired
-	inc hl
-	ld	(hl),6
+;	inc hl
+;	ld	(hl),6
 	ret
 	
 .landing:

@@ -1,4 +1,4 @@
-Sjasm Z80 Assembler v0.42c - www.xl2s.tk             [2015.05.30 - 23:07:28]
+Sjasm Z80 Assembler v0.42c - www.xl2s.tk             [2015.06.01 - 19:21:16]
 
 main.asm
 Errors: 0
@@ -871,7 +871,7 @@ Errors: 0
      205.  00:4318                      		; out		(0x99),a
      206.  00:4318                      		
      207.  00:4318                      ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-     208.  00:4318  CD F1 70            		call	test_star
+     208.  00:4318  CD F6 70            		call	test_star
      209.  00:431B                      
      210.  00:431B  AF                  		xor		a
      211.  00:431C  D3 99               		out		(0x99),a
@@ -1236,10 +1236,10 @@ Errors: 0
       13.  00:44C8                    < 		call	outvram
       14.  00:44C8                    < teller:=teller+1
       15.  00:44C8                    < 		endrepeat
-      15.  00:44C8  0E 00 11 00 D8 CD A5 41 16 1B 1E 01 CD FD 71 0E 
-      15.  00:44D8  00 11 00 E0 CD A5 41 16 1B 1E 01 CD FD 71 0E 00 
-      15.  00:44E8  11 00 E8 CD A5 41 16 1B 1E 01 CD FD 71 0E 00 11 
-      15.  00:44F8  00 F0 CD A5 41 16 1B 1E 01 CD FD 71 
+      15.  00:44C8  0E 00 11 00 D8 CD A5 41 16 1B 1E 01 CD 02 72 0E 
+      15.  00:44D8  00 11 00 E0 CD A5 41 16 1B 1E 01 CD 02 72 0E 00 
+      15.  00:44E8  11 00 E8 CD A5 41 16 1B 1E 01 CD 02 72 0E 00 11 
+      15.  00:44F8  00 F0 CD A5 41 16 1B 1E 01 CD 02 72 
       16.  00:4504                      		
       17.  00:4504  0E 00               		ld		c,0
       18.  00:4506  11 00 FA            		ld		de,0FA00h
@@ -3632,7 +3632,7 @@ Errors: 0
      108   00:54BE  CD A5 41            		call	_vdpsetvramwr
      109   00:54C1                      
      110   00:54C1  11 07 10            		ld	de,256*:_opening+7
-     111   00:54C4  CD FD 71            		call	outvram
+     111   00:54C4  CD 02 72            		call	outvram
      112   00:54C7                      		
      113   00:54C7  1E 08               1:		ld e,8
      114   00:54C9  CD BB 44            		call	checkkbd
@@ -3656,14 +3656,14 @@ Errors: 0
      132   00:54EB  CD A5 41            		call	_vdpsetvramwr
      133   00:54EE                      
      134   00:54EE  11 01 18            		ld		de, 256*:_scorebar+1
-     135   00:54F1  CD FD 71            		call	outvram
+     135   00:54F1  CD 02 72            		call	outvram
      136   00:54F4                      		
      137   00:54F4  0E 01               		ld		c,1
      138   00:54F6  11 00 B0            		ld		de,256*mapHeight*16
      139   00:54F9  CD A5 41            		call	_vdpsetvramwr
      140   00:54FC                      
      141   00:54FC  11 02 19            		ld		de, 256*:_animated+2
-     142   00:54FF  CD FD 71            		call	outvram
+     142   00:54FF  CD 02 72            		call	outvram
      143   00:5502                      
      144   00:5502                      		;--- initialise demo song
      145   00:5502  01 CD 02            		ld	bc,	_levelmap-ttreplayRAM
@@ -8109,272 +8109,278 @@ Errors: 0
       58.  01:7043  3A 15 CE            	ld	a,(yship)
       59.  01:7046  77                  	ld	(hl),a
       60.  01:7047  23                  	inc hl
-      61.  01:7048  36 78               	ld	(hl),xship_rel
-      62.  01:704A  23                  	inc hl
-      63.  01:704B  36 00               	ld	(hl),0		; shape 0 hard wired
-      64.  01:704D  23                  	inc hl
-      65.  01:704E  36 0A               	ld	(hl),10
-      66.  01:7050  23                  	inc hl
-      67.  01:7051                      
-      68.  01:7051  3A 15 CE            	ld	a,(yship)
-      69.  01:7054  77                  	ld	(hl),a
-      70.  01:7055  23                  	inc hl
-      71.  01:7056  36 78               	ld	(hl),xship_rel
-      72.  01:7058  23                  	inc hl
-      73.  01:7059  36 04               	ld	(hl),4		; shape 4 hard wired
-      74.  01:705B  4F                  	ld	c,a
-      75.  01:705C  23                  	inc hl
-      76.  01:705D  36 0B               	ld	(hl),11
-      77.  01:705F  23                  	inc hl
-      78.  01:7060                      
-      79.  01:7060  3A 15 CE            	ld	a,(yship)
-      80.  01:7063  77                  	ld	(hl),a
-      81.  01:7064  23                  	inc hl
-      82.  01:7065  36 78               	ld	(hl),xship_rel
-      83.  01:7067  23                  	inc hl
-      84.  01:7068  36 08               	ld	(hl),8		; shape 8 hard wired
-      85.  01:706A  23                  	inc hl
-      86.  01:706B  36 06               	ld	(hl),6
-      87.  01:706D  C9                  	ret
-      88.  01:706E                      	
-      89.  01:706E                      .landing:
-      90.  01:706E  21 29 CE            	ld	hl,ram_sat+4*2
-      91.  01:7071  3A 15 CE            	ld	a,(yship)
-      92.  01:7074  3D                  	dec	a
-      93.  01:7075  77                  	ld	(hl),a
-      94.  01:7076  23                  	inc hl
-      95.  01:7077  3A 11 CE            	ld	a,(xmap)
-      96.  01:707A  57                  	ld  d,a
-      97.  01:707B  3A 16 CE            	ld	a,(xship)
-      98.  01:707E  92                  	sub	a,d
-      99.  01:707F  77                  	ld	(hl),a		; xship_rel
-     100.  01:7080  23                  	inc hl
-     101.  01:7081  36 00               	ld	(hl),0		; shape 0 hard wired
-     102.  01:7083  23                  	inc hl
-     103.  01:7084  36 0F               	ld	(hl),15
-     104.  01:7086                      	
-     105.  01:7086  11 F9 FF            	ld  de,-7
-     106.  01:7089  19                  	add hl,de
-     107.  01:708A                      	
-     108.  01:708A  3A 15 CE            	ld	a,(yship)
-     109.  01:708D  3D                  	dec	a
-     110.  01:708E  77                  	ld	(hl),a
-     111.  01:708F  23                  	inc hl
-     112.  01:7090  3A 11 CE            	ld	a,(xmap)
-     113.  01:7093  57                  	ld  d,a
-     114.  01:7094  3A 16 CE            	ld	a,(xship)
-     115.  01:7097  92                  	sub	a,d
-     116.  01:7098  77                  	ld	(hl),a		; xship_rel
-     117.  01:7099  23                  	inc hl
-     118.  01:709A  36 04               	ld	(hl),4		; shape 4 hard wired
-     119.  01:709C  4F                  	ld	c,a
-     120.  01:709D  23                  	inc hl
-     121.  01:709E  36 07               	ld	(hl),7
-     122.  01:70A0                      
-     123.  01:70A0  11 F9 FF            	ld  de,-7
-     124.  01:70A3  19                  	add hl,de
-     125.  01:70A4                      
-     126.  01:70A4  3A 15 CE            	ld	a,(yship)
-     127.  01:70A7  80                  	add a,b 
-     128.  01:70A8  77                  	ld	(hl),a
-     129.  01:70A9  23                  	inc hl
-     130.  01:70AA                      
-     131.  01:70AA  3A 11 CE            	ld	a,(xmap)
-     132.  01:70AD  57                  	ld  d,a
-     133.  01:70AE  3A 16 CE            	ld	a,(xship)
-     134.  01:70B1  92                  	sub	a,d
-     135.  01:70B2  80                  	add	a,b
-     136.  01:70B3  77                  	ld	(hl),a
-     137.  01:70B4  23                  	inc hl
-     138.  01:70B5  36 08               	ld	(hl),8		; shape 8 hard wired
-     139.  01:70B7  23                  	inc hl
-     140.  01:70B8  36 01               	ld	(hl),1
-     141.  01:70BA  C9                  	ret
-     323   01:70BB                      		include probe_level.asm				
-       1.  01:70BB                       
-       2.  01:70BB                      ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-       3.  01:70BB                      ;	peek a tile
-       4.  01:70BB                      ; in	a:	y (screen coordinate)
-       5.  01:70BB                      ;		hl: x (level coordinate)
-       6.  01:70BB                      ; out	a:  tile at x,y
-       7.  01:70BB                      ;		hl: pointer in level_buffer to  tile
-       8.  01:70BB                       
-       9.  01:70BB                      probe_level:
-      10.  01:70BB                      
-      11.  01:70BB  01 CD C2            	ld	bc,_levelmap
-      12.  01:70BE  0F 0F 0F 0F         [4]	rrca
-      13.  01:70C2  E6 0F               	and 15
-      14.  01:70C4  29 29 29 29         [4]	add	hl,hl
-      15.  01:70C8  6C                  	ld	l,h
-      16.  01:70C9  67                  	ld	h,a
-      17.  01:70CA  09                  	add	hl,bc
-      18.  01:70CB  7E                  	ld	a,(hl)
-      19.  01:70CC  C9                  	ret
-      20.  01:70CD                      	
-      21.  01:70CD                      	struct star_data
-      22.  01:70CD                    < x	db	0
-      23.  01:70CD                    < y	db	0
-      24.  01:70CD                    < add	dw	0
-      25.  01:70CD                    < 	ends
-      26.  01:70CD                      	
-      27.  01:70CD                      starlist:
-      28.  01:70CD  20 4A 02 00         	star_data	 32,64+10, 32/16+(10/16)*256
-      29.  01:70D1  D0 72 0D 03         	star_data	208,64+50,208/16+(50/16)*256
-      30.  01:70D5  80 74 08 03         	star_data	128,64+52,128/16+(52/16)*256
-      31.  01:70D9                      starlist2:
-      32.  01:70D9  10 45 01 04             star_data	 16,64+5,  16/16+((64+ 5)/16)*256
-      33.  01:70DD  30 51 03 05             star_data	 48,64+17, 48/16+((64+17)/16)*256
-      34.  01:70E1  70 5A 07 05         	star_data	112,64+26,112/16+((64+26)/16)*256
-      35.  01:70E5                      starlist3:
-      36.  01:70E5  30 51 03 09             star_data	 48,64+17, 48/16+((128+17)/16)*256
-      37.  01:70E9  70 5A 07 09         	star_data	112,64+26,112/16+((128+26)/16)*256
-      38.  01:70ED  E0 6A 0E 0A         	star_data	224,64+42,224/16+((128+42)/16)*256
-      39.  01:70F1                      	
-      40.  01:70F1                      test_star:
-      41.  01:70F1  F3                  	di
-      42.  01:70F2  3A 02 CE            	ld	a,(_xoffset)
-      43.  01:70F5  87 87 87 87         [4]	add	a,a
-      44.  01:70F9  4F                  	ld  c,a
-      45.  01:70FA                      	
-      46.  01:70FA  3A 00 CE            	ld	a,(_displaypage)
-      47.  01:70FD  87 87               [2]	add	a,a
-      48.  01:70FF  47                  	ld	b,a
-      49.  01:7100                      	
-      50.  01:7100  DD 21 CD 70         	ld	ix,starlist
-      51.  01:7104  CD 19 71            	call	.star_loop	
-      52.  01:7107                      
-      53.  01:7107  04                  	inc	b
-      54.  01:7108  78                  	ld	a,b
-      55.  01:7109                      
-      56.  01:7109  CD 19 71            	call	.star_loop
-      57.  01:710C                      
-      58.  01:710C  04                  	inc	b
-      59.  01:710D  78                  	ld	a,b
-      60.  01:710E                      
-      61.  01:710E  CD 19 71            	call	.star_loop
-      62.  01:7111                      
-      63.  01:7111  3A 02 CE            	ld	a,(_xoffset)		
-      64.  01:7114  32 04 CE            	ld	(__xoffset),a
-      65.  01:7117  FB                  	ei
-      66.  01:7118  C9                  	ret
-      67.  01:7119                      	
-      68.  01:7119                      .star_loop
-      69.  01:7119  D3 99               	out (0x99),a ;set bits 14-16
-      70.  01:711B  3E 8E               	ld a,14+128
-      71.  01:711D  D3 99               	out (0x99),a
-      72.  01:711F                      
-      73.  01:711F                      
-      74.  01:711F                      	repeat 3
-      75.  01:711F                    < 1:	ld	e,(ix+star_data.add)
-      76.  01:711F                    < 	ld	d,(ix+star_data.add+1)
-      77.  01:711F                    < 	ld	hl,(_levelmap_pos)
-      78.  01:711F                    < 	add	hl,de
-      79.  01:711F                    < 	ld	a,(hl)
-      80.  01:711F                    < 	and	a
-      81.  01:711F                    < 	jp	nz,2f
-      82.  01:711F                    < 	ld	a,(__xoffset)		; compensate R#18 
-      83.  01:711F                    < 	add	a,(ix+star_data.x)
-      84.  01:711F                    < 	out (0x99),a
-      85.  01:711F                    < 	ld a,(ix+star_data.y) 	;	set bits 8-13
-      86.  01:711F                    < 	out (0x99),a
-      87.  01:711F                    < 	xor	a
-      88.  01:711F                    < 	out	(0x98),a
-      89.  01:711F                    < 	call	.set_star
-      90.  01:711F                    < 2:	ld	de,star_data
-      91.  01:711F                    < 	add	ix,de
-      92.  01:711F                    < 	endrepeat
-      92.  01:711F  DD 5E 02 DD 56 03 2A FC CD 19 7E A7 C2 41 71 3A 
-      92.  01:712F  04 CE DD 86 00 D3 99 DD 7E 01 D3 99 AF D3 98 CD 
-      92.  01:713F  95 71 11 04 00 DD 19 DD 5E 02 DD 56 03 2A FC CD 
-      92.  01:714F  19 7E A7 C2 68 71 3A 04 CE DD 86 00 D3 99 DD 7E 
-      92.  01:715F  01 D3 99 AF D3 98 CD 95 71 11 04 00 DD 19 DD 5E 
-      92.  01:716F  02 DD 56 03 2A FC CD 19 7E A7 C2 8F 71 3A 04 CE 
-      92.  01:717F  DD 86 00 D3 99 DD 7E 01 D3 99 AF D3 98 CD 95 71 
-      92.  01:718F  11 04 00 DD 19 
-      93.  01:7194  C9                  	ret
-      94.  01:7195                      	
-      95.  01:7195                      .set_star:
-      96.  01:7195  79                  	ld	a,c
-      97.  01:7196  DD BE 00            	cp	(ix+star_data.x)
-      98.  01:7199  C8                  	ret	z
-      99.  01:719A  3A 02 CE            	ld	a,(_xoffset)		; compensate R#18 
-     100.  01:719D  DD 86 00            	add	a,(ix+star_data.x)
-     101.  01:71A0  D3 99               	out (0x99),a
-     102.  01:71A2  DD 7E 01            	ld a,(ix+star_data.y) 	;	set bits 8-13
-     103.  01:71A5  D3 99               	out (0x99),a
-     104.  01:71A7  3E FF               	ld	a,255
-     105.  01:71A9  D3 98               	out	(0x98),a
-     106.  01:71AB  C9                  	ret
-     107.  01:71AC                      	
-     108.  01:71AC                      unused_other:
-     109.  01:71AC  2A 16 CE            	ld	hl,(xship)
-     110.  01:71AF  3A 15 CE            	ld	a,(yship)
-     111.  01:71B2  CD BB 70            	call	probe_level
-     112.  01:71B5  D9                  	exx
-     113.  01:71B6  21 CD C3            	ld	hl,_levelmap+256
-     114.  01:71B9  01 0D 00            	ld	bc,13
-     115.  01:71BC  ED B1               	cpir
-     116.  01:71BE  C0                  	ret nz
-     117.  01:71BF  25                  	dec	h
-     118.  01:71C0  2D                  	dec l
-     119.  01:71C1  7E                  	ld  a,(hl)
-     120.  01:71C2  D9                  	exx
-     121.  01:71C3  77                  	ld  (hl),a
-     122.  01:71C4  D9                  	exx
-     123.  01:71C5  7D                  	ld  a,l
-     124.  01:71C6  D6 CD               	sub	a,low _levelmap
-     125.  01:71C8  6F                  	ld  l,a
-     126.  01:71C9  E5                  	push	hl					; L block#
-     127.  01:71CA                      		
-     128.  01:71CA  3A 00 CE            	ld		a,(_displaypage)
-     129.  01:71CD  67                  	ld		h,a
-     130.  01:71CE  3A 02 CE            	ld		a,(_xoffset)		; compensate R#18 
-     131.  01:71D1  C6 78               	add		a,xship_rel
-     132.  01:71D3  E6 F0               	and		0xF0
-     133.  01:71D5  5F                  	ld		e,a					; destX
-     134.  01:71D6  3A 15 CE            	ld		a,(yship)
-     135.  01:71D9  E6 F0               	and 	0xF0
-     136.  01:71DB  57                  	ld		d,a					; destY
-     137.  01:71DC                      
-     138.  01:71DC  D5                  	push	de
-     139.  01:71DD  CD 3D 54            	call	_plot_distrucable
-     140.  01:71E0  D1                  	pop		de
-     141.  01:71E1                      	
-     142.  01:71E1  E1                  	pop		hl
-     143.  01:71E2  7C                  	ld		a,h
-     144.  01:71E3  EE 01               	xor		1
-     145.  01:71E5  67                  	ld		h,a
-     146.  01:71E6                      	
-     147.  01:71E6  C9                  	ret
-     148.  01:71E7  3A 10 CE            	ld		a,(dxmap)
-     149.  01:71EA  CB 07               	rlc a
-     150.  01:71EC  D2 F6 71            	jp	nc,1f		; >0 == dx
-     151.  01:71EF                      					; <0 == sx
-     152.  01:71EF  3E F0               	ld	a,-16
-     153.  01:71F1  83                  	add	a,e
-     154.  01:71F2  5F                  	ld	e,a
-     155.  01:71F3  C3 3D 54            	jp		_plot_distrucable
-     156.  01:71F6                      	
-     157.  01:71F6  3E 10               1:	ld	a,+16
-     158.  01:71F8  83                  	add	a,e
-     159.  01:71F9  5F                  	ld	e,a
-     160.  01:71FA  C3 3D 54            	jp		_plot_distrucable
-     324   01:71FD                      		
-     325   01:71FD                      outvram:
-     326   01:71FD  7A                  2:		ld	a,d
-     327   01:71FE  32 00 B0            		ld	(_kBank4),a
-     328   01:7201  21 00 A0            		ld	hl,0xA000
-     329   01:7204  01 98 00            		ld	bc,0x98
-     330   01:7207  3E 20               		ld	a,32
-     331   01:7209  ED B3               1:		otir
-     332   01:720B  3D                  		dec	a
-     333   01:720C  C2 09 72            		jp	nz,1b
-     334   01:720F  14                  		inc	d
-     335   01:7210  1D                  		dec	e
-     336   01:7211  20 EA               		jr	nz,2b
-     337   01:7213  C9                  		ret
-     338   01:7214                      		
-     339   01:7214  (02)                		page 2
+      61.  01:7048  3A 02 CE            	ld	a,(_xoffset)		; compensate R#18 
+      62.  01:704B  C6 78               	add	a,xship_rel
+      63.  01:704D  77                  	ld	(hl),a
+      64.  01:704E  23                  	inc hl
+      65.  01:704F  36 00               	ld	(hl),0		; shape 0 hard wired
+      66.  01:7051  23                  	inc hl
+      67.  01:7052                      ;	ld	(hl),10
+      68.  01:7052  23                  	inc hl
+      69.  01:7053                      
+      70.  01:7053  3A 15 CE            	ld	a,(yship)
+      71.  01:7056  77                  	ld	(hl),a
+      72.  01:7057  23                  	inc hl
+      73.  01:7058  3A 02 CE            	ld	a,(_xoffset)		; compensate R#18 
+      74.  01:705B  C6 78               	add	a,xship_rel
+      75.  01:705D  77                  	ld	(hl),a
+      76.  01:705E  23                  	inc hl
+      77.  01:705F  36 04               	ld	(hl),4		; shape 4 hard wired
+      78.  01:7061  4F                  	ld	c,a
+      79.  01:7062  23                  	inc hl
+      80.  01:7063                      ;	ld	(hl),11
+      81.  01:7063  23                  	inc hl
+      82.  01:7064                      
+      83.  01:7064  3A 15 CE            	ld	a,(yship)
+      84.  01:7067  77                  	ld	(hl),a
+      85.  01:7068  23                  	inc hl
+      86.  01:7069  3A 02 CE            	ld	a,(_xoffset)		; compensate R#18 
+      87.  01:706C  C6 78               	add	a,xship_rel
+      88.  01:706E  77                  	ld	(hl),a
+      89.  01:706F  23                  	inc hl
+      90.  01:7070  36 08               	ld	(hl),8		; shape 8 hard wired
+      91.  01:7072                      ;	inc hl
+      92.  01:7072                      ;	ld	(hl),6
+      93.  01:7072  C9                  	ret
+      94.  01:7073                      	
+      95.  01:7073                      .landing:
+      96.  01:7073  21 29 CE            	ld	hl,ram_sat+4*2
+      97.  01:7076  3A 15 CE            	ld	a,(yship)
+      98.  01:7079  3D                  	dec	a
+      99.  01:707A  77                  	ld	(hl),a
+     100.  01:707B  23                  	inc hl
+     101.  01:707C  3A 11 CE            	ld	a,(xmap)
+     102.  01:707F  57                  	ld  d,a
+     103.  01:7080  3A 16 CE            	ld	a,(xship)
+     104.  01:7083  92                  	sub	a,d
+     105.  01:7084  77                  	ld	(hl),a		; xship_rel
+     106.  01:7085  23                  	inc hl
+     107.  01:7086  36 00               	ld	(hl),0		; shape 0 hard wired
+     108.  01:7088  23                  	inc hl
+     109.  01:7089  36 0F               	ld	(hl),15
+     110.  01:708B                      	
+     111.  01:708B  11 F9 FF            	ld  de,-7
+     112.  01:708E  19                  	add hl,de
+     113.  01:708F                      	
+     114.  01:708F  3A 15 CE            	ld	a,(yship)
+     115.  01:7092  3D                  	dec	a
+     116.  01:7093  77                  	ld	(hl),a
+     117.  01:7094  23                  	inc hl
+     118.  01:7095  3A 11 CE            	ld	a,(xmap)
+     119.  01:7098  57                  	ld  d,a
+     120.  01:7099  3A 16 CE            	ld	a,(xship)
+     121.  01:709C  92                  	sub	a,d
+     122.  01:709D  77                  	ld	(hl),a		; xship_rel
+     123.  01:709E  23                  	inc hl
+     124.  01:709F  36 04               	ld	(hl),4		; shape 4 hard wired
+     125.  01:70A1  4F                  	ld	c,a
+     126.  01:70A2  23                  	inc hl
+     127.  01:70A3  36 07               	ld	(hl),7
+     128.  01:70A5                      
+     129.  01:70A5  11 F9 FF            	ld  de,-7
+     130.  01:70A8  19                  	add hl,de
+     131.  01:70A9                      
+     132.  01:70A9  3A 15 CE            	ld	a,(yship)
+     133.  01:70AC  80                  	add a,b 
+     134.  01:70AD  77                  	ld	(hl),a
+     135.  01:70AE  23                  	inc hl
+     136.  01:70AF                      
+     137.  01:70AF  3A 11 CE            	ld	a,(xmap)
+     138.  01:70B2  57                  	ld  d,a
+     139.  01:70B3  3A 16 CE            	ld	a,(xship)
+     140.  01:70B6  92                  	sub	a,d
+     141.  01:70B7  80                  	add	a,b
+     142.  01:70B8  77                  	ld	(hl),a
+     143.  01:70B9  23                  	inc hl
+     144.  01:70BA  36 08               	ld	(hl),8		; shape 8 hard wired
+     145.  01:70BC  23                  	inc hl
+     146.  01:70BD  36 01               	ld	(hl),1
+     147.  01:70BF  C9                  	ret
+     323   01:70C0                      		include probe_level.asm				
+       1.  01:70C0                       
+       2.  01:70C0                      ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+       3.  01:70C0                      ;	peek a tile
+       4.  01:70C0                      ; in	a:	y (screen coordinate)
+       5.  01:70C0                      ;		hl: x (level coordinate)
+       6.  01:70C0                      ; out	a:  tile at x,y
+       7.  01:70C0                      ;		hl: pointer in level_buffer to  tile
+       8.  01:70C0                       
+       9.  01:70C0                      probe_level:
+      10.  01:70C0                      
+      11.  01:70C0  01 CD C2            	ld	bc,_levelmap
+      12.  01:70C3  0F 0F 0F 0F         [4]	rrca
+      13.  01:70C7  E6 0F               	and 15
+      14.  01:70C9  29 29 29 29         [4]	add	hl,hl
+      15.  01:70CD  6C                  	ld	l,h
+      16.  01:70CE  67                  	ld	h,a
+      17.  01:70CF  09                  	add	hl,bc
+      18.  01:70D0  7E                  	ld	a,(hl)
+      19.  01:70D1  C9                  	ret
+      20.  01:70D2                      	
+      21.  01:70D2                      	struct star_data
+      22.  01:70D2                    < x	db	0
+      23.  01:70D2                    < y	db	0
+      24.  01:70D2                    < add	dw	0
+      25.  01:70D2                    < 	ends
+      26.  01:70D2                      	
+      27.  01:70D2                      starlist:
+      28.  01:70D2  20 4A 02 00         	star_data	 32,64+10, 32/16+(10/16)*256
+      29.  01:70D6  D0 72 0D 03         	star_data	208,64+50,208/16+(50/16)*256
+      30.  01:70DA  80 74 08 03         	star_data	128,64+52,128/16+(52/16)*256
+      31.  01:70DE                      starlist2:
+      32.  01:70DE  10 45 01 04             star_data	 16,64+5,  16/16+((64+ 5)/16)*256
+      33.  01:70E2  30 51 03 05             star_data	 48,64+17, 48/16+((64+17)/16)*256
+      34.  01:70E6  70 5A 07 05         	star_data	112,64+26,112/16+((64+26)/16)*256
+      35.  01:70EA                      starlist3:
+      36.  01:70EA  30 51 03 09             star_data	 48,64+17, 48/16+((128+17)/16)*256
+      37.  01:70EE  70 5A 07 09         	star_data	112,64+26,112/16+((128+26)/16)*256
+      38.  01:70F2  E0 6A 0E 0A         	star_data	224,64+42,224/16+((128+42)/16)*256
+      39.  01:70F6                      	
+      40.  01:70F6                      test_star:
+      41.  01:70F6  F3                  	di
+      42.  01:70F7  3A 02 CE            	ld	a,(_xoffset)
+      43.  01:70FA  87 87 87 87         [4]	add	a,a
+      44.  01:70FE  4F                  	ld  c,a
+      45.  01:70FF                      	
+      46.  01:70FF  3A 00 CE            	ld	a,(_displaypage)
+      47.  01:7102  87 87               [2]	add	a,a
+      48.  01:7104  47                  	ld	b,a
+      49.  01:7105                      	
+      50.  01:7105  DD 21 D2 70         	ld	ix,starlist
+      51.  01:7109  CD 1E 71            	call	.star_loop	
+      52.  01:710C                      
+      53.  01:710C  04                  	inc	b
+      54.  01:710D  78                  	ld	a,b
+      55.  01:710E                      
+      56.  01:710E  CD 1E 71            	call	.star_loop
+      57.  01:7111                      
+      58.  01:7111  04                  	inc	b
+      59.  01:7112  78                  	ld	a,b
+      60.  01:7113                      
+      61.  01:7113  CD 1E 71            	call	.star_loop
+      62.  01:7116                      
+      63.  01:7116  3A 02 CE            	ld	a,(_xoffset)		
+      64.  01:7119  32 04 CE            	ld	(__xoffset),a
+      65.  01:711C  FB                  	ei
+      66.  01:711D  C9                  	ret
+      67.  01:711E                      	
+      68.  01:711E                      .star_loop
+      69.  01:711E  D3 99               	out (0x99),a ;set bits 14-16
+      70.  01:7120  3E 8E               	ld a,14+128
+      71.  01:7122  D3 99               	out (0x99),a
+      72.  01:7124                      
+      73.  01:7124                      
+      74.  01:7124                      	repeat 3
+      75.  01:7124                    < 1:	ld	e,(ix+star_data.add)
+      76.  01:7124                    < 	ld	d,(ix+star_data.add+1)
+      77.  01:7124                    < 	ld	hl,(_levelmap_pos)
+      78.  01:7124                    < 	add	hl,de
+      79.  01:7124                    < 	ld	a,(hl)
+      80.  01:7124                    < 	and	a
+      81.  01:7124                    < 	jp	nz,2f
+      82.  01:7124                    < 	ld	a,(__xoffset)		; compensate R#18 
+      83.  01:7124                    < 	add	a,(ix+star_data.x)
+      84.  01:7124                    < 	out (0x99),a
+      85.  01:7124                    < 	ld a,(ix+star_data.y) 	;	set bits 8-13
+      86.  01:7124                    < 	out (0x99),a
+      87.  01:7124                    < 	xor	a
+      88.  01:7124                    < 	out	(0x98),a
+      89.  01:7124                    < 	call	.set_star
+      90.  01:7124                    < 2:	ld	de,star_data
+      91.  01:7124                    < 	add	ix,de
+      92.  01:7124                    < 	endrepeat
+      92.  01:7124  DD 5E 02 DD 56 03 2A FC CD 19 7E A7 C2 46 71 3A 
+      92.  01:7134  04 CE DD 86 00 D3 99 DD 7E 01 D3 99 AF D3 98 CD 
+      92.  01:7144  9A 71 11 04 00 DD 19 DD 5E 02 DD 56 03 2A FC CD 
+      92.  01:7154  19 7E A7 C2 6D 71 3A 04 CE DD 86 00 D3 99 DD 7E 
+      92.  01:7164  01 D3 99 AF D3 98 CD 9A 71 11 04 00 DD 19 DD 5E 
+      92.  01:7174  02 DD 56 03 2A FC CD 19 7E A7 C2 94 71 3A 04 CE 
+      92.  01:7184  DD 86 00 D3 99 DD 7E 01 D3 99 AF D3 98 CD 9A 71 
+      92.  01:7194  11 04 00 DD 19 
+      93.  01:7199  C9                  	ret
+      94.  01:719A                      	
+      95.  01:719A                      .set_star:
+      96.  01:719A  79                  	ld	a,c
+      97.  01:719B  DD BE 00            	cp	(ix+star_data.x)
+      98.  01:719E  C8                  	ret	z
+      99.  01:719F  3A 02 CE            	ld	a,(_xoffset)		; compensate R#18 
+     100.  01:71A2  DD 86 00            	add	a,(ix+star_data.x)
+     101.  01:71A5  D3 99               	out (0x99),a
+     102.  01:71A7  DD 7E 01            	ld a,(ix+star_data.y) 	;	set bits 8-13
+     103.  01:71AA  D3 99               	out (0x99),a
+     104.  01:71AC  3E FF               	ld	a,255
+     105.  01:71AE  D3 98               	out	(0x98),a
+     106.  01:71B0  C9                  	ret
+     107.  01:71B1                      	
+     108.  01:71B1                      unused_other:
+     109.  01:71B1  2A 16 CE            	ld	hl,(xship)
+     110.  01:71B4  3A 15 CE            	ld	a,(yship)
+     111.  01:71B7  CD C0 70            	call	probe_level
+     112.  01:71BA  D9                  	exx
+     113.  01:71BB  21 CD C3            	ld	hl,_levelmap+256
+     114.  01:71BE  01 0D 00            	ld	bc,13
+     115.  01:71C1  ED B1               	cpir
+     116.  01:71C3  C0                  	ret nz
+     117.  01:71C4  25                  	dec	h
+     118.  01:71C5  2D                  	dec l
+     119.  01:71C6  7E                  	ld  a,(hl)
+     120.  01:71C7  D9                  	exx
+     121.  01:71C8  77                  	ld  (hl),a
+     122.  01:71C9  D9                  	exx
+     123.  01:71CA  7D                  	ld  a,l
+     124.  01:71CB  D6 CD               	sub	a,low _levelmap
+     125.  01:71CD  6F                  	ld  l,a
+     126.  01:71CE  E5                  	push	hl					; L block#
+     127.  01:71CF                      		
+     128.  01:71CF  3A 00 CE            	ld		a,(_displaypage)
+     129.  01:71D2  67                  	ld		h,a
+     130.  01:71D3  3A 02 CE            	ld		a,(_xoffset)		; compensate R#18 
+     131.  01:71D6  C6 78               	add		a,xship_rel
+     132.  01:71D8  E6 F0               	and		0xF0
+     133.  01:71DA  5F                  	ld		e,a					; destX
+     134.  01:71DB  3A 15 CE            	ld		a,(yship)
+     135.  01:71DE  E6 F0               	and 	0xF0
+     136.  01:71E0  57                  	ld		d,a					; destY
+     137.  01:71E1                      
+     138.  01:71E1  D5                  	push	de
+     139.  01:71E2  CD 3D 54            	call	_plot_distrucable
+     140.  01:71E5  D1                  	pop		de
+     141.  01:71E6                      	
+     142.  01:71E6  E1                  	pop		hl
+     143.  01:71E7  7C                  	ld		a,h
+     144.  01:71E8  EE 01               	xor		1
+     145.  01:71EA  67                  	ld		h,a
+     146.  01:71EB                      	
+     147.  01:71EB  C9                  	ret
+     148.  01:71EC  3A 10 CE            	ld		a,(dxmap)
+     149.  01:71EF  CB 07               	rlc a
+     150.  01:71F1  D2 FB 71            	jp	nc,1f		; >0 == dx
+     151.  01:71F4                      					; <0 == sx
+     152.  01:71F4  3E F0               	ld	a,-16
+     153.  01:71F6  83                  	add	a,e
+     154.  01:71F7  5F                  	ld	e,a
+     155.  01:71F8  C3 3D 54            	jp		_plot_distrucable
+     156.  01:71FB                      	
+     157.  01:71FB  3E 10               1:	ld	a,+16
+     158.  01:71FD  83                  	add	a,e
+     159.  01:71FE  5F                  	ld	e,a
+     160.  01:71FF  C3 3D 54            	jp		_plot_distrucable
+     324   01:7202                      		
+     325   01:7202                      outvram:
+     326   01:7202  7A                  2:		ld	a,d
+     327   01:7203  32 00 B0            		ld	(_kBank4),a
+     328   01:7206  21 00 A0            		ld	hl,0xA000
+     329   01:7209  01 98 00            		ld	bc,0x98
+     330   01:720C  3E 20               		ld	a,32
+     331   01:720E  ED B3               1:		otir
+     332   01:7210  3D                  		dec	a
+     333   01:7211  C2 0E 72            		jp	nz,1b
+     334   01:7214  14                  		inc	d
+     335   01:7215  1D                  		dec	e
+     336   01:7216  20 EA               		jr	nz,2b
+     337   01:7218  C9                  		ret
+     338   01:7219                      		
+     339   01:7219  (02)                		page 2
      340   02:8000                      	; include mainhero_LMMM.asm
      341   02:8000                      
      342   02:8000                      	
@@ -11920,20 +11926,20 @@ Errors: 0
 01:00006FC7   ms_ctrl.ms_explode
 01:00006FFB   put_ms_sprt
 01:00007040   put_ms_sprt.expl
-01:0000706E X put_ms_sprt.landing
-01:000070BB   probe_level
+01:00007073 X put_ms_sprt.landing
+01:000070C0   probe_level
 00:00000000   star_data.x
 00:00000001   star_data.y
 00:00000002   star_data.add
 00:00000004   star_data
-01:000070CD   starlist
-01:000070D9 X starlist2
-01:000070E5 X starlist3
-01:000070F1   test_star
-01:00007119   test_star.star_loop
-01:00007195   test_star.set_star
-01:000071AC X unused_other
-01:000071FD   outvram
+01:000070D2   starlist
+01:000070DE X starlist2
+01:000070EA X starlist3
+01:000070F6   test_star
+01:0000711E   test_star.star_loop
+01:0000719A   test_star.set_star
+01:000071B1 X unused_other
+01:00007202   outvram
 03:0000A000   manta_color
 03:0000A680   ms_spt
 04:0000A000   _tiles0
@@ -12255,11 +12261,11 @@ Errors: 0
    00005BB4    1100       <empty>
 
  Page: 01
-  Org: 00006000  Size: 00002000  Used: 00001214
+  Org: 00006000  Size: 00002000  Used: 00001219
 
    Address   Length Align   Label
-   00006000    4628         replay_init
-   00007214    3564       <empty>
+   00006000    4633         replay_init
+   00007219    3559       <empty>
 
  Page: 02
   Org: 00008000  Size: 00002000  Used: 00000000

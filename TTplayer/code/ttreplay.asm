@@ -44,7 +44,7 @@ replay_pause:
 	ld	a,(replay_mode)
 	and	a
 	jp	z,_replay_pause_r
-	;-- stop decding and processing music data
+	;-- stop dec0ding and processing music data
 	xor	a
 	ld	(replay_mode),a
 	;-- set mixers to silence.

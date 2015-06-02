@@ -142,7 +142,7 @@ _ntsc:	ld	(SEL_NTSC),a	; if set NSTC, if reset PAL
 		call	outvram
 
 		; ;--- initialise demo song
-		; ld	bc,	_levelmap-ttreplayRAM
+		; ld	bc,	end_ttreplayRAM-ttreplayRAM
 		; ld	hl,	ttreplayRAM
 		; ld	de,	ttreplayRAM+1
 		; ld	(hl),0
@@ -162,7 +162,7 @@ _ntsc:	ld	(SEL_NTSC),a	; if set NSTC, if reset PAL
 
 
 		ld		e,0
-        call	_setpage
+		call	_setpage
 				
 		ld	a, :_level
 		ld	(_kBank4),a
@@ -180,8 +180,9 @@ _ntsc:	ld	(SEL_NTSC),a	; if set NSTC, if reset PAL
 
 		call	replay_init
 restart:
+		call	replay_pause
 		call	_intreset
-		xor		a
+		ld		a,1
 		ld		(_displaypage),a		
 		call 	_cls0
 		ld		hl,_levelmap
@@ -223,23 +224,31 @@ restart:
 		call 	load_colors
 
 		;--- initialise demo song
-		ld	bc,	_levelmap-ttreplayRAM
+		ld	bc,	end_ttreplayRAM-ttreplayRAM
 		ld	hl,	ttreplayRAM
 		ld	de,	ttreplayRAM+1
 		ld	(hl),0
 		ldir
 	
-		ld	a,:demo_song
+		ld	a,:end_demo_song
 		setpage_a
-		
+		di
 		ld	bc,	end_demo_song-musbuff
 		ld	hl,	demo_song
 		ld	de,	musbuff
 		ldir
-			
+		
+		xor	a
+		ld	(_kBank1),a
+		inc	a
+		ld	(_kBank2),a
+		inc	a
+		ld	(_kBank3),a
+		
 		ld		hl,musbuff
 		call	replay_loadsong
-
+		ei
+		
 		call	_isrinit
 
 main_loop: 
@@ -440,30 +449,6 @@ color_base:
 
 		
 		incbin 	enemies_clr.bin
-		; repeat 4
-		; ds	16,12
-		; ds	16,6+64
-		; endrepeat
-		; repeat 4
-		; ds	16,10
-		; ds	16,1+64
-		; endrepeat
-		; repeat 4
-		; ds	16,4
-		; ds	16,9+64
-		; endrepeat
-		; repeat 4
-		; ds	16,12
-		; ds	16,1+64
-		; endrepeat
-		; repeat 4
-		; ds	16,12
-		; ds	16,5+64
-		; endrepeat
-		; repeat 4
-		; ds	16,10
-		; ds	16,3+64
-		; endrepeat
 		
 FINISH:
 
@@ -472,12 +457,16 @@ FINISH:
 ; Variables
 ;---------------------------------------------------------
 	MAP 0x0040
-musbuff:		#15*1024
+musbuff:		#8*1024
+	ENDMAP
+	
+	MAP 0x3000
+ttreplayRAM:		#0
+	include	"..\TTplayer\code\ttreplayRAM.asm"
+end_ttreplayRAM:	#0
 	ENDMAP
 	
 	MAP 0xC000
-ttreplayRAM:		#0
-	include	"..\TTplayer\code\ttreplayRAM.asm"
 
 _levelmap:			#mapWidth*mapHeight
 

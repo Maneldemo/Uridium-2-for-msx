@@ -1363,7 +1363,6 @@ enemy_bullet_loop:
 
 
 test_obstacles.found
-.found:
 	ld	a,(ms_state)
 	cp	ms_explode
 	ret	z

@@ -255,7 +255,7 @@ test_obstacles.found.found: equ 00005423h
 _plot_distrucable: equ 0000543Dh
 START: equ 0000547Fh
 _ntsc: equ 0000548Ch
-restart: equ 00005546h
+restart: equ 0000551Fh
 main_loop: equ 000055A2h
 AFXPLAY: equ 000055E4h
 _print_probe: equ 000055E5h

@@ -1,4 +1,4 @@
-Sjasm Z80 Assembler v0.42c - www.xl2s.tk             [2015.06.01 - 19:21:16]
+Sjasm Z80 Assembler v0.42c - www.xl2s.tk             [2015.06.02 - 22:18:04]
 
 main.asm
 Errors: 0
@@ -3665,173 +3665,192 @@ Errors: 0
      141   00:54FC  11 02 19            		ld		de, 256*:_animated+2
      142   00:54FF  CD 02 72            		call	outvram
      143   00:5502                      
-     144   00:5502                      		;--- initialise demo song
-     145   00:5502  01 CD 02            		ld	bc,	_levelmap-ttreplayRAM
-     146   00:5505  21 00 C0            		ld	hl,	ttreplayRAM
-     147   00:5508  11 01 C0            		ld	de,	ttreplayRAM+1
-     148   00:550B  36 00               		ld	(hl),0
-     149   00:550D  ED B0               		ldir
-     150   00:550F                      	
-     151   00:550F  3E 0E               		ld	a,:demo_song
-     152   00:5511                      		setpage_a
-     152   00:5511  32 00 90          >   ld (_kBank3),a
-     152   00:5514  3C                >   inc a
-     152   00:5515  32 00 B0          >   ld (_kBank4),a
-     153   00:5518                      		
-     154   00:5518  01 B8 0E            		ld	bc,	end_demo_song-musbuff
-     155   00:551B  21 00 80            		ld	hl,	demo_song
-     156   00:551E  11 40 00            		ld	de,	musbuff
-     157   00:5521  ED B0               		ldir
-     158   00:5523                      			
-     159   00:5523  CD 00 60            		call	replay_init
-     160   00:5526  21 40 00            		ld		hl,musbuff
-     161   00:5529  CD 5A 60            		call	replay_loadsong
-     162   00:552C                      
-     163   00:552C                      
-     164   00:552C  1E 00               		ld		e,0
-     165   00:552E  CD D9 41                    call	_setpage
-     166   00:5531                      				
-     167   00:5531  3E 0F               		ld	a, :_level
-     168   00:5533  32 00 B0            		ld	(_kBank4),a
-     169   00:5536                      		
-     170   00:5536  21 00 A0            		ld		hl,_level
-     171   00:5539  11 CD C2            		ld		de,_levelmap
-     172   00:553C  01 00 0B            		ld		bc,mapWidth*mapHeight
-     173   00:553F  ED B0               		ldir
-     174   00:5541                      
-     175   00:5541                      
-     176   00:5541                      		; call	init_page0
-     177   00:5541                      
-     178   00:5541  3E 06               		ld		a,6
-     179   00:5543  32 08 CE            		ld		(cur_level),a
-     180   00:5546                      
-     181   00:5546                      restart:
-     182   00:5546  CD 88 42            		call	_intreset
-     183   00:5549  AF                  		xor		a
-     184   00:554A  32 00 CE            		ld		(_displaypage),a		
-     185   00:554D  CD 90 41            		call 	_cls0
-     186   00:5550  21 CD C2            		ld		hl,_levelmap
-     187   00:5553  22 FC CD            		ld		(_levelmap_pos),hl
-     188   00:5556                      		
-     189   00:5556  AF                  		xor		a
-     190   00:5557  67                  		ld		h,a
-     191   00:5558  6F                  		ld		l,a
-     192   00:5559  32 20 CE            		ld		(flip_flop),a
-     193   00:555C  32 1E CE            		ld		(god_mode),a
-     194   00:555F  32 F9 CD            		ld		(_ymappos),a
-     195   00:5562  22 FA CD            		ld		(_xmappos),hl
-     196   00:5565                      		
-     197   00:5565  22 F5 CD            		ld		(_nframes),hl
-     198   00:5568  22 DC CD            		ld		(_mcdx),hl
-     199   00:556B  32 DA CD            		ld		(_mcframe),a
-     200   00:556E                      		
-     201   00:556E  32 03 CE            		ld		(_yoffset),a		;  0 tutto su
-     202   00:5571  32 02 CE            		ld		(_xoffset),a		;  0 tutto su
-     203   00:5574                      								
-     204   00:5574  32 18 CE            		ld	(aniframe),a
-     205   00:5577  32 1B CE            		ld	(anispeed),a
-     206   00:557A  32 19 CE            		ld	(ms_state),a
-     207   00:557D  3C                  		inc a
-     208   00:557E  32 1A CE            		ld	(old_aniframe),a		; old_aniframe!=aniframe
-     209   00:5581                      	
-     210   00:5581  32 10 CE            		ld		(dxmap),a		; moving right
-     211   00:5584  32 0F CE            		ld		(_dxmap),a		; moving right
-     212   00:5587                      
-     213   00:5587  22 11 CE            		ld		(xmap),hl
-     214   00:558A  22 13 CE            		ld		(_xmapx4),hl
-     215   00:558D  01 78 00            		ld		bc,xship_rel
-     216   00:5590  09                  		add 	hl,bc
-     217   00:5591  22 16 CE            		ld		(xship),hl
-     218   00:5594  3E 50               		ld		a,80
-     219   00:5596  32 15 CE            		ld		(yship),a
-     220   00:5599                      
-     221   00:5599  CD 40 4A            		call 	npc_init								
-     222   00:559C  CD 11 45            		call 	load_colors
-     223   00:559F                      
-     224   00:559F  CD 64 42            		call	_isrinit
-     225   00:55A2                      
-     226   00:55A2                      main_loop: 
-     227   00:55A2                      				
-     228   00:55A2  21 00 00            		ld	hl,0
-     229   00:55A5  22 9E FC            		ld	(_jiffy),hl
-     230   00:55A8                      
-     231   00:55A8                      ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-     232   00:55A8                      ; run ms FSM and place its sprites in the SAT in RAM
-     233   00:55A8  CD A1 6C            		call	ms_ctrl
-     234   00:55AB                      ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-     235   00:55AB                      ; test for game restart
-     236   00:55AB  3A 19 CE            		ld	a,(ms_state)
-     237   00:55AE  FE 0C               		cp	ms_reset
-     238   00:55B0  CA 46 55            		jp	z,restart
-     239   00:55B3                      
-     240   00:55B3                      ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-     241   00:55B3                      ; place MS in the SAT and test for collision
-     242   00:55B3  CD FB 6F            		call	put_ms_sprt
-     243   00:55B6  3A 1E CE            		ld		a,(god_mode)
-     244   00:55B9  A7                  		and 	a
-     245   00:55BA                      		; call	z,test_obstacles
-     246   00:55BA                      
-     247   00:55BA                      ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-     248   00:55BA                      ; run NCPS FSM
-     249   00:55BA  CD C5 4A            		call	wave_timer
-     250   00:55BD  CD 1D 4E            		call	npc_loop
-     251   00:55C0  CD 39 53            		call	enemy_bullet_loop
-     252   00:55C3                      
-     253   00:55C3                      ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-     254   00:55C3                      ; run MS bullets FSM
-     255   00:55C3  CD 00 5B            		call	bullet_loop
-     256   00:55C6                      
-     257   00:55C6                      		; ld	a,00100101B			; random colour
-     258   00:55C6                      		; out		(0x99),a
-     259   00:55C6                      		; ld		a,7+128
-     260   00:55C6                      		; out		(0x99),a
-     261   00:55C6                      		
-     262   00:55C6                      		; call	_waitvdp
-     263   00:55C6                      
-     264   00:55C6                      		; ld	a,10100101B			; random colour
-     265   00:55C6                      		; out		(0x99),a
-     266   00:55C6                      		; ld		a,7+128
-     267   00:55C6                      		; out		(0x99),a
-     268   00:55C6                      				
-     269   00:55C6  3A D0 CD            		ld	a,(joystick)
-     270   00:55C9  E6 20               		and	32
-     271   00:55CB                      		; call	z,_plot_distrucable
-     272   00:55CB                      
-     273   00:55CB                      ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-     274   00:55CB                      		; ld		a,3
-     275   00:55CB                      		; out		(0x99),a
-     276   00:55CB                      		; ld		a,7+128
-     277   00:55CB                      		; out		(0x99),a
-     278   00:55CB                      		
-     279   00:55CB                      ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-     280   00:55CB                      		; call	test_star
-     281   00:55CB                      
-     282   00:55CB                      		; xor		a
-     283   00:55CB                      		; out		(0x99),a
-     284   00:55CB                      		; ld		a,7+128
-     285   00:55CB                      		; out		(0x99),a
-     286   00:55CB                      ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-     287   00:55CB                      
-     288   00:55CB                      		
-     289   00:55CB  3A 9E FC            1:		ld	a,(_jiffy)		; wait for vblank (and not for linit)
-     290   00:55CE  B7                  		or	a
-     291   00:55CF  28 FA               		jr	z,1b
-     292   00:55D1                      	
-     293   00:55D1  2A 11 CE            		ld	hl,(xmap)
-     294   00:55D4  01 78 00            		ld	bc,xship_rel
-     295   00:55D7  09                  		add hl,bc
-     296   00:55D8  22 16 CE            		ld	(xship),hl
-     297   00:55DB                      
-     298   00:55DB  3A 10 CE            		ld		a,(dxmap)
-     299   00:55DE  32 0F CE            		ld		(_dxmap),a
-     300   00:55E1                      
-     301   00:55E1  C3 A2 55            		jp      main_loop
-     302   00:55E4                      
-     303   00:55E4                      ;-------------------------------------
-     304   00:55E4                      AFXPLAY:
-     305   00:55E4  C9                  		ret
-     306   00:55E5                      ;	include vuitpakker.asm
-     307   00:55E5                      	include print.asm
+     144   00:5502                      		; ;--- initialise demo song
+     145   00:5502                      		; ld	bc,	_levelmap-ttreplayRAM
+     146   00:5502                      		; ld	hl,	ttreplayRAM
+     147   00:5502                      		; ld	de,	ttreplayRAM+1
+     148   00:5502                      		; ld	(hl),0
+     149   00:5502                      		; ldir
+     150   00:5502                      	
+     151   00:5502                      		; ld	a,:demo_song
+     152   00:5502                      		; setpage_a
+     153   00:5502                      		
+     154   00:5502                      		; ld	bc,	end_demo_song-musbuff
+     155   00:5502                      		; ld	hl,	demo_song
+     156   00:5502                      		; ld	de,	musbuff
+     157   00:5502                      		; ldir
+     158   00:5502                      			
+     159   00:5502                      		; call	replay_init
+     160   00:5502                      		; ld		hl,musbuff
+     161   00:5502                      		; call	replay_loadsong
+     162   00:5502                      
+     163   00:5502                      
+     164   00:5502  1E 00               		ld		e,0
+     165   00:5504  CD D9 41                    call	_setpage
+     166   00:5507                      				
+     167   00:5507  3E 0F               		ld	a, :_level
+     168   00:5509  32 00 B0            		ld	(_kBank4),a
+     169   00:550C                      		
+     170   00:550C  21 00 A0            		ld		hl,_level
+     171   00:550F  11 CD C2            		ld		de,_levelmap
+     172   00:5512  01 00 0B            		ld		bc,mapWidth*mapHeight
+     173   00:5515  ED B0               		ldir
+     174   00:5517                      
+     175   00:5517                      
+     176   00:5517                      		; call	init_page0
+     177   00:5517                      
+     178   00:5517  3E 06               		ld		a,6
+     179   00:5519  32 08 CE            		ld		(cur_level),a
+     180   00:551C                      
+     181   00:551C  CD 00 60            		call	replay_init
+     182   00:551F                      restart:
+     183   00:551F  CD 88 42            		call	_intreset
+     184   00:5522  AF                  		xor		a
+     185   00:5523  32 00 CE            		ld		(_displaypage),a		
+     186   00:5526  CD 90 41            		call 	_cls0
+     187   00:5529  21 CD C2            		ld		hl,_levelmap
+     188   00:552C  22 FC CD            		ld		(_levelmap_pos),hl
+     189   00:552F                      		
+     190   00:552F  AF                  		xor		a
+     191   00:5530  67                  		ld		h,a
+     192   00:5531  6F                  		ld		l,a
+     193   00:5532  32 20 CE            		ld		(flip_flop),a
+     194   00:5535  32 1E CE            		ld		(god_mode),a
+     195   00:5538  32 F9 CD            		ld		(_ymappos),a
+     196   00:553B  22 FA CD            		ld		(_xmappos),hl
+     197   00:553E                      		
+     198   00:553E  22 F5 CD            		ld		(_nframes),hl
+     199   00:5541  22 DC CD            		ld		(_mcdx),hl
+     200   00:5544  32 DA CD            		ld		(_mcframe),a
+     201   00:5547                      		
+     202   00:5547  32 03 CE            		ld		(_yoffset),a		;  0 tutto su
+     203   00:554A  32 02 CE            		ld		(_xoffset),a		;  0 tutto su
+     204   00:554D                      								
+     205   00:554D  32 18 CE            		ld	(aniframe),a
+     206   00:5550  32 1B CE            		ld	(anispeed),a
+     207   00:5553  32 19 CE            		ld	(ms_state),a
+     208   00:5556  3C                  		inc a
+     209   00:5557  32 1A CE            		ld	(old_aniframe),a		; old_aniframe!=aniframe
+     210   00:555A                      	
+     211   00:555A  32 10 CE            		ld		(dxmap),a		; moving right
+     212   00:555D  32 0F CE            		ld		(_dxmap),a		; moving right
+     213   00:5560                      
+     214   00:5560  22 11 CE            		ld		(xmap),hl
+     215   00:5563  22 13 CE            		ld		(_xmapx4),hl
+     216   00:5566  01 78 00            		ld		bc,xship_rel
+     217   00:5569  09                  		add 	hl,bc
+     218   00:556A  22 16 CE            		ld		(xship),hl
+     219   00:556D  3E 50               		ld		a,80
+     220   00:556F  32 15 CE            		ld		(yship),a
+     221   00:5572                      
+     222   00:5572  CD 40 4A            		call 	npc_init								
+     223   00:5575  CD 11 45            		call 	load_colors
+     224   00:5578                      
+     225   00:5578                      		;--- initialise demo song
+     226   00:5578  01 CD 02            		ld	bc,	_levelmap-ttreplayRAM
+     227   00:557B  21 00 C0            		ld	hl,	ttreplayRAM
+     228   00:557E  11 01 C0            		ld	de,	ttreplayRAM+1
+     229   00:5581  36 00               		ld	(hl),0
+     230   00:5583  ED B0               		ldir
+     231   00:5585                      	
+     232   00:5585  3E 0E               		ld	a,:demo_song
+     233   00:5587                      		setpage_a
+     233   00:5587  32 00 90          >   ld (_kBank3),a
+     233   00:558A  3C                >   inc a
+     233   00:558B  32 00 B0          >   ld (_kBank4),a
+     234   00:558E                      		
+     235   00:558E  01 B8 0E            		ld	bc,	end_demo_song-musbuff
+     236   00:5591  21 00 80            		ld	hl,	demo_song
+     237   00:5594  11 40 00            		ld	de,	musbuff
+     238   00:5597  ED B0               		ldir
+     239   00:5599                      			
+     240   00:5599  21 40 00            		ld		hl,musbuff
+     241   00:559C  CD 5A 60            		call	replay_loadsong
+     242   00:559F                      
+     243   00:559F  CD 64 42            		call	_isrinit
+     244   00:55A2                      
+     245   00:55A2                      main_loop: 
+     246   00:55A2                      				
+     247   00:55A2  21 00 00            		ld	hl,0
+     248   00:55A5  22 9E FC            		ld	(_jiffy),hl
+     249   00:55A8                      
+     250   00:55A8                      ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+     251   00:55A8                      ; run ms FSM and place its sprites in the SAT in RAM
+     252   00:55A8  CD A1 6C            		call	ms_ctrl
+     253   00:55AB                      ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+     254   00:55AB                      ; test for game restart
+     255   00:55AB  3A 19 CE            		ld	a,(ms_state)
+     256   00:55AE  FE 0C               		cp	ms_reset
+     257   00:55B0  CA 1F 55            		jp	z,restart
+     258   00:55B3                      
+     259   00:55B3                      ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+     260   00:55B3                      ; place MS in the SAT and test for collision
+     261   00:55B3  CD FB 6F            		call	put_ms_sprt
+     262   00:55B6  3A 1E CE            		ld		a,(god_mode)
+     263   00:55B9  A7                  		and 	a
+     264   00:55BA                      		; call	z,test_obstacles
+     265   00:55BA                      
+     266   00:55BA                      ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+     267   00:55BA                      ; run NCPS FSM
+     268   00:55BA  CD C5 4A            		call	wave_timer
+     269   00:55BD  CD 1D 4E            		call	npc_loop
+     270   00:55C0  CD 39 53            		call	enemy_bullet_loop
+     271   00:55C3                      
+     272   00:55C3                      ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+     273   00:55C3                      ; run MS bullets FSM
+     274   00:55C3  CD 00 5B            		call	bullet_loop
+     275   00:55C6                      
+     276   00:55C6                      		; ld	a,00100101B			; random colour
+     277   00:55C6                      		; out		(0x99),a
+     278   00:55C6                      		; ld		a,7+128
+     279   00:55C6                      		; out		(0x99),a
+     280   00:55C6                      		
+     281   00:55C6                      		; call	_waitvdp
+     282   00:55C6                      
+     283   00:55C6                      		; ld	a,10100101B			; random colour
+     284   00:55C6                      		; out		(0x99),a
+     285   00:55C6                      		; ld		a,7+128
+     286   00:55C6                      		; out		(0x99),a
+     287   00:55C6                      				
+     288   00:55C6  3A D0 CD            		ld	a,(joystick)
+     289   00:55C9  E6 20               		and	32
+     290   00:55CB                      		; call	z,_plot_distrucable
+     291   00:55CB                      
+     292   00:55CB                      ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+     293   00:55CB                      		; ld		a,3
+     294   00:55CB                      		; out		(0x99),a
+     295   00:55CB                      		; ld		a,7+128
+     296   00:55CB                      		; out		(0x99),a
+     297   00:55CB                      		
+     298   00:55CB                      ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+     299   00:55CB                      		; call	test_star
+     300   00:55CB                      
+     301   00:55CB                      		; xor		a
+     302   00:55CB                      		; out		(0x99),a
+     303   00:55CB                      		; ld		a,7+128
+     304   00:55CB                      		; out		(0x99),a
+     305   00:55CB                      ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+     306   00:55CB                      
+     307   00:55CB                      		
+     308   00:55CB  3A 9E FC            1:		ld	a,(_jiffy)		; wait for vblank (and not for linit)
+     309   00:55CE  B7                  		or	a
+     310   00:55CF  28 FA               		jr	z,1b
+     311   00:55D1                      	
+     312   00:55D1  2A 11 CE            		ld	hl,(xmap)
+     313   00:55D4  01 78 00            		ld	bc,xship_rel
+     314   00:55D7  09                  		add hl,bc
+     315   00:55D8  22 16 CE            		ld	(xship),hl
+     316   00:55DB                      
+     317   00:55DB  3A 10 CE            		ld		a,(dxmap)
+     318   00:55DE  32 0F CE            		ld		(_dxmap),a
+     319   00:55E1                      
+     320   00:55E1  C3 A2 55            		jp      main_loop
+     321   00:55E4                      
+     322   00:55E4                      ;-------------------------------------
+     323   00:55E4                      AFXPLAY:
+     324   00:55E4  C9                  		ret
+     325   00:55E5                      ;	include vuitpakker.asm
+     326   00:55E5                      	include print.asm
        1.  00:55E5                      
        2.  00:55E5                      	
        3.  00:55E5                      ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -3939,7 +3958,7 @@ Errors: 0
      105.  00:5672  12                  	ld  (de),a
      106.  00:5673  13                  	inc de
      107.  00:5674  C9                  	ret
-     308   00:5675                      	include plot_line.asm
+     327   00:5675                      	include plot_line.asm
        1.  00:5675                      ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
        2.  00:5675                      ; no input
        3.  00:5675                      ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -4235,7 +4254,7 @@ Errors: 0
      293.  00:57B8  FB                  	ei
      294.  00:57B9  C9                  	ret
      295.  00:57BA                      	
-     309   00:57BA                      	include plot_line2.asm
+     328   00:57BA                      	include plot_line2.asm
        1.  00:57BA                      plot_line1:
        2.  00:57BA  3A 02 CE            	ld	a,(_xoffset)
        3.  00:57BD  83                  	add a,e
@@ -4436,7 +4455,7 @@ Errors: 0
      189.  00:58EA  A3 C2 E2 58 FB E1 24 
      190.  00:58F1  C9                  	ret
      191.  00:58F2                      	
-     310   00:58F2                      	include color_update.asm
+     329   00:58F2                      	include color_update.asm
        1.  00:58F2                      ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
        2.  00:58F2                      ; update main ship
        3.  00:58F2                      ;
@@ -4638,8 +4657,8 @@ Errors: 0
      193.  00:5A67  C3 89 59            	jp	set_manta_color
      194.  00:5A6A                      
      195.  00:5A6A                      
-     311   00:5A6A                      ms_bllts_col_win:
-     312   00:5A6A                      	include ms_bllts_frm_coll_wind.asm
+     330   00:5A6A                      ms_bllts_col_win:
+     331   00:5A6A                      	include ms_bllts_frm_coll_wind.asm
        1.  00:5A6A                      ms_bllts_coll_wind:
        2.  00:5A6A  05 0B 02 0E             defb 5,11,2,14 ; xmin,xmax,ymin,ymax
        3.  00:5A6E  05 0B 04 0D             defb 5,11,4,13 
@@ -4650,7 +4669,7 @@ Errors: 0
        8.  00:5A82  05 0B 06 0B             defb 5,11,6,11 
        9.  00:5A86  05 0B 04 0D             defb 5,11,4,13 
       10.  00:5A8A                      
-     313   00:5A8A                      	include	ms_bllts.asm
+     332   00:5A8A                      	include	ms_bllts.asm
        1.  00:5A8A                      ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
        2.  00:5A8A                      ; activate ms bullets
        3.  00:5A8A                      ;
@@ -4937,13 +4956,13 @@ Errors: 0
      278.  00:5BB4                      	
      279.  00:5BB4                      
      280.  00:5BB4                      	
-     314   00:5BB4                      		
-     315   00:5BB4                      ;-------------------------------------
-     316   00:5BB4                      
-     317   00:5BB4                      	
-     318   00:5BB4  (01)                		page 1
-     319   01:6000                      
-     320   01:6000                      		include	"..\TTplayer\code\ttreplay.asm"
+     333   00:5BB4                      		
+     334   00:5BB4                      ;-------------------------------------
+     335   00:5BB4                      
+     336   00:5BB4                      	
+     337   00:5BB4  (01)                		page 1
+     338   01:6000                      
+     339   01:6000                      		include	"..\TTplayer\code\ttreplay.asm"
        1.  01:6000                      ;=================================
        2.  01:6000                      ; TriloTracker re-player v0.3
        3.  01:6000                      ;
@@ -7497,7 +7516,7 @@ Errors: 0
     2551.  01:6CA1                      	
     2552.  01:6CA1                      
     2553.  01:6CA1                      
-     321   01:6CA1                      		include	"ms_crtl.asm"
+     340   01:6CA1                      		include	"ms_crtl.asm"
        1.  01:6CA1                      	
        2.  01:6CA1  (01:0000)           ms_fly__right				equ	0
        3.  01:6CA1  (01:0001)           ms_spin_face_right			equ	1
@@ -8048,7 +8067,7 @@ Errors: 0
      548.  01:6FFA                      
      549.  01:6FFA  C9                  	ret
      550.  01:6FFB                      
-     322   01:6FFB                      		include	"put_ms_sprt.asm"
+     341   01:6FFB                      		include	"put_ms_sprt.asm"
        1.  01:6FFB                      
        2.  01:6FFB                      ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
        3.  01:6FFB                      ;
@@ -8196,7 +8215,7 @@ Errors: 0
      145.  01:70BC  23                  	inc hl
      146.  01:70BD  36 01               	ld	(hl),1
      147.  01:70BF  C9                  	ret
-     323   01:70C0                      		include probe_level.asm				
+     342   01:70C0                      		include probe_level.asm				
        1.  01:70C0                       
        2.  01:70C0                      ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
        3.  01:70C0                      ;	peek a tile
@@ -8365,53 +8384,53 @@ Errors: 0
      158.  01:71FD  83                  	add	a,e
      159.  01:71FE  5F                  	ld	e,a
      160.  01:71FF  C3 3D 54            	jp		_plot_distrucable
-     324   01:7202                      		
-     325   01:7202                      outvram:
-     326   01:7202  7A                  2:		ld	a,d
-     327   01:7203  32 00 B0            		ld	(_kBank4),a
-     328   01:7206  21 00 A0            		ld	hl,0xA000
-     329   01:7209  01 98 00            		ld	bc,0x98
-     330   01:720C  3E 20               		ld	a,32
-     331   01:720E  ED B3               1:		otir
-     332   01:7210  3D                  		dec	a
-     333   01:7211  C2 0E 72            		jp	nz,1b
-     334   01:7214  14                  		inc	d
-     335   01:7215  1D                  		dec	e
-     336   01:7216  20 EA               		jr	nz,2b
-     337   01:7218  C9                  		ret
-     338   01:7219                      		
-     339   01:7219  (02)                		page 2
-     340   02:8000                      	; include mainhero_LMMM.asm
-     341   02:8000                      
-     342   02:8000                      	
-     343   02:8000  (03)                		page 3
-     344   03:A000                      manta_color:
-     345   03:A000  (0680)              		incbin mship03_clr.bin
-     346   03:A680                      ms_spt:
-     347   03:A680  (1380)              		incbin mship03_frm.bin
-     348   03:BA00                      		
-     349   03:BA00  (04)                		page 4
-     350   04:A000                      _tiles0:
-     351   04:A000  (2000)              		incbin "tiles.bin",0x0000,0x2000
-     352   04:C000  (05)                		page 5
-     353   05:A000  (2000)              		incbin "tiles.bin",0x2000,0x2000
-     354   05:C000  (06)                		page 6
-     355   06:A000  (2000)              		incbin "tiles.bin",0x4000,0x2000
-     356   06:C000  (07)                		page 7
-     357   07:A000  (2000)              		incbin "tiles.bin",0x6000,0x2000
-     358   07:C000  (08)                		page 8
-     359   08:A000  (2000)              		incbin "tiles.bin",0x8000,0x2000
-     360   08:C000  (09)                		page 9
-     361   09:A000  (2000)              		incbin "tiles.bin",0xA000,0x2000
-     362   09:C000  (0A)                		page 10
-     363   0A:A000  (2000)              		incbin "tiles.bin",0xC000,0x2000
-     364   0A:C000  (0B)                		page 11
-     365   0B:A000  (1100)              		incbin "tiles.bin",0xE000;,0x2000
-     366   0B:B100                      
-     367   0B:B100  (0E)                		page 14
-     368   0E:8000                      demo_song:
-     369   0E:8000                      		org 0x0040
-     370   0E:0040                      		include	"demosong.asm"
+     343   01:7202                      		
+     344   01:7202                      outvram:
+     345   01:7202  7A                  2:		ld	a,d
+     346   01:7203  32 00 B0            		ld	(_kBank4),a
+     347   01:7206  21 00 A0            		ld	hl,0xA000
+     348   01:7209  01 98 00            		ld	bc,0x98
+     349   01:720C  3E 20               		ld	a,32
+     350   01:720E  ED B3               1:		otir
+     351   01:7210  3D                  		dec	a
+     352   01:7211  C2 0E 72            		jp	nz,1b
+     353   01:7214  14                  		inc	d
+     354   01:7215  1D                  		dec	e
+     355   01:7216  20 EA               		jr	nz,2b
+     356   01:7218  C9                  		ret
+     357   01:7219                      		
+     358   01:7219  (02)                		page 2
+     359   02:8000                      	; include mainhero_LMMM.asm
+     360   02:8000                      
+     361   02:8000                      	
+     362   02:8000  (03)                		page 3
+     363   03:A000                      manta_color:
+     364   03:A000  (0680)              		incbin mship03_clr.bin
+     365   03:A680                      ms_spt:
+     366   03:A680  (1380)              		incbin mship03_frm.bin
+     367   03:BA00                      		
+     368   03:BA00  (04)                		page 4
+     369   04:A000                      _tiles0:
+     370   04:A000  (2000)              		incbin "tiles.bin",0x0000,0x2000
+     371   04:C000  (05)                		page 5
+     372   05:A000  (2000)              		incbin "tiles.bin",0x2000,0x2000
+     373   05:C000  (06)                		page 6
+     374   06:A000  (2000)              		incbin "tiles.bin",0x4000,0x2000
+     375   06:C000  (07)                		page 7
+     376   07:A000  (2000)              		incbin "tiles.bin",0x6000,0x2000
+     377   07:C000  (08)                		page 8
+     378   08:A000  (2000)              		incbin "tiles.bin",0x8000,0x2000
+     379   08:C000  (09)                		page 9
+     380   09:A000  (2000)              		incbin "tiles.bin",0xA000,0x2000
+     381   09:C000  (0A)                		page 10
+     382   0A:A000  (2000)              		incbin "tiles.bin",0xC000,0x2000
+     383   0A:C000  (0B)                		page 11
+     384   0B:A000  (1100)              		incbin "tiles.bin",0xE000;,0x2000
+     385   0B:B100                      
+     386   0B:B100  (0E)                		page 14
+     387   0E:8000                      demo_song:
+     388   0E:8000                      		org 0x0040
+     389   0E:0040                      		include	"demosong.asm"
        1.  0E:0040                      ; Compiled using tt_compile.exe V0.3 [12-04-2015]
        2.  0E:0040                      ; Copyright 2015 Richard Cornelisse
        3.  0E:0040                      
@@ -10955,7 +10974,7 @@ Errors: 0
     2522.  0E:0C57                      .track_50:
     2523.  0E:0C57  BF                  	db $BF		;[End-Of-Track]
     2524.  0E:0C58                      ; [ Song sub-track data ]
-     371   0E:0C58                      		include	"..\TTplayer\code\ttreplayDAT.asm"
+     390   0E:0C58                      		include	"..\TTplayer\code\ttreplayDAT.asm"
        1.  0E:0C58                      
        2.  0E:0C58  00 (128)            	ds 8*16, 0
        3.  0E:0CD8                      _VOLUME_TABLE
@@ -11020,96 +11039,96 @@ Errors: 0
       41.  0E:0EE8                      	db      0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0	
       41.  0E:0EE8  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 
       42.  0E:0EF8                      	
-     372   0E:0EF8                      end_demo_song:	
-     373   0E:0EF8                      
-     374   0E:0EF8  (0F)                		page 15
-     375   0F:A000                      _level:
-     376   0F:A000  (0B00)              		incbin "datamap.bin"
-     377   0F:AB00                      	
-     378   0F:AB00  (10)                		page 16
-     379   10:A000                      _opening:
-     380   10:A000  (2000)              		incbin "opening.bin",0x0000,0x2000
-     381   10:C000  (11)                		page 17
-     382   11:A000  (2000)              		incbin "opening.bin",0x2000,0x2000
-     383   11:C000  (12)                		page 18
-     384   12:A000  (2000)              		incbin "opening.bin",0x4000,0x2000
-     385   12:C000  (13)                		page 19
-     386   13:A000  (2000)              		incbin "opening.bin",0x6000,0x2000
-     387   13:C000  (14)                		page 20
-     388   14:A000  (2000)              		incbin "opening.bin",0x8000,0x2000
-     389   14:C000  (15)                		page 21
-     390   15:A000  (2000)              		incbin "opening.bin",0xA000,0x2000
-     391   15:C000  (16)                		page 22
-     392   16:A000  (1400)              		incbin "opening.bin",0xC000;,0x2000
-     393   16:B400  (17)                		page 23
-     394   17:A000                      		; incbin "opening.bin",0xE000;,,0x2000
-     395   17:A000                      	
-     396   17:A000  (18)                		page 24
-     397   18:A000                      _scorebar:	
-     398   18:A000  (1800)              		incbin scorebar.bin
-     399   18:B800                      	
-     400   18:B800  (19)                		page 25
-     401   19:A000                      _animated:	
-     402   19:A000  (2000)              		incbin animated.bin,0x0000,0x2000
-     403   19:C000  (1A)                		page 26
-     404   1A:A000  (2000)              		incbin animated.bin,0x2000,0x2000
-     405   1A:C000                      
-     406   1A:C000  (1B)                		page 27
-     407   1B:A000                      sprtdata:
-     408   1B:A000  (0200)              		incbin 	uridium_revA.bin,,16*32
-     409   1B:A200  (0600)              		incbin 	enemies_frm.bin
-     410   1B:A800                      
-     411   1B:A800  (1C)                		page 28
-     412   1C:A000                      color_base:
-     413   1C:A000                      		repeat 4
-     414   1C:A000                    < 		ds	16,8
-     415   1C:A000                    < 		ds	16,10+64
-     416   1C:A000  08 (16)           < 		endrepeat
-     417   1C:A080                      		repeat 4
-     418   1C:A080                    < 		ds	16,8
-     419   1C:A080                    < 		ds	16,10+64
-     420   1C:A080  08 (16)           < 		endrepeat
-     421   1C:A100                      
-     422   1C:A100                      		
-     423   1C:A100  (0300)              		incbin 	enemies_clr.bin
-     424   1C:A400                      		; repeat 4
-     425   1C:A400                      		; ds	16,12
-     426   1C:A400                      		; ds	16,6+64
-     427   1C:A400                      		; endrepeat
-     428   1C:A400                      		; repeat 4
-     429   1C:A400                      		; ds	16,10
-     430   1C:A400                      		; ds	16,1+64
-     431   1C:A400                      		; endrepeat
-     432   1C:A400                      		; repeat 4
-     433   1C:A400                      		; ds	16,4
-     434   1C:A400                      		; ds	16,9+64
-     435   1C:A400                      		; endrepeat
-     436   1C:A400                      		; repeat 4
-     437   1C:A400                      		; ds	16,12
-     438   1C:A400                      		; ds	16,1+64
-     439   1C:A400                      		; endrepeat
-     440   1C:A400                      		; repeat 4
-     441   1C:A400                      		; ds	16,12
-     442   1C:A400                      		; ds	16,5+64
-     443   1C:A400                      		; endrepeat
-     444   1C:A400                      		; repeat 4
-     445   1C:A400                      		; ds	16,10
-     446   1C:A400                      		; ds	16,3+64
-     447   1C:A400                      		; endrepeat
-     448   1C:A400                      		
-     449   1C:A400                      FINISH:
-     450   1C:A400                      
-     451   1C:A400                      
-     452   1C:A400                      ;---------------------------------------------------------
-     453   1C:A400                      ; Variables
-     454   1C:A400                      ;---------------------------------------------------------
-     455   1C:A400  (0040)              	MAP 0x0040
-     456   1C:A400  (1C:0040)           musbuff:		#15*1024
-     457   1C:A400  (0000)              	ENDMAP
-     458   1C:A400                      	
-     459   1C:A400  (C000)              	MAP 0xC000
-     460   1C:A400  (1C:C000)           ttreplayRAM:		#0
-     461   1C:A400                      	include	"..\TTplayer\code\ttreplayRAM.asm"
+     391   0E:0EF8                      end_demo_song:	
+     392   0E:0EF8                      
+     393   0E:0EF8  (0F)                		page 15
+     394   0F:A000                      _level:
+     395   0F:A000  (0B00)              		incbin "datamap.bin"
+     396   0F:AB00                      	
+     397   0F:AB00  (10)                		page 16
+     398   10:A000                      _opening:
+     399   10:A000  (2000)              		incbin "opening.bin",0x0000,0x2000
+     400   10:C000  (11)                		page 17
+     401   11:A000  (2000)              		incbin "opening.bin",0x2000,0x2000
+     402   11:C000  (12)                		page 18
+     403   12:A000  (2000)              		incbin "opening.bin",0x4000,0x2000
+     404   12:C000  (13)                		page 19
+     405   13:A000  (2000)              		incbin "opening.bin",0x6000,0x2000
+     406   13:C000  (14)                		page 20
+     407   14:A000  (2000)              		incbin "opening.bin",0x8000,0x2000
+     408   14:C000  (15)                		page 21
+     409   15:A000  (2000)              		incbin "opening.bin",0xA000,0x2000
+     410   15:C000  (16)                		page 22
+     411   16:A000  (1400)              		incbin "opening.bin",0xC000;,0x2000
+     412   16:B400  (17)                		page 23
+     413   17:A000                      		; incbin "opening.bin",0xE000;,,0x2000
+     414   17:A000                      	
+     415   17:A000  (18)                		page 24
+     416   18:A000                      _scorebar:	
+     417   18:A000  (1800)              		incbin scorebar.bin
+     418   18:B800                      	
+     419   18:B800  (19)                		page 25
+     420   19:A000                      _animated:	
+     421   19:A000  (2000)              		incbin animated.bin,0x0000,0x2000
+     422   19:C000  (1A)                		page 26
+     423   1A:A000  (2000)              		incbin animated.bin,0x2000,0x2000
+     424   1A:C000                      
+     425   1A:C000  (1B)                		page 27
+     426   1B:A000                      sprtdata:
+     427   1B:A000  (0200)              		incbin 	uridium_revA.bin,,16*32
+     428   1B:A200  (0600)              		incbin 	enemies_frm.bin
+     429   1B:A800                      
+     430   1B:A800  (1C)                		page 28
+     431   1C:A000                      color_base:
+     432   1C:A000                      		repeat 4
+     433   1C:A000                    < 		ds	16,8
+     434   1C:A000                    < 		ds	16,10+64
+     435   1C:A000  08 (16)           < 		endrepeat
+     436   1C:A080                      		repeat 4
+     437   1C:A080                    < 		ds	16,8
+     438   1C:A080                    < 		ds	16,10+64
+     439   1C:A080  08 (16)           < 		endrepeat
+     440   1C:A100                      
+     441   1C:A100                      		
+     442   1C:A100  (0300)              		incbin 	enemies_clr.bin
+     443   1C:A400                      		; repeat 4
+     444   1C:A400                      		; ds	16,12
+     445   1C:A400                      		; ds	16,6+64
+     446   1C:A400                      		; endrepeat
+     447   1C:A400                      		; repeat 4
+     448   1C:A400                      		; ds	16,10
+     449   1C:A400                      		; ds	16,1+64
+     450   1C:A400                      		; endrepeat
+     451   1C:A400                      		; repeat 4
+     452   1C:A400                      		; ds	16,4
+     453   1C:A400                      		; ds	16,9+64
+     454   1C:A400                      		; endrepeat
+     455   1C:A400                      		; repeat 4
+     456   1C:A400                      		; ds	16,12
+     457   1C:A400                      		; ds	16,1+64
+     458   1C:A400                      		; endrepeat
+     459   1C:A400                      		; repeat 4
+     460   1C:A400                      		; ds	16,12
+     461   1C:A400                      		; ds	16,5+64
+     462   1C:A400                      		; endrepeat
+     463   1C:A400                      		; repeat 4
+     464   1C:A400                      		; ds	16,10
+     465   1C:A400                      		; ds	16,3+64
+     466   1C:A400                      		; endrepeat
+     467   1C:A400                      		
+     468   1C:A400                      FINISH:
+     469   1C:A400                      
+     470   1C:A400                      
+     471   1C:A400                      ;---------------------------------------------------------
+     472   1C:A400                      ; Variables
+     473   1C:A400                      ;---------------------------------------------------------
+     474   1C:A400  (0040)              	MAP 0x0040
+     475   1C:A400  (1C:0040)           musbuff:		#15*1024
+     476   1C:A400  (0000)              	ENDMAP
+     477   1C:A400                      	
+     478   1C:A400  (C000)              	MAP 0xC000
+     479   1C:A400  (1C:C000)           ttreplayRAM:		#0
+     480   1C:A400                      	include	"..\TTplayer\code\ttreplayRAM.asm"
        1.  1C:A400                      ;================================
        2.  1C:A400                      ; The new replayer.
        3.  1C:A400                      ;
@@ -11275,102 +11294,102 @@ Errors: 0
      163.  1C:A400  (1C:C23D)           oldregs:	#(32*4)+(3*5)+1		; a way to int the SCC
      164.  1C:A400                      
      165.  1C:A400                      
-     462   1C:A400                      
-     463   1C:A400  (1C:C2CD)           _levelmap:			#mapWidth*mapHeight
-     464   1C:A400                      
-     465   1C:A400  (1C:CDCD)           slotvar				#1
-     466   1C:A400  (1C:CDCE)           slotram				#1
-     467   1C:A400  (1C:CDCF)           SEL_NTSC			#1
-     468   1C:A400                      
-     469   1C:A400  (1C:CDD0)           joystick			#1
-     470   1C:A400                      
-     471   1C:A400  (1C:CDD1)           _mcdivider			#1
-     472   1C:A400                      
-     473   1C:A400  (1C:CDD2)           _mcx				#2	; relative with in the frame on the screen
-     474   1C:A400  (1C:CDD4)           _mcy				#2
-     475   1C:A400                      
-     476   1C:A400  (1C:CDD6)           _mclx				#2	; absolute with the level in ram
-     477   1C:A400  (1C:CDD8)           _mcly				#2
-     478   1C:A400                      
-     479   1C:A400  (1C:CDDA)           _mcframe			#1
-     480   1C:A400  (1C:CDDB)           _mcstate			#1
      481   1C:A400                      
-     482   1C:A400  (1C:CDDC)           _mcdx				#2
-     483   1C:A400  (1C:CDDE)           _mcdy				#2
-     484   1C:A400                      
-     485   1C:A400  (1C:CDE0)           _mcprobe:			#1
-     486   1C:A400  (1C:CDE1)           _mcprobeb:			#1
+     482   1C:A400  (1C:C2CD)           _levelmap:			#mapWidth*mapHeight
+     483   1C:A400                      
+     484   1C:A400  (1C:CDCD)           slotvar				#1
+     485   1C:A400  (1C:CDCE)           slotram				#1
+     486   1C:A400  (1C:CDCF)           SEL_NTSC			#1
      487   1C:A400                      
-     488   1C:A400  (1C:CDE2)           _ticxframe			#1
+     488   1C:A400  (1C:CDD0)           joystick			#1
      489   1C:A400                      
-     490   1C:A400  (1C:CDE3)           _buffer:			#16
-     491   1C:A400  (1C:CDF3)           _fps:				#2
-     492   1C:A400  (1C:CDF5)           _nframes:			#2
-     493   1C:A400  (1C:CDF7)           _vbit16:			#2
+     490   1C:A400  (1C:CDD1)           _mcdivider			#1
+     491   1C:A400                      
+     492   1C:A400  (1C:CDD2)           _mcx				#2	; relative with in the frame on the screen
+     493   1C:A400  (1C:CDD4)           _mcy				#2
      494   1C:A400                      
-     495   1C:A400  (1C:CDF9)           _ymappos:			#1
-     496   1C:A400  (1C:CDFA)           _xmappos:			#2
-     497   1C:A400  (1C:CDFC)           _levelmap_pos:		#2
-     498   1C:A400                      
-     499   1C:A400  (1C:CDFE)           _shadowbuff:		#2
+     495   1C:A400  (1C:CDD6)           _mclx				#2	; absolute with the level in ram
+     496   1C:A400  (1C:CDD8)           _mcly				#2
+     497   1C:A400                      
+     498   1C:A400  (1C:CDDA)           _mcframe			#1
+     499   1C:A400  (1C:CDDB)           _mcstate			#1
      500   1C:A400                      
-     501   1C:A400  (1C:CE00)           _displaypage:		#1
-     502   1C:A400                      
-     503   1C:A400  (1C:CE01)           _mccolorchange:		#1
-     504   1C:A400  (1C:CE02)           _xoffset:			#1
-     505   1C:A400  (1C:CE03)           _yoffset:			#1
+     501   1C:A400  (1C:CDDC)           _mcdx				#2
+     502   1C:A400  (1C:CDDE)           _mcdy				#2
+     503   1C:A400                      
+     504   1C:A400  (1C:CDE0)           _mcprobe:			#1
+     505   1C:A400  (1C:CDE1)           _mcprobeb:			#1
      506   1C:A400                      
-     507   1C:A400  (1C:CE04)           __xoffset:			#1
-     508   1C:A400  (1C:CE05)           __r18:				#1
-     509   1C:A400                      
-     510   1C:A400  (1C:CE06)           randSeed:			#2
-     511   1C:A400  (1C:CE08)           cur_level:			#1
-     512   1C:A400  (1C:CE09)           wave_count:			#1
-     513   1C:A400  (1C:CE0A)           landing_permission:	#1
-     514   1C:A400  (1C:CE0B)           assault_wave_timer:	#2
-     515   1C:A400  (1C:CE0D)           bullet_rate:		#1
-     516   1C:A400  (1C:CE0E)           _dxchng:			#1		; <>0 if direction changes
-     517   1C:A400  (1C:CE0F)           _dxmap:				#1		; previous dxmap
-     518   1C:A400  (1C:CE10)           dxmap:				#1
-     519   1C:A400  (1C:CE11)           xmap:				#2
-     520   1C:A400  (1C:CE13)           _xmapx4:			#2		; xmap x 4
-     521   1C:A400  (1C:CE15)           yship:				#1
-     522   1C:A400  (1C:CE16)           xship:				#2
-     523   1C:A400  (1C:CE18)           aniframe:			#1
-     524   1C:A400  (1C:CE19)           ms_state:			#1
-     525   1C:A400  (1C:CE1A)           old_aniframe:		#1
-     526   1C:A400  (1C:CE1B)           anispeed:			#1
-     527   1C:A400  (1C:CE1C)           already_dead:		#1
-     528   1C:A400  (1C:CE1D)           lives_bin:			#1
-     529   1C:A400                      
-     530   1C:A400  (1C:CE1E)           god_mode:			#1
-     531   1C:A400  (1C:CE1F)           visible_sprts:		#1
-     532   1C:A400  (1C:CE20)           flip_flop:			#1
-     533   1C:A400                      
-     534   1C:A400  (1C:CE21)           ram_sat:			#3*4
-     535   1C:A400                      
-     536   1C:A400                      	struct enemy_data
-     537   1C:A400                    < y				db	0
-     538   1C:A400                    < x				dw	0
-     539   1C:A400                    < xoff			db	0
-     540   1C:A400                    < yoff			db	0
-     541   1C:A400                    < xsize			db	0
-     542   1C:A400                    < ysize			db	0
-     543   1C:A400                    < status			db	0	; B7 = DWN/UP | B6 = RIGHT/LEFT | B5 = ok/wrong clr | B0 = Inactive/Active
-     544   1C:A400                    < cntr			db	0
-     545   1C:A400                    < kind			db	0
-     546   1C:A400                    < frame			db	0
-     547   1C:A400                    < color			db	0
-     548   1C:A400                    < color2			db	0
-     549   1C:A400                    < speed			dw	0
-     550   1C:A400                    < 	ends
-     551   1C:A400                      	
-     552   1C:A400  (1C:CE2D)           any_object:			#0
-     553   1C:A400  (1C:CE2D)           ms_bullets:			#enemy_data*max_bullets
-     554   1C:A400  (1C:CE4B)           enem_bullets:		#enemy_data*max_enem_bullets
-     555   1C:A400  (1C:CE78)           enemies:			#enemy_data*max_enem
-     556   1C:A400  (1C:CF2C)           endram:				#1
-     557   1C:A400  (0000)              	ENDMAP
+     507   1C:A400  (1C:CDE2)           _ticxframe			#1
+     508   1C:A400                      
+     509   1C:A400  (1C:CDE3)           _buffer:			#16
+     510   1C:A400  (1C:CDF3)           _fps:				#2
+     511   1C:A400  (1C:CDF5)           _nframes:			#2
+     512   1C:A400  (1C:CDF7)           _vbit16:			#2
+     513   1C:A400                      
+     514   1C:A400  (1C:CDF9)           _ymappos:			#1
+     515   1C:A400  (1C:CDFA)           _xmappos:			#2
+     516   1C:A400  (1C:CDFC)           _levelmap_pos:		#2
+     517   1C:A400                      
+     518   1C:A400  (1C:CDFE)           _shadowbuff:		#2
+     519   1C:A400                      
+     520   1C:A400  (1C:CE00)           _displaypage:		#1
+     521   1C:A400                      
+     522   1C:A400  (1C:CE01)           _mccolorchange:		#1
+     523   1C:A400  (1C:CE02)           _xoffset:			#1
+     524   1C:A400  (1C:CE03)           _yoffset:			#1
+     525   1C:A400                      
+     526   1C:A400  (1C:CE04)           __xoffset:			#1
+     527   1C:A400  (1C:CE05)           __r18:				#1
+     528   1C:A400                      
+     529   1C:A400  (1C:CE06)           randSeed:			#2
+     530   1C:A400  (1C:CE08)           cur_level:			#1
+     531   1C:A400  (1C:CE09)           wave_count:			#1
+     532   1C:A400  (1C:CE0A)           landing_permission:	#1
+     533   1C:A400  (1C:CE0B)           assault_wave_timer:	#2
+     534   1C:A400  (1C:CE0D)           bullet_rate:		#1
+     535   1C:A400  (1C:CE0E)           _dxchng:			#1		; <>0 if direction changes
+     536   1C:A400  (1C:CE0F)           _dxmap:				#1		; previous dxmap
+     537   1C:A400  (1C:CE10)           dxmap:				#1
+     538   1C:A400  (1C:CE11)           xmap:				#2
+     539   1C:A400  (1C:CE13)           _xmapx4:			#2		; xmap x 4
+     540   1C:A400  (1C:CE15)           yship:				#1
+     541   1C:A400  (1C:CE16)           xship:				#2
+     542   1C:A400  (1C:CE18)           aniframe:			#1
+     543   1C:A400  (1C:CE19)           ms_state:			#1
+     544   1C:A400  (1C:CE1A)           old_aniframe:		#1
+     545   1C:A400  (1C:CE1B)           anispeed:			#1
+     546   1C:A400  (1C:CE1C)           already_dead:		#1
+     547   1C:A400  (1C:CE1D)           lives_bin:			#1
+     548   1C:A400                      
+     549   1C:A400  (1C:CE1E)           god_mode:			#1
+     550   1C:A400  (1C:CE1F)           visible_sprts:		#1
+     551   1C:A400  (1C:CE20)           flip_flop:			#1
+     552   1C:A400                      
+     553   1C:A400  (1C:CE21)           ram_sat:			#3*4
+     554   1C:A400                      
+     555   1C:A400                      	struct enemy_data
+     556   1C:A400                    < y				db	0
+     557   1C:A400                    < x				dw	0
+     558   1C:A400                    < xoff			db	0
+     559   1C:A400                    < yoff			db	0
+     560   1C:A400                    < xsize			db	0
+     561   1C:A400                    < ysize			db	0
+     562   1C:A400                    < status			db	0	; B7 = DWN/UP | B6 = RIGHT/LEFT | B5 = ok/wrong clr | B0 = Inactive/Active
+     563   1C:A400                    < cntr			db	0
+     564   1C:A400                    < kind			db	0
+     565   1C:A400                    < frame			db	0
+     566   1C:A400                    < color			db	0
+     567   1C:A400                    < color2			db	0
+     568   1C:A400                    < speed			dw	0
+     569   1C:A400                    < 	ends
+     570   1C:A400                      	
+     571   1C:A400  (1C:CE2D)           any_object:			#0
+     572   1C:A400  (1C:CE2D)           ms_bullets:			#enemy_data*max_bullets
+     573   1C:A400  (1C:CE4B)           enem_bullets:		#enemy_data*max_enem_bullets
+     574   1C:A400  (1C:CE78)           enemies:			#enemy_data*max_enem
+     575   1C:A400  (1C:CF2C)           endram:				#1
+     576   1C:A400  (0000)              	ENDMAP
 
     LABELS
 -------------------------------------------------
@@ -11631,7 +11650,7 @@ Errors: 0
 00:0000543D   _plot_distrucable
 00:0000547F   START
 00:0000548C   _ntsc
-00:00005546   restart
+00:0000551F   restart
 00:000055A2   main_loop
 00:000055E4   AFXPLAY
 00:000055E5 X _print_probe

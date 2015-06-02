@@ -141,24 +141,24 @@ _ntsc:	ld	(SEL_NTSC),a	; if set NSTC, if reset PAL
 		ld		de, 256*:_animated+2
 		call	outvram
 
-		;--- initialise demo song
-		ld	bc,	_levelmap-ttreplayRAM
-		ld	hl,	ttreplayRAM
-		ld	de,	ttreplayRAM+1
-		ld	(hl),0
-		ldir
+		; ;--- initialise demo song
+		; ld	bc,	_levelmap-ttreplayRAM
+		; ld	hl,	ttreplayRAM
+		; ld	de,	ttreplayRAM+1
+		; ld	(hl),0
+		; ldir
 	
-		ld	a,:demo_song
-		setpage_a
+		; ld	a,:demo_song
+		; setpage_a
 		
-		ld	bc,	end_demo_song-musbuff
-		ld	hl,	demo_song
-		ld	de,	musbuff
-		ldir
+		; ld	bc,	end_demo_song-musbuff
+		; ld	hl,	demo_song
+		; ld	de,	musbuff
+		; ldir
 			
-		call	replay_init
-		ld		hl,musbuff
-		call	replay_loadsong
+		; call	replay_init
+		; ld		hl,musbuff
+		; call	replay_loadsong
 
 
 		ld		e,0
@@ -178,6 +178,7 @@ _ntsc:	ld	(SEL_NTSC),a	; if set NSTC, if reset PAL
 		ld		a,6
 		ld		(cur_level),a
 
+		call	replay_init
 restart:
 		call	_intreset
 		xor		a
@@ -220,6 +221,24 @@ restart:
 
 		call 	npc_init								
 		call 	load_colors
+
+		;--- initialise demo song
+		ld	bc,	_levelmap-ttreplayRAM
+		ld	hl,	ttreplayRAM
+		ld	de,	ttreplayRAM+1
+		ld	(hl),0
+		ldir
+	
+		ld	a,:demo_song
+		setpage_a
+		
+		ld	bc,	end_demo_song-musbuff
+		ld	hl,	demo_song
+		ld	de,	musbuff
+		ldir
+			
+		ld		hl,musbuff
+		call	replay_loadsong
 
 		call	_isrinit
 

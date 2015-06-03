@@ -36,8 +36,40 @@ _fake_isr
 		out (0x99),a
 		ld a,128+15
 		out (0x99),a
-		 
-		in	a,(0x99)
+
+		ld	a,(replay_mode)
+		and	a
+		jr	z,1f
+		
+		push   hl         
+		push   de         
+		push   bc         
+		exx               
+		ex     af,af'     
+		push   hl         
+		push   de         
+		push   bc         
+		push   af         
+		push   iy         
+		push   ix         
+
+
+		call	_replay_route		; first output data	
+		call	_replay_play		; calculate next output
+		
+		pop    ix         
+		pop    iy         
+		pop    af         
+		pop    bc         
+		pop    de         
+		pop    hl         
+		ex     af,af'     
+		exx               
+		pop    bc         
+		pop    de         
+		pop    hl         
+
+1:		in	a,(0x99)
 		pop	af
 		ei
 		ret
@@ -193,7 +225,7 @@ lint:
 		push	hl
 		ld		a,(dxmap)
 		rlc a
-		jp	z,replay_route			;  output music data	
+		jp	z,_replay_route			;  output music data	
 		jp	nc,_blank_line_lft		; >0 == dx
 		jp	 c,_blank_line_rgt		; <0 == sx
 1:		pop	hl
@@ -268,7 +300,7 @@ vblank:
 		; ld	a,7+128
 		; out	(0x99),a
 		
-		call	replay_play			; calculate next output
+		call	_replay_play			; calculate next output
 
 		; xor		a		; black
 		; out	(0x99),a
@@ -291,6 +323,32 @@ vblank:
 		ei
 		ret
 ;-------------------------------------
+_replay_loadsong
+		di
+		ld	a,:demo_song
+		ld	(_kBank4),a
+		jp replay_loadsong
+_replay_play	
+		di
+		ld	a,:demo_song
+		ld	(_kBank4),a
+		jp	replay_play
+_replay_init
+		di
+		ld	a,:demo_song
+		ld	(_kBank4),a
+		jp	replay_init
+_replay_pause
+		di
+		ld	a,:demo_song
+		ld	(_kBank4),a
+		jp	replay_pause
+_replay_route
+		di
+		ld	a,:demo_song
+		ld	(_kBank4),a
+		jp	replay_route
+;-------------------------------------
 
 _blank_line_lft:
 		; ld	a,00000111B		; blue
@@ -300,7 +358,7 @@ _blank_line_lft:
 
 		ld	e,0
 		call	blank_line
-		call	replay_route		; first output data	
+		call	_replay_route		; first output data	
 		
 		
 		; xor	a
@@ -319,7 +377,7 @@ _blank_line_rgt
 
 		ld	e,240
 		call	blank_line
-		call	replay_route		; first output data	
+		call	_replay_route		; first output data	
 
 		; xor	a
 		; out	(0x99),a

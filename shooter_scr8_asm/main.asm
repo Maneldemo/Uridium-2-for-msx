@@ -14,9 +14,9 @@
 		defpage	 2,0x8000, 0x2000		; swapped data 
 		defpage	 3,0xA000, 0x2000		; swapped data 
 		
-		defpage	 4..11					; 64KB of swapped data 
+		defpage	 4..12					; 64KB of swapped data 
 
-		defpage	12,0x4000, 0x2000		; swapped code
+		; defpage	12,0x4000, 0x2000		; swapped code
 		defpage	13,0x6000, 0x2000		; swapped code 
 		defpage	14,0x8000, 0x2000		; swapped data 
 		defpage	15,0xA000, 0x2000		; swapped data 
@@ -93,7 +93,6 @@ _ntsc:	ld	(SEL_NTSC),a	; if set NSTC, if reset PAL
 		call	setrompage2
 		call	setrampage0
 
-		call	_intreset
 
 		xor	a
 		ld	(_kBank1),a
@@ -101,6 +100,15 @@ _ntsc:	ld	(SEL_NTSC),a	; if set NSTC, if reset PAL
 		ld	(_kBank2),a
 		inc	a
 		ld	(_kBank3),a
+		
+		;--- initialise demo song
+		ld	bc,	end_ttreplayRAM-ttreplayRAM
+		ld	hl,	ttreplayRAM
+		ld	de,	ttreplayRAM+1
+		ld	(hl),0
+		ldir
+		call	_replay_init
+		call	_intreset
 		
 		ld		c,0
 		ld		d,c
@@ -141,12 +149,6 @@ _ntsc:	ld	(SEL_NTSC),a	; if set NSTC, if reset PAL
 		ld		de, 256*:_animated+2
 		call	outvram
 
-		; ;--- initialise demo song
-		; ld	bc,	end_ttreplayRAM-ttreplayRAM
-		; ld	hl,	ttreplayRAM
-		; ld	de,	ttreplayRAM+1
-		; ld	(hl),0
-		; ldir
 	
 		; ld	a,:demo_song
 		; setpage_a
@@ -175,13 +177,26 @@ _ntsc:	ld	(SEL_NTSC),a	; if set NSTC, if reset PAL
 
 		; call	init_page0
 
-		ld		a,6
+		ld		a,0
 		ld		(cur_level),a
 
-		call	replay_init
+		ld		hl,demo_song
+		call	_replay_loadsong
+		ei
+1:		jp      1b
+
 restart:
-		call	replay_pause
+		call	_replay_init
 		call	_intreset
+
+		;--- initialise demo song
+		ld	bc,	end_ttreplayRAM-ttreplayRAM
+		ld	hl,	ttreplayRAM
+		ld	de,	ttreplayRAM+1
+		ld	(hl),0
+		ldir
+		
+
 		ld		a,1
 		ld		(_displaypage),a		
 		call 	_cls0
@@ -223,21 +238,6 @@ restart:
 		call 	npc_init								
 		call 	load_colors
 
-		;--- initialise demo song
-		ld	bc,	end_ttreplayRAM-ttreplayRAM
-		ld	hl,	ttreplayRAM
-		ld	de,	ttreplayRAM+1
-		ld	(hl),0
-		ldir
-	
-		ld	a,:end_demo_song
-		setpage_a
-		di
-		ld	bc,	end_demo_song-musbuff
-		ld	hl,	demo_song
-		ld	de,	musbuff
-		ldir
-		
 		xor	a
 		ld	(_kBank1),a
 		inc	a
@@ -245,10 +245,9 @@ restart:
 		inc	a
 		ld	(_kBank3),a
 		
-		ld		hl,musbuff
-		call	replay_loadsong
-		ei
-		
+		ld		hl,demo_song
+		call	_replay_loadsong
+
 		call	_isrinit
 
 main_loop: 
@@ -392,9 +391,10 @@ _tiles0:
 		page 11
 		incbin "tiles.bin",0xE000;,0x2000
 
-		page 14
+		page 12
 demo_song:
-		org 0x0040
+musbuff:
+		; org 0x0040
 		include	"demosong.asm"
 		include	"..\TTplayer\code\ttreplayDAT.asm"
 end_demo_song:	
@@ -456,11 +456,8 @@ FINISH:
 ;---------------------------------------------------------
 ; Variables
 ;---------------------------------------------------------
-	MAP 0x0040
-musbuff:		#8*1024
-	ENDMAP
 	
-	MAP 0x3000
+	MAP 0x100
 ttreplayRAM:		#0
 	include	"..\TTplayer\code\ttreplayRAM.asm"
 end_ttreplayRAM:	#0

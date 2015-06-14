@@ -6,10 +6,9 @@
 ;================================
 	
 ; Converted:
-; replace ( and ) with [ and ]
+; replace [ and ] with [ and ]
 ; replace \n. with \n@@
 ; replace \t. with \t@@	
-; replace ,. with ,@@
 ; disable all defines and ifdef	
 	
 ;define EXTERNAL_SCC 
@@ -330,24 +329,12 @@ replay_play:
 ;===========================================================
 replay_decodedata:
 	;--- process the channels [tracks]
-	ld 	hl,TRACK_Chan1+17+TRACK_Retrig
-	dec	[hl]				;Check if retrig has ended
-	jp	nz,@@retrig_skip1
-	ld	a,[TRACK_Chan1+17+TRACK_Flags]
-	res	B_TRGCMD,a
-	ld	[TRACK_Chan1+17+TRACK_Flags],a
-	
-@@retrig_skip1:	
-	dec	hl
-;	ld 	hl,TRACK_Chan1+17+TRACK_Delay
+	ld 	hl,TRACK_Chan1+17+TRACK_Delay
 	dec	[hl]
 	jp	nz,@@decode2
 
-	
-	
-	
 	ld	a,[TRACK_Chan1+17+TRACK_Flags]
-	and	11111011b		; reset B_TRGENV
+	and	11110011b		; reset B_TRGENV and B_TRGCMD
 	ld	d,a
 	ld	a,[TRACK_Chan1+17+TRACK_Note]	
 	ld	ix,TRACK_Chan1+17
@@ -358,21 +345,12 @@ replay_decodedata:
 	ld	[TRACK_Chan1+17+TRACK_Flags],a	
 
 @@decode2:	
-	ld 	hl,TRACK_Chan2+17+TRACK_Retrig
-	dec	[hl]				;Check if retrig has ended
-	jp	nz,@@retrig_skip2
-	ld	a,[TRACK_Chan2+17+TRACK_Flags]
-	res	B_TRGCMD,a
-	ld	[TRACK_Chan2+17+TRACK_Flags],a
-	
-@@retrig_skip2:	
-	dec	hl
-;	ld 	hl,TRACK_Chan2+17+TRACK_Delay
+	ld 	hl,TRACK_Chan2+17+TRACK_Delay
 	dec	[hl]
 	jp	nz,@@decode3
 
 	ld	a,[TRACK_Chan2+17+TRACK_Flags]
-	and	11111011b		; reset B_TRGENV
+	and	11110011b		; reset B_TRGENV and B_TRGCMD
 	ld	d,a
 	ld	a,[TRACK_Chan2+17+TRACK_Note]	
 	ld	ix,TRACK_Chan2+17
@@ -383,21 +361,12 @@ replay_decodedata:
 	ld	[TRACK_Chan2+17+TRACK_Flags],a	
 
 @@decode3:
-	ld 	hl,TRACK_Chan3+17+TRACK_Retrig
-	dec	[hl]				;Check if retrig has ended
-	jp	nz,@@retrig_skip3
-	ld	a,[TRACK_Chan3+17+TRACK_Flags]
-	res	B_TRGCMD,a
-	ld	[TRACK_Chan3+17+TRACK_Flags],a
-	
-@@retrig_skip3:	
-	dec	hl
-;	ld 	hl,TRACK_Chan3+17+TRACK_Delay
+	ld 	hl,TRACK_Chan3+17+TRACK_Delay
 	dec	[hl]
 	jp	nz,@@decode4
 
 	ld	a,[TRACK_Chan3+17+TRACK_Flags]
-	and	11111011b		; reset B_TRGENV
+	and	11110011b		; reset B_TRGENV and B_TRGCMD
 	ld	d,a		;'
 	ld	a,[TRACK_Chan3+17+TRACK_Note]	
 	ld	ix,TRACK_Chan3+17
@@ -408,21 +377,12 @@ replay_decodedata:
 	ld	[TRACK_Chan3+17+TRACK_Flags],a	
 
 @@decode4:
-	ld 	hl,TRACK_Chan4+17+TRACK_Retrig
-	dec	[hl]				;Check if retrig has ended
-	jp	nz,@@retrig_skip4
-	ld	a,[TRACK_Chan4+17+TRACK_Flags]
-	res	B_TRGCMD,a
-	ld	[TRACK_Chan4+17+TRACK_Flags],a
-	
-@@retrig_skip4:	
-	dec	hl
-;	ld 	hl,TRACK_Chan4+17+TRACK_Delay
+	ld 	hl,TRACK_Chan4+17+TRACK_Delay
 	dec	[hl]
 	jp	nz,@@decode5
 
 	ld	a,[TRACK_Chan4+17+TRACK_Flags]
-	and	11111011b		; reset B_TRGENV
+	and	11110011b		; reset B_TRGENV and B_TRGCMD
 	ld 	d,a		;'
 	ld	a,[TRACK_Chan4+17+TRACK_Note]	
 	ld	ix,TRACK_Chan4+17
@@ -434,21 +394,12 @@ replay_decodedata:
 
 
 @@decode5:
-	ld 	hl,TRACK_Chan5+17+TRACK_Retrig
-	dec	[hl]				;Check if retrig has ended
-	jp	nz,@@retrig_skip5
-	ld	a,[TRACK_Chan5+17+TRACK_Flags]
-	res	B_TRGCMD,a
-	ld	[TRACK_Chan5+17+TRACK_Flags],a
-	
-@@retrig_skip5:	
-	dec	hl
-;	ld 	hl,TRACK_Chan5+17+TRACK_Delay
+	ld 	hl,TRACK_Chan5+17+TRACK_Delay
 	dec	[hl]
 	jp	nz,@@decode6
 
 	ld	a,[TRACK_Chan5+17+TRACK_Flags]
-	and	11111011b		; reset B_TRGENV
+	and	11110011b		; reset B_TRGENV and B_TRGCMD
 	ld	d,a		;'
 	ld	a,[TRACK_Chan5+17+TRACK_Note]	
 	ld	ix,TRACK_Chan5+17
@@ -460,20 +411,12 @@ replay_decodedata:
 
 
 @@decode6:
-	ld 	hl,TRACK_Chan6+17+TRACK_Retrig
-	dec	[hl]				;Check if retrig has ended
-	jp	nz,@@retrig_skip6
-	ld	a,[TRACK_Chan6+17+TRACK_Flags]
-	res	B_TRGCMD,a
-	ld	[TRACK_Chan6+17+TRACK_Flags],a	
-@@retrig_skip6:	
-	dec	hl
-;	ld 	hl,TRACK_Chan6+17+TRACK_Delay
+	ld 	hl,TRACK_Chan6+17+TRACK_Delay
 	dec	[hl]
 	jp	nz,@@decode7
 
 	ld	a,[TRACK_Chan6+17+TRACK_Flags]
-	and	11111011b		; reset B_TRGENV
+	and	11110011b		; reset B_TRGENV and B_TRGCMD
 	ld	d,a		;'
 	ld	a,[TRACK_Chan6+17+TRACK_Note]	
 	ld	ix,TRACK_Chan6+17
@@ -485,21 +428,12 @@ replay_decodedata:
 
 
 @@decode7:
-	ld 	hl,TRACK_Chan7+17+TRACK_Retrig
-	dec	[hl]				;Check if retrig has ended
-	jp	nz,@@retrig_skip7
-	ld	a,[TRACK_Chan7+17+TRACK_Flags]
-	res	B_TRGCMD,a
-	ld	[TRACK_Chan7+17+TRACK_Flags],a
-	
-@@retrig_skip7:	
-	dec	hl
-;	ld 	hl,TRACK_Chan7+17+TRACK_Delay
+	ld 	hl,TRACK_Chan7+17+TRACK_Delay
 	dec	[hl]
 	jp	nz,@@decode8
 
 	ld	a,[TRACK_Chan7+17+TRACK_Flags]
-	and	11111011b		; reset B_TRGENV
+	and	11110011b		; reset B_TRGENV and B_TRGCMD
 	ld	d,a		;'
 	ld	a,[TRACK_Chan7+17+TRACK_Note]	
 	ld	ix,TRACK_Chan7+17
@@ -511,21 +445,12 @@ replay_decodedata:
 
 
 @@decode8:
-	ld 	hl,TRACK_Chan8+17+TRACK_Retrig
-	dec	[hl]				;Check if retrig has ended
-	jp	nz,@@retrig_skip8
-	ld	a,[TRACK_Chan8+17+TRACK_Flags]
-	res	B_TRGCMD,a
-	ld	[TRACK_Chan8+17+TRACK_Flags],a
-	
-@@retrig_skip8:	
-	dec	hl
-;	ld 	hl,TRACK_Chan8+17+TRACK_Delay
+	ld 	hl,TRACK_Chan8+17+TRACK_Delay
 	dec	[hl]
 	jp	nz,@@decode_end
 
 	ld	a,[TRACK_Chan8+17+TRACK_Flags]
-	and	11111011b		; reset B_TRGENV
+	and	11110011b		; reset B_TRGENV and B_TRGCMD
 	ld	d,a		;'
 	ld	a,[TRACK_Chan8+17+TRACK_Note]	
 	ld	ix,TRACK_Chan8+17
@@ -722,12 +647,12 @@ replay_decode_chan:
 ;	ld	a,[ix+TRACK_Note]
 	ld	[replay_previous_note],a
 
-;	;--- Check if retrig has ended
-;	dec	[ix+TRACK_Retrig]
-;	jp	nz,@@skip_retrig_reset
-;	res 	B_TRGCMD,[ix+TRACK_Flags]
-;
-;.skip_retrig_reset:
+	;--- Check if retrig has ended
+	dec	[ix+TRACK_Retrig]
+	jp	nz,@@skip_retrig_reset
+	res 	B_TRGCMD,[ix+TRACK_Flags]
+
+@@skip_retrig_reset:
 	;=============
 	; Note 
 	;=============
@@ -2092,7 +2017,7 @@ _pcAY_cmde_wave_compr:
 	res	B_TRGCMD,d	;[ix+TRACK_Flags]	; reset command
 	set	B_TRGWAV,d	;[ix+TRACK_Flags]	; reset normal wave update
 	ld	a,d
-	ex	af,af'	;'
+	ex	AF,AF'	;'
 	
 	;get the waveform	start	in [DE]
 	ld	de,_0x9800

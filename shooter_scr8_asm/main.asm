@@ -183,7 +183,7 @@ _ntsc:	ld	(SEL_NTSC),a	; if set NSTC, if reset PAL
 		ld		hl,demo_song
 		call	_replay_loadsong
 		ei
-1:		jp      1b
+; 1:		jp      1b
 
 restart:
 		call	_replay_init

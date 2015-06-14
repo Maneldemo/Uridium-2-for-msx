@@ -68,8 +68,6 @@ set_manta_color
 	add	hl,bc
 	ld	c,0x98
 	call	out32
-	; ld	a,1
-	; ld	(_kBank2),a
 	ret
 		
 

@@ -329,6 +329,7 @@ _replay_loadsong
 		ld	(_kBank4),a
 		jp replay_loadsong
 _replay_play	
+		ret
 		di
 		ld	a,:demo_song
 		ld	(_kBank4),a

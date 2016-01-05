@@ -33,9 +33,7 @@ _kBank2: 	equ 07000h ;- 77FFh (7000h used)
 _kBank3: 	equ 09000h ;- 97FFh (9000h used)
 _kBank4: 	equ 0B000h ;- B7FFh (B000h used)
 	
-mapWidth	equ	256
-mapHeight	equ	11
-YSIZE		equ	10*16+8
+
 
 	macro setpage_a
 		ld	(_kBank3),a
@@ -55,10 +53,10 @@ YSIZE		equ	10*16+8
 	;-------------------------------------		
 
 
-		include "rominit64.asm"
-		include "vdpio.asm"
-		include "turbo.asm"
-		include "isr.asm"
+		include rominit64.asm
+		include vdpio.asm
+		include turbo.asm
+		include isr.asm
 		
 		include checkkbd.asm
 		include sprts.asm
@@ -66,6 +64,7 @@ YSIZE		equ	10*16+8
 		include collision_tst.asm
 		include enemies.asm
 		include plot_distrucable.asm
+		include opening.asm
 		
 ;-------------------------------------
 ; Entry point
@@ -104,29 +103,18 @@ _ntsc:	ld	(SEL_NTSC),a	; if set NSTC, if reset PAL
 		inc	a
 		ld	(_kBank3),a
 		
-		;--- initialise demo song
-		ld	bc,	end_ttreplayRAM-ttreplayRAM
-		ld	hl,	ttreplayRAM
-		ld	de,	ttreplayRAM+1
-		ld	(hl),0
-		ldir
-		call	_replay_init
-		call	_intreset
+		;--- initialise ISR in RAM
 		
-		ld		c,0
-		ld		d,c
-		ld		e,c
-		call	_vdpsetvramwr
+		di
+		ld	hl,0x0038
+		ld	(hl),0xC3
+		inc	hl
+		ld	(hl),low _fake_isr
+		inc	hl
+		ld	(hl),high _fake_isr
 
-		ld	de,256*:_opening+7
-		call	outvram
+		call	opening
 		
-1:		ld e,8
-		call	checkkbd
-		and		00000001B
-		jr		nz,1b
-
-		call	_cls
 		di
 		ld		a,(RG9SAV)		
 		and		01111111B		; Set 192 lines
@@ -183,21 +171,11 @@ _ntsc:	ld	(SEL_NTSC),a	; if set NSTC, if reset PAL
 		ld		a,0
 		ld		(cur_level),a
 
-		ld		hl,demo_song
-		call	_replay_loadsong
 		ei
-; 1:		jp      1b
 
 restart:
-		call	_replay_init
 		call	_intreset
 
-		;--- initialise demo song
-		ld	bc,	end_ttreplayRAM-ttreplayRAM
-		ld	hl,	ttreplayRAM
-		ld	de,	ttreplayRAM+1
-		ld	(hl),0
-		ldir
 		
 
 		ld		a,1
@@ -248,8 +226,6 @@ restart:
 		inc	a
 		ld	(_kBank3),a
 		
-		ld		hl,demo_song
-		call	_replay_loadsong
 
 		call	_isrinit
 
@@ -347,7 +323,6 @@ ms_bllts_col_win:
 	
 		page 1
 
-		include	"..\TTplayer\code\ttreplay.asm"
 		include	"ms_crtl.asm"
 		include	"put_ms_sprt.asm"
 		include probe_level.asm				
@@ -395,12 +370,6 @@ _tiles0:
 		incbin "tiles.bin",0xE000;,0x2000
 
 		page 12
-demo_song:
-musbuff:
-		; org 0x0040
-		include	"demosong.asm"
-		include	"..\TTplayer\code\ttreplayDAT.asm"
-end_demo_song:	
 
 		page 15
 _level:
@@ -460,11 +429,6 @@ FINISH:
 ; Variables
 ;---------------------------------------------------------
 	
-	MAP 0x100
-ttreplayRAM:		#0
-	include	"..\TTplayer\code\ttreplayRAM.asm"
-end_ttreplayRAM:	#0
-	ENDMAP
 	
 	MAP 0xC000
 

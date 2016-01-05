@@ -11,6 +11,10 @@ assault_wave_timer_preset:	equ	3*60	; a wave each 3 seconds
 enemy_bullet_speed:			equ	2	
 xship_rel:					equ (128-8)
 
+mapWidth	equ	256
+mapHeight	equ	11
+YSIZE		equ	10*16+8
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 

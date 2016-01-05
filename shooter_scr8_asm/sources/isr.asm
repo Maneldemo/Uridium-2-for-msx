@@ -37,9 +37,9 @@ _fake_isr
 		ld a,128+15
 		out (0x99),a
 
-		ld	a,(replay_mode)
-		and	a
-		jr	z,1f
+		; ld	a,(replay_mode)
+		; and	a
+		; jr	z,1f
 		
 		push   hl         
 		push   de         
@@ -54,8 +54,6 @@ _fake_isr
 		push   ix         
 
 
-		call	_replay_route		; first output data	
-		call	_replay_play		; calculate next output
 		
 		pop    ix         
 		pop    iy         
@@ -156,9 +154,10 @@ waitHBLANK
 		ld a,128+15
 		out (0x99),a		; poll for HBLANK
 		 
-; 1:		in	a,(0x99)		; we are in HBLANK already, so wait until end of HBLANK
-		; and	0x20
-		; jp	nz,1b			
+; 1:	in	a,(0x99)		; we are in HBLANK already, so wait until end of HBLANK
+; 		and	0x20
+; 		jp	nz,1b			
+
 2:		in	a,(0x99)		; wait until end of the active area
 		and	0x20
 		jp	z,2b
@@ -225,7 +224,7 @@ lint:
 		push	hl
 		ld		a,(dxmap)
 		rlc a
-		jp	z,_replay_route			;  output music data	
+
 		jp	nc,_blank_line_lft		; >0 == dx
 		jp	 c,_blank_line_rgt		; <0 == sx
 1:		pop	hl
@@ -300,7 +299,6 @@ vblank:
 		; ld	a,7+128
 		; out	(0x99),a
 		
-		call	_replay_play			; calculate next output
 
 		; xor		a		; black
 		; out	(0x99),a
@@ -323,32 +321,6 @@ vblank:
 		ei
 		ret
 ;-------------------------------------
-_replay_loadsong
-		di
-		ld	a,:demo_song
-		ld	(_kBank4),a
-		jp replay_loadsong
-_replay_play	
-		ret
-		di
-		ld	a,:demo_song
-		ld	(_kBank4),a
-		jp	replay_play
-_replay_init
-		di
-		ld	a,:demo_song
-		ld	(_kBank4),a
-		jp	replay_init
-_replay_pause
-		di
-		ld	a,:demo_song
-		ld	(_kBank4),a
-		jp	replay_pause
-_replay_route
-		di
-		ld	a,:demo_song
-		ld	(_kBank4),a
-		jp	replay_route
 ;-------------------------------------
 
 _blank_line_lft:
@@ -359,7 +331,7 @@ _blank_line_lft:
 
 		ld	e,0
 		call	blank_line
-		call	_replay_route		; first output data	
+
 		
 		
 		; xor	a
@@ -378,7 +350,6 @@ _blank_line_rgt
 
 		ld	e,240
 		call	blank_line
-		call	_replay_route		; first output data	
 
 		; xor	a
 		; out	(0x99),a

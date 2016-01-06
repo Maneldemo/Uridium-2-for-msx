@@ -64,7 +64,7 @@ _kBank4: 	equ 0B000h ;- B7FFh (B000h used)
 		include collision_tst.asm
 		include enemies.asm
 		include plot_distrucable.asm
-		include opening.asm
+
 		
 ;-------------------------------------
 ; Entry point
@@ -115,14 +115,6 @@ _ntsc:	ld	(SEL_NTSC),a	; if set NSTC, if reset PAL
 
 		call	opening
 		
-		di
-		ld		a,(RG9SAV)		
-		and		01111111B		; Set 192 lines
-		ld		(RG9SAV),a
-		out		(0x99),a
-		ld		a,128+9
-		out		(0x99),a
-		ei
 
 		call 	_hw_sprite_init
 
@@ -199,11 +191,11 @@ restart:
 		ld		(_yoffset),a		;  0 tutto su
 		ld		(_xoffset),a		;  0 tutto su
 								
-		ld	(aniframe),a
-		ld	(anispeed),a
-		ld	(ms_state),a
-		inc a
-		ld	(old_aniframe),a		; old_aniframe!=aniframe
+		ld		(aniframe),a
+		ld		(anispeed),a
+		ld		(ms_state),a
+		inc 	a
+		ld		(old_aniframe),a		; old_aniframe!=aniframe
 	
 		ld		(dxmap),a		; moving right
 		ld		(_dxmap),a		; moving right
@@ -220,11 +212,11 @@ restart:
 		call 	load_colors
 
 		xor	a
-		ld	(_kBank1),a
+		ld		(_kBank1),a
 		inc	a
-		ld	(_kBank2),a
+		ld		(_kBank2),a
 		inc	a
-		ld	(_kBank3),a
+		ld		(_kBank3),a
 		
 
 		call	_isrinit
@@ -323,10 +315,10 @@ ms_bllts_col_win:
 	
 		page 1
 
-		include	"ms_crtl.asm"
-		include	"put_ms_sprt.asm"
+		include	ms_crtl.asm
+		include	put_ms_sprt.asm
 		include probe_level.asm				
-		
+		include opening.asm		
 outvram:
 2:		ld	a,d
 		ld	(_kBank4),a

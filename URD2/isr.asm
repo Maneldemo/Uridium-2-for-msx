@@ -32,13 +32,14 @@ _jiffy: equ 0xFC9E
 
 _fake_isr
 		push	af
-		xor	a 			; read S#0
-		out (0x99),a
-		ld a,128+15
-		out (0x99),a
-
-		; ld	a,(replay_mode)
-		; and	a
+		; xor		a
+		; out		(0x99),a
+		; ld		a,7+128
+		; out		(0x99),a
+		
+		; ld	a,(halfrate)
+		; xor	255
+		; ld	(halfrate),a				
 		; jr	z,1f
 		
 		push   hl         
@@ -58,14 +59,20 @@ _fake_isr
 		ld		a,7+128
 		out		(0x99),a
 
-		ld		e,240
-		ld		d,240-16
+		ld		e,240-16
+		ld		d,240-32
 		call	move_block
 		
-		; call _waitvdp		
 		call	brdrs
+
+		ld		a,11100011B
+		out		(0x99),a
+		ld		a,7+128
+		out		(0x99),a
+
+		call _waitvdp		
 		
-		ld		a,r
+		xor		a
 		out		(0x99),a
 		ld		a,7+128
 		out		(0x99),a
@@ -83,9 +90,9 @@ _fake_isr
 		pop    hl         
 
 1:		
-		xor	a
+		xor	a 			; read S#0
 		out (0x99),a
-		ld a, 128+15
+		ld a,128+15
 		out (0x99),a
 		in	a,(0x99)
 		pop	af
@@ -139,25 +146,25 @@ brdrs:
 	ld	a,(_xoffset)
 	call	_brd_4x64
 
-	ld	a,(_displaypage)
-[2] add a,a
-	or	2
-	out (0x99),a 	; set bits 14-16
-	ld a,14+128
-	out (0x99),a
+	; ld	a,(_displaypage)
+; [2] add a,a
+	; or	2
+	; out (0x99),a 	; set bits 14-16
+	; ld a,14+128
+	; out (0x99),a
 
-	ld	d,0x40		; write access	
-	call	_line_4x64
+	; ld	d,0x40		; write access	
+	; call	_line_4x64
 
-	ld	a,(_displaypage)
-[2] add a,a
-	or	2
-	out (0x99),a 	; set bits 14-16
-	ld a,14+128
-	out (0x99),a
-	ld	d,0x40		; write access
-	ld	a,(_xoffset)
-	call	_brd_4x64
+	; ld	a,(_displaypage)
+; [2] add a,a
+	; or	2
+	; out (0x99),a 	; set bits 14-16
+	; ld a,14+128
+	; out (0x99),a
+	; ld	d,0x40		; write access
+	; ld	a,(_xoffset)
+	; call	_brd_4x64
 
 	ret		
 	
@@ -181,32 +188,39 @@ _line_4x64:
 	ld	l,a
 
 	; hl -> tile column
-
-	ld	bc,16*256+0x98
-1:	ld a,e 		;set bits 0-7
-	out (0x99),a
-	ld a,d 		;set bits 8-13
-	out (0x99),a
-	inc	d
-	outi
-	jp	nz,1b
+	call	plot_tile_column
 	
 	pop	hl
 	; inc h
 	inc l
 	endrepeat
 	ret
-
-_brd_4x64:
-	ld	c,a
-	ld	b,64
-1:	ld a,c 		;set bits 0-7
+	
+plot_tile_column:	
+	ld	c,0x98
+	repeat 16
+	ld a,e 		;set bits 0-7
 	out (0x99),a
 	ld a,d 		;set bits 8-13
 	out (0x99),a
 	inc	d
-	ld	a,00011100b
+	outi
+	endrepeat
+	ret
+	
+_brd_4x64:
+	ld	c,a
+	ld	b,8
+1:	
+	repeat 8
+	ld a,c 		;set bits 0-7
+	out (0x99),a
+	ld a,d 		;set bits 8-13
+	out (0x99),a
+	inc	d
+	ld	a,e		;00011100b
 	out	(0x98),a
+	endrepeat	
 	djnz 1b
 	ret
 	
@@ -226,7 +240,7 @@ move_block:
 
 	ld 		c, 0x9B
 	
-	call _waitvdp		; no need ATM
+	; call _waitvdp		; no need ATM
 	
 	out		(c), e 		; sx
 	xor a
@@ -249,7 +263,7 @@ move_block:
 	out 	(0x9B), a
 	xor a
 	out 	(0x9B), a	
-	ld		a,12*16			; mapHeight*16
+	ld		a,8*16			; mapHeight*16
 	out 	(0x9B), a
 	xor		a
 	out 	(0x9B), a

@@ -124,7 +124,8 @@ set_scr:
 
 	// enable sprites + TP
 	ld		a,(RG8SAV)
-	or		00100010B
+	; or		00100010B
+	or		00100000B
 	ld		(RG8SAV),a
 		
 	// Set @50Hz (only PAL is supported)
@@ -141,7 +142,7 @@ set_scr:
 2:	ld		(RG9SAV),a
 
 	ld  	a,8
-	call		chgmod
+	call	chgmod
 
 	ld		a,(RG9SAV)		
 	and		01111111B		; 192 lines	

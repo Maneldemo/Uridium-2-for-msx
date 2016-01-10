@@ -45,7 +45,7 @@ _kBank4: 	equ 0B000h ;- B7FFh (B000h used)
 ;-------------------------------------
 START:
 		xor	a
-		dec	a
+		; dec	a
 		ld	(SEL_NTSC),a
 		call	set_scr
 		di
@@ -83,6 +83,7 @@ START:
 		ld	(_xoffset),a		
 		xor	a
 		ld	(_displaypage),a		
+		ld	(halfrate),a		
 		
 		ei
 1:		halt
@@ -108,7 +109,9 @@ PAL_ntsc
 	ret
 		
 _levelmap
+		repeat 16
 		db	0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
+		endrepeat
 		
 		page 3
 _tiles0:
@@ -431,6 +434,8 @@ _tiles0:
 slotvar				#1
 slotram				#1
 SEL_NTSC			#1
+
+halfrate			#1
 
 ; joystick			#1
 

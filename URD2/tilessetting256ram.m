@@ -16,12 +16,8 @@ for g=0:7
     end
 end
 
-%[A2,MAP] = imread('NUMBERS.bmp');
 
-%[A2,MAP] = imread('GNG2048x176.PNG');
-%[A2,MAP] = imread('graphics\lmap6.bmp');
-
-[A2,MAP] = imread('graphics\toni_level.png');
+[A2,MAP] = imread('levels\test_level.png');
 
 
 [ A2 MAP] = imapprox(A2,MAP,pal, 'nodither');
@@ -118,7 +114,7 @@ figure
 image(D)
 axis equal;
 colormap(pal)
-imwrite(D,pal,'graphics\tileset.png','png');
+imwrite(D,pal,'tilesets\tileset.png','png');
 
 NewMap = InpMap;
 
@@ -142,7 +138,7 @@ A = col2im(ReducedImage,[16 16],[H W],'distinct');
 figure
 image(A)
 colormap(MAP)
-imwrite(A,MAP,'graphics\output.png','png');
+imwrite(A,MAP,'output.png','png');
 
 fid = fopen('tiles.bin','wb');
 for y=1:K

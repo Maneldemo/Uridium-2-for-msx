@@ -86,7 +86,7 @@ START:
 		ld	(_jiffy),hl		
 		xor	a
 		ld	(_displaypage),a		
-		ld	(halfrate),a		
+		ld	(_xoffset),a
 		
 		ei
 1:		halt
@@ -435,8 +435,6 @@ _tiles0:
 slotvar				#1
 slotram				#1
 SEL_NTSC			#1
-
-halfrate			#1
 
 ; joystick			#1
 

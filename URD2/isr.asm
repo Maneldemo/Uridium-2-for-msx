@@ -1,17 +1,10 @@
 
-		; include "header.asm"
-
 
 _fake_isr
 		push	af
-		; xor		a
-		; out		(0x99),a
-		; ld		a,7+128
-		; out		(0x99),a
 		
-		; ld	a,(halfrate)
-		; xor	255
-		; ld	(halfrate),a				
+		; ld	a,(noscroll)
+		; or	a
 		; jr	z,1f
 		
 		push   hl         
@@ -31,21 +24,9 @@ _fake_isr
 		ld		a,7+128
 		out		(0x99),a
 
-		call	fsm
+		call	hfsm
+		call	xfsm
 		
-		; ld		e,240-16
-		; ld		d,240-32
-		; call	move_slice
-		
-		; call	brdrs
-
-		; ld		a,11100011B
-		; out		(0x99),a
-		; ld		a,7+128
-		; out		(0x99),a
-
-		; call 	_waitvdp		
-
 		ld	hl,(_jiffy)
 		inc	hl
 		ld	(_jiffy),hl

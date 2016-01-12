@@ -1,12 +1,4 @@
 
-brdrs:
-		ld	hl,_levelmap
-		
-		ld	a,(_xoffset)
-		ld	ixl,a	; ixl = x
-		add a,240
-		ld	e,a		; e = x+240
-
 _brdrs:
 		ld	hl,_levelmap
 

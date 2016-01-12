@@ -155,7 +155,18 @@ x15:	ld		e,16*15
 		ret
 		
 		
-		
-		
+		; ld		a,b
+; [4]		add		a,a
+		; ld		e,a
+		; sub		a,16
+		; ld		d,a
+		; call	move_slice
+		; ld		a,b
+		; dec		a
+		; ld		xhl,a
+		; add		a,240
+		; ld		e,a
+		; call	_brdrs
+		; ret
 		
 		

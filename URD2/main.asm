@@ -82,8 +82,8 @@ START:
 		inc	hl
 		ld	(hl),high _fake_isr
 
-		ld	a,0
-		ld	(_xoffset),a		
+		ld	hl,0
+		ld	(_jiffy),hl		
 		xor	a
 		ld	(_displaypage),a		
 		ld	(halfrate),a		
@@ -91,16 +91,13 @@ START:
 		ei
 1:		halt
 		ld	a,(_xoffset)		
-		inc	a
-		and	15
-		ld	(_xoffset),a		
+		and	a
 		jp	nz,1b
 		
 		ld	e,8
 		call	checkkbd
-		and	1
+		and	1				; space
 		call	z,PAL_ntsc
-		
 		jp	1b
 		
 PAL_ntsc

@@ -45,6 +45,13 @@ _fake_isr
 		; out		(0x99),a
 
 		; call 	_waitvdp		
+
+		ld	hl,(_jiffy)
+		inc	hl
+		ld	(_jiffy),hl
+		ld	a,15
+		and	l
+		ld	(_xoffset),a
 		
 		xor		a
 		out		(0x99),a

@@ -1,34 +1,6 @@
 
 		; include "header.asm"
-		
-// MSX 1 
-RG0SAV  equ 0xF3DF  
-RG1SAV  equ 0xF3E0  
-RG2SAV  equ 0xF3E1
-RG3SAV  equ 0xF3E2
-RG4SAV  equ 0xF3E3
-RG5SAV  equ 0xF3E4
-RG6SAV  equ 0xF3E5
-RG7SAV  equ 0xF3E6
-// MSX 2
-RG8SAV  equ 0xFFE7 
-RG9SAV  equ 0xFFE8 
-RG10SAV equ 0xFFE9 
-RG11SAV equ 0xFFEA 
-RG12SAV equ 0xFFEB 
-RG13SAV equ 0xFFEC 
-RG14SAV equ 0xFFED 
-RG15SAV equ 0xFFEE 
-RG16SAV equ 0xFFEF 
-RG17SAV equ 0xFFF0 
-RG18SAV equ 0xFFF1 
-RG19SAV equ 0xFFF2 
-RG20SAV equ 0xFFF3 
-RG21SAV equ 0xFFF4 
-RG22SAV equ 0xFFF5 
-RG23SAV equ 0xFFF7 
 
-_jiffy: equ 0xFC9E 
 
 _fake_isr
 		push	af
@@ -59,18 +31,20 @@ _fake_isr
 		ld		a,7+128
 		out		(0x99),a
 
-		ld		e,240-16
-		ld		d,240-32
-		call	move_block
+		call	fsm
 		
-		call	brdrs
+		; ld		e,240-16
+		; ld		d,240-32
+		; call	move_slice
+		
+		; call	brdrs
 
-		ld		a,11100011B
-		out		(0x99),a
-		ld		a,7+128
-		out		(0x99),a
+		; ld		a,11100011B
+		; out		(0x99),a
+		; ld		a,7+128
+		; out		(0x99),a
 
-		call _waitvdp		
+		; call 	_waitvdp		
 		
 		xor		a
 		out		(0x99),a
@@ -99,181 +73,6 @@ _fake_isr
 		ei
 		ret
 
-brdrs:
-	ld	hl,_levelmap
-
-	ld	e,240
-	
-	ld	a,(_xoffset)
-	add a,e
-	ld	e,a		; de = y*256+x
-	
-	ld	a,(_displaypage)
-[2] add a,a
-	out (0x99),a 	; set bits 14-16
-	ld a,14+128
-	out (0x99),a
-
-	ld	d,0x40		; write access
-	call	_line_4x64
-	
-	ld	a,(_displaypage)
-[2] add a,a
-	out (0x99),a 	; set bits 14-16
-	ld a,14+128
-	out (0x99),a
-	ld	d,0x40		; write access
-	ld	a,(_xoffset)
-	call	_brd_4x64
-	
-	ld	a,(_displaypage)
-[2] add a,a
-	or	1
-	out (0x99),a 	; set bits 14-16
-	ld a,14+128
-	out (0x99),a
-
-	ld	d,0x40		; write access	
-	call	_line_4x64
-	
-	ld	a,(_displaypage)
-[2] add a,a
-	or	1
-	out (0x99),a 	; set bits 14-16
-	ld a,14+128
-	out (0x99),a
-	ld	d,0x40		; write access
-	ld	a,(_xoffset)
-	call	_brd_4x64
-
-	; ld	a,(_displaypage)
-; [2] add a,a
-	; or	2
-	; out (0x99),a 	; set bits 14-16
-	; ld a,14+128
-	; out (0x99),a
-
-	; ld	d,0x40		; write access	
-	; call	_line_4x64
-
-	; ld	a,(_displaypage)
-; [2] add a,a
-	; or	2
-	; out (0x99),a 	; set bits 14-16
-	; ld a,14+128
-	; out (0x99),a
-	; ld	d,0x40		; write access
-	; ld	a,(_xoffset)
-	; call	_brd_4x64
-
-	ret		
-	
-
-_line_4x64:
-; hl ->   Map in RAM
-	repeat 4
-	push	hl
-		
-	ld	a,(hl)
-[3]	rlca
-	and	00000111B
-	add	a,:_tiles0
-	ld	(_kBank4),a
-	ld	a,(hl)
-	and	00011111B
-	add	a,high _tiles0
-	ld	h,a
-	ld	a,(_xoffset)
-[4]	add	a,a
-	ld	l,a
-
-	; hl -> tile column
-	call	plot_tile_column
-	
-	pop	hl
-	; inc h
-	inc l
-	endrepeat
-	ret
-	
-plot_tile_column:	
-	ld	c,0x98
-	repeat 16
-	ld a,e 		;set bits 0-7
-	out (0x99),a
-	ld a,d 		;set bits 8-13
-	out (0x99),a
-	inc	d
-	outi
-	endrepeat
-	ret
-	
-_brd_4x64:
-	ld	c,a
-	ld	b,8
-1:	
-	repeat 8
-	ld a,c 		;set bits 0-7
-	out (0x99),a
-	ld a,d 		;set bits 8-13
-	out (0x99),a
-	inc	d
-	ld	a,e		;00011100b
-	out	(0x98),a
-	endrepeat	
-	djnz 1b
-	ret
-	
-
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-; input
-; e = sx	from not _displaypage
-; d = dx	to _displaypage
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-move_block:
-	ld 		a, 32
-	out 	(0x99),a
-	ld 		a, 17+128
-	out 	(0x99),a
-
-	ld 		c, 0x9B
-	
-	; call _waitvdp		; no need ATM
-	
-	out		(c), e 		; sx
-	xor a
-	out		(0x9B), a 	; sx (high)
-	
-	out		(0x9B), a 	; sy
-	ld 		a,(_displaypage)	; source page
-	out 	(0x9B), a 	; sy 	(high-> page 0 or 1)
-
-	out 	(c), d 		; dx
-	xor a
-	out 	(0x9B), a	; dx (high)
-	
-	out 	(0x9B), a 		; dy
-	ld 		a,(_displaypage)	; destination page
-	xor	1				
-	out 	(0x9B), a	; dy 	(high-> page 0 or 1)
-
-	ld 		a,16 		; block size
-	out 	(0x9B), a
-	xor a
-	out 	(0x9B), a	
-	ld		a,8*16			; mapHeight*16
-	out 	(0x9B), a
-	xor		a
-	out 	(0x9B), a
-	out 	(0x9B), a
-	out 	(0x9B), a
-
-	ld		a,11010000B
-	out 	(0x9B), a		; command HMMM
-	ret
-		
 
 ; _isrinit:
 		; di

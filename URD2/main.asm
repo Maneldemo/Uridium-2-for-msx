@@ -37,6 +37,9 @@ _kBank4: 	equ 0B000h ;- B7FFh (B000h used)
 		include rominit64.asm
 		include vdpio.asm
 		include isr.asm
+		include fsmscroll.asm
+		include vdpcmds.asm
+		include brdrs.asm
 		
 		include checkkbd.asm
 		
@@ -99,14 +102,15 @@ START:
 		call	z,PAL_ntsc
 		
 		jp	1b
+		
 PAL_ntsc
-	ld		a,(RG9SAV)		
-	xor		00000010B		; PAL or NTSC 
-	ld		(RG9SAV),a
-	out		(0x99),a
-	ld		a,9+128
-	out		(0x99),a
-	ret
+		ld		a,(RG9SAV)		
+		xor		00000010B		; PAL or NTSC 
+		ld		(RG9SAV),a
+		out		(0x99),a
+		ld		a,9+128
+		out		(0x99),a
+		ret
 		
 _levelmap
 		repeat 16

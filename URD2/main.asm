@@ -82,6 +82,8 @@ START:
 		inc	hl
 		ld	(hl),high _fake_isr
 
+		call	mapinit
+		
 		ld	hl,0
 		ld	(_jiffy),hl		
 		xor	a
@@ -108,12 +110,25 @@ PAL_ntsc
 		ld		a,9+128
 		out		(0x99),a
 		ret
+
+mapinit		
+		ld	a, :_level
+		ld	(_kBank4),a
+		ld		hl,_level
+		ld		de,_levelmap
+		ld		bc,mapWidth*mapHeight
+		ldir
+		ld		hl,_levelmap
+		ld		(_levelmap_pos),hl
 		
-_levelmap
-		repeat 16
-		db	@# + 16*5
-		endrepeat
+		xor		a
+		ld		h,a
+		ld		l,a		
+		ld		(_ymappos),a
+		ld		(_xmappos),hl
 		
+		ret
+
 		
 		page 4
 _tiles0:
@@ -129,13 +144,14 @@ _tiles0:
 		page 9
 		incbin "tiles.bin",0xA000,0x2000
 		page 10
-		incbin "tiles.bin",0xC000,0x2000
-		page 11
-		incbin "tiles.bin",0xE000;,0x2000
-		
-		; repeat 16
-		; ds 256,255-@#
-		; endrepeat
+		incbin "tiles.bin",0xC000;,0x2000
+		; page 11
+		; incbin "tiles.bin",0xE000;,0x2000
+
+		page 12		
+_level
+		incbin	datamap.bin		
+
 		; call	opening
 		
 
@@ -447,7 +463,7 @@ _tiles0:
 	
 	MAP 0xC000
 
-; _levelmap:			#mapWidth*mapHeight
+_levelmap:			#mapWidth*mapHeight
 
 slotvar				#1
 slotram				#1
@@ -479,9 +495,9 @@ SEL_NTSC			#1
 ; _nframes:			#2
 ; _vbit16:			#2
 
-; _ymappos:			#1
-; _xmappos:			#2
-; _levelmap_pos:		#2
+_ymappos:			#1
+_xmappos:			#2
+_levelmap_pos:		#2
 
 ; _shadowbuff:		#2
 

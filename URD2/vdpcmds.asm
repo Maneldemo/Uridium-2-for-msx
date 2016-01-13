@@ -2,7 +2,7 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; input
-; e = sx	from not _displaypage
+; b = sx	from not _displaypage
 ; d = dx	to _displaypage
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -16,7 +16,7 @@ move_slice:
 		
 		; call _waitvdp				; no need ATM
 		
-		out		(c), e 				; sx
+		out		(c), b 				; sx
 		xor a
 		out		(0x9B), a 			; sx (high)
 		
@@ -81,9 +81,8 @@ clear_slice:
 		xor a
 		out 	(0x9B), a
 
-		ld	a,00011100B
+		xor		a
 		out 	(0x9B), a			; border_color
-		xor a
 		out 	(0x9B), a
 
 		ld		a,11000000B

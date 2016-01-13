@@ -17,18 +17,18 @@ for g=0:7
 end
 
 
-[A2,MAP] = imread('levels\test_level.png');
+[A,MAP] = imread('levels\test_level.png');
 
 
-[ A2 MAP] = imapprox(A2,MAP,pal, 'nodither');
+[ A MAP] = imapprox(A,MAP,pal, 'nodither');
 pal = MAP;
 %MAP = pal;
 
-S = fix(size(A2)/16).*16;
+S = fix(size(A)/16).*16;
 H = S(1);
 W = S(2);
 
-B = A2(1:H,1:W);
+B = A(1:H,1:W);
 
 H = size(B,1);
 W = size(B,2);
@@ -43,8 +43,8 @@ InpTiles = im2col(B,'indexed',[16 16],'distinct');
 % if (0)
 % 	RGB = ind2rgb(InpTiles',MAP);
 % 	t = [RGB(:,:,1) RGB(:,:,2) RGB(:,:,3)];
-% 	[IDX, C] = KMEANS(t, 128,'EmptyAction','singleton','Replicates',10);
-% 	UniqueTiles = zeros(128,256,3);
+% 	[IDX, C] = kmeans(t, 256,'EmptyAction','singleton','Replicates',10);
+% 	UniqueTiles = zeros(256,256,3);
 % 	UniqueTiles (:,:,1) = C(:,1:256);
 % 	UniqueTiles (:,:,2) = C(:,257:512);
 % 	UniqueTiles (:,:,3) = C(:,513:768);

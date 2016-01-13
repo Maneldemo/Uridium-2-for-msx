@@ -24,17 +24,38 @@ _fake_isr
 		ld		a,7+128
 		out		(0x99),a
 
-		call	hfsm
-		call	xfsm
-		
-		call _waitvdp				; no need ATM
-		
-		ld	hl,(_jiffy)
-		inc	hl
-		ld	(_jiffy),hl
+		ld	hl,(_xmappos)
 		ld	a,15
 		and	l
 		ld	(_xoffset),a
+		
+		repeat 4
+		srl	h
+		rr	l
+		endrepeat
+		
+		ld	de,_levelmap+16
+		add	hl,de
+		
+		ld		(_levelmap_pos),hl
+		
+		call	hfsm
+		call	xfsm
+		call	_brdrs
+		
+		; call _waitvdp				; no need ATM
+		
+		ld	hl,(_xmappos)
+		inc	hl
+		ld	a,15
+		and	h
+		ld	h,a
+		ld	(_xmappos),hl
+
+		ld	hl,(_jiffy)
+		inc	hl
+		ld	(_jiffy),hl
+		
 		
 		xor		a
 		out		(0x99),a

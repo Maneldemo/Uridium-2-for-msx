@@ -27,6 +27,8 @@ _fake_isr
 		call	hfsm
 		call	xfsm
 		
+		call _waitvdp				; no need ATM
+		
 		ld	hl,(_jiffy)
 		inc	hl
 		ld	(_jiffy),hl

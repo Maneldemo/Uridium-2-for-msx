@@ -76,7 +76,7 @@ plot_col16:
 		out (0x99),a
 		ld a,d 			;set bits 8-13
 		out (0x99),a
-		ld	a,e
+		xor	a
 		out	(0x98),a
 		ld a,e 			;set bits 0-7
 		out (0x99),a

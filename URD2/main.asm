@@ -111,14 +111,31 @@ PAL_ntsc
 		
 _levelmap
 		repeat 16
-		db	0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
+		db	@# + 16*5
 		endrepeat
 		
-		page 3
+		
+		page 4
 _tiles0:
-		repeat 16
-		ds 256,255-@#
-		endrepeat
+		incbin "tiles.bin",0x0000,0x2000
+		page 5
+		incbin "tiles.bin",0x2000,0x2000
+		page 6
+		incbin "tiles.bin",0x4000,0x2000
+		page 7
+		incbin "tiles.bin",0x6000,0x2000
+		page 8
+		incbin "tiles.bin",0x8000,0x2000
+		page 9
+		incbin "tiles.bin",0xA000,0x2000
+		page 10
+		incbin "tiles.bin",0xC000,0x2000
+		page 11
+		incbin "tiles.bin",0xE000;,0x2000
+		
+		; repeat 16
+		; ds 256,255-@#
+		; endrepeat
 		; call	opening
 		
 

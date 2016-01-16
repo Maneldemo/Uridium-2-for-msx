@@ -13,16 +13,16 @@ _kBank4: 	equ 0B000h ;- B7FFh (B000h used)
 
 
 
-		defpage	 0,0x4000, 0x2000		; page 0 main code + far call routines
-		defpage	 1,0x6000, 0x2000		; page 1 main code + far call routines
-		defpage	 2,0x8000, 0x2000		; swapped data 
+		defpage	 0,0x4000, 0x2000		; page 0 main code 
+		defpage	 1,0x6000, 0x2000		; page 1 code 
+		defpage	 2,0x8000, 0x2000		; page 2 code  
 		defpage	 3,0xA000, 0x2000		; swapped data 
 		
 		defpage	 4..15					; 64KB of swapped data 
 
 
 
-  		include "header.asm"
+  		include "header.asm"			; only definitions
 		
 		
 		
@@ -34,7 +34,7 @@ _kBank4: 	equ 0B000h ;- B7FFh (B000h used)
 	;-------------------------------------		
 
 
-		include rominit64.asm
+		include rominit64.asm				
 		include vdpio.asm
 		include isr.asm
 		include fsmscroll.asm
@@ -48,9 +48,8 @@ _kBank4: 	equ 0B000h ;- B7FFh (B000h used)
 ;-------------------------------------
 START:
 		xor	a
-		; dec	a
-		ld	(SEL_NTSC),a
-		call	set_scr
+		ld	(SEL_NTSC),a		; PAL MODE
+		call	set_scr			; set video mode to screen 8
 		di
 		
 ;-------------------------------------
@@ -58,18 +57,19 @@ START:
 ;   set pages and sub slot
 ;-------------------------------------
         call    search_slot
-        call    search_slotram
-		call	setrompage2
-		call	setrampage0
+        call    search_slotram	
+		call	setrompage2		; ROM in page 1 & 2
+		call	setrampage0		; RAM in page 0 & 3
 
 
-		xor	a
+		; activate  the fist 24K of rom
+		xor	a			   
 		ld	(_kBank1),a
 		inc	a
 		ld	(_kBank2),a
 		inc	a
 		ld	(_kBank3),a
-
+		
 		call	_cls
 		
 		;--- initialise ISR in RAM
@@ -82,13 +82,15 @@ START:
 		inc	hl
 		ld	(hl),high _fake_isr
 
+		; copy the level map from ROM to RAM
+		
+		call	vdptest
 		call	mapinit
 		
 		ld	hl,0
 		ld	(_jiffy),hl		
 		xor	a
 		ld	(_displaypage),a		
-		ld	(_xoffset),a
 		
 		ei
 1:		halt
@@ -118,8 +120,6 @@ mapinit
 		ld		de,_levelmap
 		ld		bc,mapWidth*mapHeight
 		ldir
-		ld		hl,_levelmap
-		ld		(_levelmap_pos),hl
 		
 		xor		a
 		ld		h,a
@@ -128,7 +128,17 @@ mapinit
 		ld		(_xmappos),hl
 		
 		ret
-
+vdptest:
+		ld	e,16
+		ld	d,32
+		ld	b,0
+		ld	hl,_tiles0+256*((16*3 + 9) & 31)
+		ld	a,:_tiles0+1
+		ld	(_kBank4),a
+		call	LMMC_tile
+1:		jp	1b
+		ret
+		
 		
 		page 4
 _tiles0:
@@ -497,7 +507,6 @@ SEL_NTSC			#1
 
 _ymappos:			#1
 _xmappos:			#2
-_levelmap_pos:		#2
 
 ; _shadowbuff:		#2
 

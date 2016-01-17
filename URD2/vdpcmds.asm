@@ -16,7 +16,7 @@ LMMC_tile:
 		out 	(0x9B), a			; dx (high)
 		ld 		a,d					; 
 		out 	(0x9B), a			; dy
-		ld 		a,c					; destination page
+		ld 		a,b					; destination page
 		out 	(0x9B), a			; dy (high-> page 0 or 1)
 		
 		ld 		a,16

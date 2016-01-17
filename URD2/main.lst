@@ -1,4 +1,4 @@
-Sjasm Z80 Assembler v0.42c - www.xl2s.tk             [2016.01.16 - 18:06:49]
+Sjasm Z80 Assembler v0.42c - www.xl2s.tk             [2016.01.17 - 10:28:54]
 
 main.asm
 Errors: 0
@@ -1275,7 +1275,7 @@ Errors: 0
       16.  00:42DF  D3 9B               		out 	(0x9B), a			; dx (high)
       17.  00:42E1  7A                  		ld 		a,d					; 
       18.  00:42E2  D3 9B               		out 	(0x9B), a			; dy
-      19.  00:42E4  79                  		ld 		a,c					; destination page
+      19.  00:42E4  78                  		ld 		a,b					; destination page
       20.  00:42E5  D3 9B               		out 	(0x9B), a			; dy (high-> page 0 or 1)
       21.  00:42E7                      		
       22.  00:42E7  3E 10               		ld 		a,16
@@ -1736,444 +1736,474 @@ Errors: 0
      129   00:4612                      		
      130   00:4612  C9                  		ret
      131   00:4613                      vdptest:
-     132   00:4613  1E 10               		ld	e,16
-     133   00:4615  16 20               		ld	d,32
-     134   00:4617  06 00               		ld	b,0
-     135   00:4619  21 00 B9            		ld	hl,_tiles0+256*((16*3 + 9) & 31)
-     136   00:461C  3E 05               		ld	a,:_tiles0+1
-     137   00:461E  32 00 B0            		ld	(_kBank4),a
-     138   00:4621  CD D3 42            		call	LMMC_tile
-     139   00:4624  C3 24 46            1:		jp	1b
-     140   00:4627  C9                  		ret
-     141   00:4628                      		
-     142   00:4628                      		
-     143   00:4628  (04)                		page 4
-     144   04:A000                      _tiles0:
-     145   04:A000  (2000)              		incbin "tiles.bin",0x0000,0x2000
-     146   04:C000  (05)                		page 5
-     147   05:A000  (2000)              		incbin "tiles.bin",0x2000,0x2000
-     148   05:C000  (06)                		page 6
-     149   06:A000  (2000)              		incbin "tiles.bin",0x4000,0x2000
-     150   06:C000  (07)                		page 7
-     151   07:A000  (2000)              		incbin "tiles.bin",0x6000,0x2000
-     152   07:C000  (08)                		page 8
-     153   08:A000  (2000)              		incbin "tiles.bin",0x8000,0x2000
-     154   08:C000  (09)                		page 9
-     155   09:A000  (2000)              		incbin "tiles.bin",0xA000,0x2000
-     156   09:C000  (0A)                		page 10
-     157   0A:A000  (1F00)              		incbin "tiles.bin",0xC000;,0x2000
-     158   0A:BF00                      		; page 11
-     159   0A:BF00                      		; incbin "tiles.bin",0xE000;,0x2000
-     160   0A:BF00                      
-     161   0A:BF00  (0C)                		page 12		
-     162   0C:A000                      _level
-     163   0C:A000  (0B00)              		incbin	datamap.bin		
-     164   0C:AB00                      
-     165   0C:AB00                      		; call	opening
-     166   0C:AB00                      		
-     167   0C:AB00                      
-     168   0C:AB00                      		; call 	_hw_sprite_init
-     169   0C:AB00                      
-     170   0C:AB00                      		; ld		c,0
-     171   0C:AB00                      		; ld		de,256*(mapHeight*16+3)
-     172   0C:AB00                      		; call	_vdpsetvramwr
-     173   0C:AB00                      
-     174   0C:AB00                      		; ld		de, 256*:_scorebar+1
-     175   0C:AB00                      		; call	outvram
-     176   0C:AB00                      		
-     177   0C:AB00                      		; ld		c,1
-     178   0C:AB00                      		; ld		de,256*mapHeight*16
-     179   0C:AB00                      		; call	_vdpsetvramwr
-     180   0C:AB00                      
-     181   0C:AB00                      		; ld		de, 256*:_animated+2
-     182   0C:AB00                      		; call	outvram
-     183   0C:AB00                      
-     184   0C:AB00                      	
-     185   0C:AB00                      		; ; ld	a,:demo_song
-     186   0C:AB00                      		; ; setpage_a
-     187   0C:AB00                      		
-     188   0C:AB00                      		; ; ld	bc,	end_demo_song-musbuff
-     189   0C:AB00                      		; ; ld	hl,	demo_song
-     190   0C:AB00                      		; ; ld	de,	musbuff
-     191   0C:AB00                      		; ; ldir
-     192   0C:AB00                      			
-     193   0C:AB00                      		; ; call	replay_init
-     194   0C:AB00                      		; ; ld		hl,musbuff
-     195   0C:AB00                      		; ; call	replay_loadsong
-     196   0C:AB00                      
+     132   00:4613  16 A0               		ld	d,160			; dest y
+     133   00:4615  1E 00               		ld	e,0				; dest x
+     134   00:4617  06 01               		ld	b,1				; page
+     135   00:4619  0E 39               		ld	c,16*3+9		; initial tile
+     136   00:461B  3E 60               		ld	a,96			; number of tiles
+     137   00:461D  F5                  1:		push	af
+     138   00:461E                      
+     139   00:461E  79                  		ld	a,c
+     140   00:461F  07 07 07            [3]		rlca
+     141   00:4622  E6 07               		and	00000111B
+     142   00:4624  C6 04               		add	a,:_tiles0
+     143   00:4626  32 00 B0            		ld	(_kBank4),a		; select tile bank
+     144   00:4629                      
+     145   00:4629  79                  		ld	a,c
+     146   00:462A  E6 1F               		and	00011111B
+     147   00:462C  C6 A0               		add	a,high _tiles0
+     148   00:462E  67                  		ld	h,a				; select offset in the bank
+     149   00:462F  2E 00               		ld	l,0
+     150   00:4631                      		
+     151   00:4631  D5                  		push	de
+     152   00:4632  C5                  		push	bc
+     153   00:4633  CD D3 42            		call	LMMC_tile
+     154   00:4636  C1                  		pop		bc
+     155   00:4637  D1                  		pop		de
+     156   00:4638                      		
+     157   00:4638  3E 10               		ld		a,16		; x=x+16
+     158   00:463A  83                  		add		a,e
+     159   00:463B  5F                  		ld		e,a
+     160   00:463C  30 04               		jr		nc,2f
+     161   00:463E                      
+     162   00:463E  3E 10               		ld		a,16		; y=y+16
+     163   00:4640  82                  		add		a,d
+     164   00:4641  57                  		ld		d,a
+     165   00:4642                      		
+     166   00:4642  0C                  2:		inc		c
+     167   00:4643  F1                  		pop	af
+     168   00:4644  3D                  		dec	a
+     169   00:4645  20 D6               		jr	nz,1b
+     170   00:4647  C9                  		ret
+     171   00:4648                      		
+     172   00:4648                      		
+     173   00:4648  (04)                		page 4
+     174   04:A000                      _tiles0:
+     175   04:A000  (2000)              		incbin "tiles.bin",0x0000,0x2000
+     176   04:C000  (05)                		page 5
+     177   05:A000  (2000)              		incbin "tiles.bin",0x2000,0x2000
+     178   05:C000  (06)                		page 6
+     179   06:A000  (2000)              		incbin "tiles.bin",0x4000,0x2000
+     180   06:C000  (07)                		page 7
+     181   07:A000  (2000)              		incbin "tiles.bin",0x6000,0x2000
+     182   07:C000  (08)                		page 8
+     183   08:A000  (2000)              		incbin "tiles.bin",0x8000,0x2000
+     184   08:C000  (09)                		page 9
+     185   09:A000  (2000)              		incbin "tiles.bin",0xA000,0x2000
+     186   09:C000  (0A)                		page 10
+     187   0A:A000  (1F00)              		incbin "tiles.bin",0xC000;,0x2000
+     188   0A:BF00                      		; page 11
+     189   0A:BF00                      		; incbin "tiles.bin",0xE000;,0x2000
+     190   0A:BF00                      
+     191   0A:BF00  (0C)                		page 12		
+     192   0C:A000                      _level
+     193   0C:A000  (0B00)              		incbin	datamap.bin		
+     194   0C:AB00                      
+     195   0C:AB00                      		; call	opening
+     196   0C:AB00                      		
      197   0C:AB00                      
-     198   0C:AB00                      		; ld		e,0
-     199   0C:AB00                      		; call	_setpage
-     200   0C:AB00                      				
-     201   0C:AB00                      		; ld	a, :_level
-     202   0C:AB00                      		; ld	(_kBank4),a
-     203   0C:AB00                      		
-     204   0C:AB00                      		; ld		hl,_level
-     205   0C:AB00                      		; ld		de,_levelmap
-     206   0C:AB00                      		; ld		bc,mapWidth*mapHeight
-     207   0C:AB00                      		; ldir
-     208   0C:AB00                      
-     209   0C:AB00                      
-     210   0C:AB00                      		; ; call	init_page0
-     211   0C:AB00                      
-     212   0C:AB00                      		; ld		a,0
-     213   0C:AB00                      		; ld		(cur_level),a
-     214   0C:AB00                      
-     215   0C:AB00                      		; ei
-     216   0C:AB00                      
-     217   0C:AB00                      ; restart:
-     218   0C:AB00                      		; call	_intreset
-     219   0C:AB00                      
-     220   0C:AB00                      		
-     221   0C:AB00                      
-     222   0C:AB00                      		; ld		a,1
-     223   0C:AB00                      		; ld		(_displaypage),a		
-     224   0C:AB00                      		; call 	_cls0
-     225   0C:AB00                      		; ld		hl,_levelmap
-     226   0C:AB00                      		; ld		(_levelmap_pos),hl
-     227   0C:AB00                      		
-     228   0C:AB00                      		; xor		a
-     229   0C:AB00                      		; ld		h,a
-     230   0C:AB00                      		; ld		l,a
-     231   0C:AB00                      		; ld		(flip_flop),a
-     232   0C:AB00                      		; ld		(god_mode),a
-     233   0C:AB00                      		; ld		(_ymappos),a
-     234   0C:AB00                      		; ld		(_xmappos),hl
-     235   0C:AB00                      		
-     236   0C:AB00                      		; ld		(_nframes),hl
-     237   0C:AB00                      		; ld		(_mcdx),hl
-     238   0C:AB00                      		; ld		(_mcframe),a
-     239   0C:AB00                      		
-     240   0C:AB00                      		; ld		(_yoffset),a		;  0 tutto su
-     241   0C:AB00                      		; ld		(_xoffset),a		;  0 tutto su
-     242   0C:AB00                      								
-     243   0C:AB00                      		; ld		(aniframe),a
-     244   0C:AB00                      		; ld		(anispeed),a
-     245   0C:AB00                      		; ld		(ms_state),a
-     246   0C:AB00                      		; inc 	a
-     247   0C:AB00                      		; ld		(old_aniframe),a		; old_aniframe!=aniframe
-     248   0C:AB00                      	
-     249   0C:AB00                      		; ld		(dxmap),a		; moving right
-     250   0C:AB00                      		; ld		(_dxmap),a		; moving right
+     198   0C:AB00                      		; call 	_hw_sprite_init
+     199   0C:AB00                      
+     200   0C:AB00                      		; ld		c,0
+     201   0C:AB00                      		; ld		de,256*(mapHeight*16+3)
+     202   0C:AB00                      		; call	_vdpsetvramwr
+     203   0C:AB00                      
+     204   0C:AB00                      		; ld		de, 256*:_scorebar+1
+     205   0C:AB00                      		; call	outvram
+     206   0C:AB00                      		
+     207   0C:AB00                      		; ld		c,1
+     208   0C:AB00                      		; ld		de,256*mapHeight*16
+     209   0C:AB00                      		; call	_vdpsetvramwr
+     210   0C:AB00                      
+     211   0C:AB00                      		; ld		de, 256*:_animated+2
+     212   0C:AB00                      		; call	outvram
+     213   0C:AB00                      
+     214   0C:AB00                      	
+     215   0C:AB00                      		; ; ld	a,:demo_song
+     216   0C:AB00                      		; ; setpage_a
+     217   0C:AB00                      		
+     218   0C:AB00                      		; ; ld	bc,	end_demo_song-musbuff
+     219   0C:AB00                      		; ; ld	hl,	demo_song
+     220   0C:AB00                      		; ; ld	de,	musbuff
+     221   0C:AB00                      		; ; ldir
+     222   0C:AB00                      			
+     223   0C:AB00                      		; ; call	replay_init
+     224   0C:AB00                      		; ; ld		hl,musbuff
+     225   0C:AB00                      		; ; call	replay_loadsong
+     226   0C:AB00                      
+     227   0C:AB00                      
+     228   0C:AB00                      		; ld		e,0
+     229   0C:AB00                      		; call	_setpage
+     230   0C:AB00                      				
+     231   0C:AB00                      		; ld	a, :_level
+     232   0C:AB00                      		; ld	(_kBank4),a
+     233   0C:AB00                      		
+     234   0C:AB00                      		; ld		hl,_level
+     235   0C:AB00                      		; ld		de,_levelmap
+     236   0C:AB00                      		; ld		bc,mapWidth*mapHeight
+     237   0C:AB00                      		; ldir
+     238   0C:AB00                      
+     239   0C:AB00                      
+     240   0C:AB00                      		; ; call	init_page0
+     241   0C:AB00                      
+     242   0C:AB00                      		; ld		a,0
+     243   0C:AB00                      		; ld		(cur_level),a
+     244   0C:AB00                      
+     245   0C:AB00                      		; ei
+     246   0C:AB00                      
+     247   0C:AB00                      ; restart:
+     248   0C:AB00                      		; call	_intreset
+     249   0C:AB00                      
+     250   0C:AB00                      		
      251   0C:AB00                      
-     252   0C:AB00                      		; ld		(xmap),hl
-     253   0C:AB00                      		; ld		(_xmapx4),hl
-     254   0C:AB00                      		; ld		bc,xship_rel
-     255   0C:AB00                      		; add 	hl,bc
-     256   0C:AB00                      		; ld		(xship),hl
-     257   0C:AB00                      		; ld		a,80
-     258   0C:AB00                      		; ld		(yship),a
-     259   0C:AB00                      
-     260   0C:AB00                      		; call 	npc_init								
-     261   0C:AB00                      		; call 	load_colors
-     262   0C:AB00                      
-     263   0C:AB00                      		; xor	a
-     264   0C:AB00                      		; ld		(_kBank1),a
-     265   0C:AB00                      		; inc	a
-     266   0C:AB00                      		; ld		(_kBank2),a
-     267   0C:AB00                      		; inc	a
-     268   0C:AB00                      		; ld		(_kBank3),a
+     252   0C:AB00                      		; ld		a,1
+     253   0C:AB00                      		; ld		(_displaypage),a		
+     254   0C:AB00                      		; call 	_cls0
+     255   0C:AB00                      		; ld		hl,_levelmap
+     256   0C:AB00                      		; ld		(_levelmap_pos),hl
+     257   0C:AB00                      		
+     258   0C:AB00                      		; xor		a
+     259   0C:AB00                      		; ld		h,a
+     260   0C:AB00                      		; ld		l,a
+     261   0C:AB00                      		; ld		(flip_flop),a
+     262   0C:AB00                      		; ld		(god_mode),a
+     263   0C:AB00                      		; ld		(_ymappos),a
+     264   0C:AB00                      		; ld		(_xmappos),hl
+     265   0C:AB00                      		
+     266   0C:AB00                      		; ld		(_nframes),hl
+     267   0C:AB00                      		; ld		(_mcdx),hl
+     268   0C:AB00                      		; ld		(_mcframe),a
      269   0C:AB00                      		
-     270   0C:AB00                      
-     271   0C:AB00                      		; call	_isrinit
-     272   0C:AB00                      
-     273   0C:AB00                      ; main_loop: 
-     274   0C:AB00                      				
-     275   0C:AB00                      		; ld	hl,0
-     276   0C:AB00                      		; ld	(_jiffy),hl
-     277   0C:AB00                      
-     278   0C:AB00                      ; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-     279   0C:AB00                      ; ; run ms FSM and place its sprites in the SAT in RAM
-     280   0C:AB00                      		; call	ms_ctrl
-     281   0C:AB00                      ; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-     282   0C:AB00                      ; ; test for game restart
-     283   0C:AB00                      		; ld	a,(ms_state)
-     284   0C:AB00                      		; cp	ms_reset
-     285   0C:AB00                      		; jp	z,restart
-     286   0C:AB00                      
-     287   0C:AB00                      ; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-     288   0C:AB00                      ; ; place MS in the SAT and test for collision
-     289   0C:AB00                      		; call	put_ms_sprt
-     290   0C:AB00                      		; ld		a,(god_mode)
-     291   0C:AB00                      		; and 	a
-     292   0C:AB00                      		; ; call	z,test_obstacles
-     293   0C:AB00                      
-     294   0C:AB00                      ; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-     295   0C:AB00                      ; ; run NCPS FSM
-     296   0C:AB00                      		; call	wave_timer
-     297   0C:AB00                      		; call	npc_loop
-     298   0C:AB00                      		; call	enemy_bullet_loop
-     299   0C:AB00                      
-     300   0C:AB00                      ; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-     301   0C:AB00                      ; ; run MS bullets FSM
-     302   0C:AB00                      		; call	bullet_loop
-     303   0C:AB00                      
-     304   0C:AB00                      		; ; ld	a,00100101B			; random colour
-     305   0C:AB00                      		; ; out		(0x99),a
-     306   0C:AB00                      		; ; ld		a,7+128
-     307   0C:AB00                      		; ; out		(0x99),a
-     308   0C:AB00                      		
-     309   0C:AB00                      		; ; call	_waitvdp
-     310   0C:AB00                      
-     311   0C:AB00                      		; ; ld	a,10100101B			; random colour
-     312   0C:AB00                      		; ; out		(0x99),a
-     313   0C:AB00                      		; ; ld		a,7+128
-     314   0C:AB00                      		; ; out		(0x99),a
-     315   0C:AB00                      				
-     316   0C:AB00                      		; ld	a,(joystick)
-     317   0C:AB00                      		; and	32
-     318   0C:AB00                      		; ; call	z,_plot_distrucable
-     319   0C:AB00                      
-     320   0C:AB00                      ; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-     321   0C:AB00                      		; ; ld		a,3
-     322   0C:AB00                      		; ; out		(0x99),a
-     323   0C:AB00                      		; ; ld		a,7+128
-     324   0C:AB00                      		; ; out		(0x99),a
-     325   0C:AB00                      		
-     326   0C:AB00                      ; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-     327   0C:AB00                      		; ; call	test_star
-     328   0C:AB00                      
-     329   0C:AB00                      		; ; xor		a
-     330   0C:AB00                      		; ; out		(0x99),a
-     331   0C:AB00                      		; ; ld		a,7+128
-     332   0C:AB00                      		; ; out		(0x99),a
-     333   0C:AB00                      ; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-     334   0C:AB00                      
-     335   0C:AB00                      		
-     336   0C:AB00                      ; 1:		ld	a,(_jiffy)		; wait for vblank (and not for linit)
-     337   0C:AB00                      		; or	a
-     338   0C:AB00                      		; jr	z,1b
-     339   0C:AB00                      	
-     340   0C:AB00                      		; ld	hl,(xmap)
-     341   0C:AB00                      		; ld	bc,xship_rel
-     342   0C:AB00                      		; add hl,bc
-     343   0C:AB00                      		; ld	(xship),hl
-     344   0C:AB00                      
-     345   0C:AB00                      		; ld		a,(dxmap)
-     346   0C:AB00                      		; ld		(_dxmap),a
-     347   0C:AB00                      
-     348   0C:AB00                      		; jp      main_loop
+     270   0C:AB00                      		; ld		(_yoffset),a		;  0 tutto su
+     271   0C:AB00                      		; ld		(_xoffset),a		;  0 tutto su
+     272   0C:AB00                      								
+     273   0C:AB00                      		; ld		(aniframe),a
+     274   0C:AB00                      		; ld		(anispeed),a
+     275   0C:AB00                      		; ld		(ms_state),a
+     276   0C:AB00                      		; inc 	a
+     277   0C:AB00                      		; ld		(old_aniframe),a		; old_aniframe!=aniframe
+     278   0C:AB00                      	
+     279   0C:AB00                      		; ld		(dxmap),a		; moving right
+     280   0C:AB00                      		; ld		(_dxmap),a		; moving right
+     281   0C:AB00                      
+     282   0C:AB00                      		; ld		(xmap),hl
+     283   0C:AB00                      		; ld		(_xmapx4),hl
+     284   0C:AB00                      		; ld		bc,xship_rel
+     285   0C:AB00                      		; add 	hl,bc
+     286   0C:AB00                      		; ld		(xship),hl
+     287   0C:AB00                      		; ld		a,80
+     288   0C:AB00                      		; ld		(yship),a
+     289   0C:AB00                      
+     290   0C:AB00                      		; call 	npc_init								
+     291   0C:AB00                      		; call 	load_colors
+     292   0C:AB00                      
+     293   0C:AB00                      		; xor	a
+     294   0C:AB00                      		; ld		(_kBank1),a
+     295   0C:AB00                      		; inc	a
+     296   0C:AB00                      		; ld		(_kBank2),a
+     297   0C:AB00                      		; inc	a
+     298   0C:AB00                      		; ld		(_kBank3),a
+     299   0C:AB00                      		
+     300   0C:AB00                      
+     301   0C:AB00                      		; call	_isrinit
+     302   0C:AB00                      
+     303   0C:AB00                      ; main_loop: 
+     304   0C:AB00                      				
+     305   0C:AB00                      		; ld	hl,0
+     306   0C:AB00                      		; ld	(_jiffy),hl
+     307   0C:AB00                      
+     308   0C:AB00                      ; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+     309   0C:AB00                      ; ; run ms FSM and place its sprites in the SAT in RAM
+     310   0C:AB00                      		; call	ms_ctrl
+     311   0C:AB00                      ; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+     312   0C:AB00                      ; ; test for game restart
+     313   0C:AB00                      		; ld	a,(ms_state)
+     314   0C:AB00                      		; cp	ms_reset
+     315   0C:AB00                      		; jp	z,restart
+     316   0C:AB00                      
+     317   0C:AB00                      ; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+     318   0C:AB00                      ; ; place MS in the SAT and test for collision
+     319   0C:AB00                      		; call	put_ms_sprt
+     320   0C:AB00                      		; ld		a,(god_mode)
+     321   0C:AB00                      		; and 	a
+     322   0C:AB00                      		; ; call	z,test_obstacles
+     323   0C:AB00                      
+     324   0C:AB00                      ; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+     325   0C:AB00                      ; ; run NCPS FSM
+     326   0C:AB00                      		; call	wave_timer
+     327   0C:AB00                      		; call	npc_loop
+     328   0C:AB00                      		; call	enemy_bullet_loop
+     329   0C:AB00                      
+     330   0C:AB00                      ; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+     331   0C:AB00                      ; ; run MS bullets FSM
+     332   0C:AB00                      		; call	bullet_loop
+     333   0C:AB00                      
+     334   0C:AB00                      		; ; ld	a,00100101B			; random colour
+     335   0C:AB00                      		; ; out		(0x99),a
+     336   0C:AB00                      		; ; ld		a,7+128
+     337   0C:AB00                      		; ; out		(0x99),a
+     338   0C:AB00                      		
+     339   0C:AB00                      		; ; call	_waitvdp
+     340   0C:AB00                      
+     341   0C:AB00                      		; ; ld	a,10100101B			; random colour
+     342   0C:AB00                      		; ; out		(0x99),a
+     343   0C:AB00                      		; ; ld		a,7+128
+     344   0C:AB00                      		; ; out		(0x99),a
+     345   0C:AB00                      				
+     346   0C:AB00                      		; ld	a,(joystick)
+     347   0C:AB00                      		; and	32
+     348   0C:AB00                      		; ; call	z,_plot_distrucable
      349   0C:AB00                      
-     350   0C:AB00                      ; ;-------------------------------------
-     351   0C:AB00                      ; AFXPLAY:
-     352   0C:AB00                      		; ret
-     353   0C:AB00                      ; ;	include vuitpakker.asm
-     354   0C:AB00                      	; include print.asm
-     355   0C:AB00                      	; include plot_line.asm
-     356   0C:AB00                      	; include plot_line2.asm
-     357   0C:AB00                      	; include color_update.asm
-     358   0C:AB00                      ; ms_bllts_col_win:
-     359   0C:AB00                      	; include ms_bllts_frm_coll_wind.asm
-     360   0C:AB00                      	; include	ms_bllts.asm
-     361   0C:AB00                      		
-     362   0C:AB00                      ; ;-------------------------------------
-     363   0C:AB00                      
-     364   0C:AB00                      	
-     365   0C:AB00                      		; page 1
-     366   0C:AB00                      
-     367   0C:AB00                      		; include	ms_crtl.asm
-     368   0C:AB00                      		; include	put_ms_sprt.asm
-     369   0C:AB00                      		; include probe_level.asm				
-     370   0C:AB00                      		; include opening.asm		
-     371   0C:AB00                      ; outvram:
-     372   0C:AB00                      ; 2:		ld	a,d
-     373   0C:AB00                      		; ld	(_kBank4),a
-     374   0C:AB00                      		; ld	hl,0xA000
-     375   0C:AB00                      		; ld	bc,0x98
-     376   0C:AB00                      		; ld	a,32
-     377   0C:AB00                      ; 1:		otir
-     378   0C:AB00                      		; dec	a
-     379   0C:AB00                      		; jp	nz,1b
-     380   0C:AB00                      		; inc	d
-     381   0C:AB00                      		; dec	e
-     382   0C:AB00                      		; jr	nz,2b
-     383   0C:AB00                      		; ret
-     384   0C:AB00                      		
-     385   0C:AB00                      		; page 2
-     386   0C:AB00                      	; ; include mainhero_LMMM.asm
-     387   0C:AB00                      
-     388   0C:AB00                      	
-     389   0C:AB00                      		; page 3
-     390   0C:AB00                      ; manta_color:
-     391   0C:AB00                      		; incbin mship03_clr.bin
-     392   0C:AB00                      ; ms_spt:
-     393   0C:AB00                      		; incbin mship03_frm.bin
-     394   0C:AB00                      		
-     395   0C:AB00                      		; page 4
-     396   0C:AB00                      ; _tiles0:
-     397   0C:AB00                      		; incbin "tiles.bin",0x0000,0x2000
-     398   0C:AB00                      		; page 5
-     399   0C:AB00                      		; incbin "tiles.bin",0x2000,0x2000
-     400   0C:AB00                      		; page 6
-     401   0C:AB00                      		; incbin "tiles.bin",0x4000,0x2000
-     402   0C:AB00                      		; page 7
-     403   0C:AB00                      		; incbin "tiles.bin",0x6000,0x2000
-     404   0C:AB00                      		; page 8
-     405   0C:AB00                      		; incbin "tiles.bin",0x8000,0x2000
-     406   0C:AB00                      		; page 9
-     407   0C:AB00                      		; incbin "tiles.bin",0xA000,0x2000
-     408   0C:AB00                      		; page 10
-     409   0C:AB00                      		; incbin "tiles.bin",0xC000,0x2000
-     410   0C:AB00                      		; page 11
-     411   0C:AB00                      		; incbin "tiles.bin",0xE000;,0x2000
-     412   0C:AB00                      
-     413   0C:AB00                      		; page 12
-     414   0C:AB00                      
-     415   0C:AB00                      		; page 15
-     416   0C:AB00                      ; _level:
-     417   0C:AB00                      		; incbin "datamap.bin"
+     350   0C:AB00                      ; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+     351   0C:AB00                      		; ; ld		a,3
+     352   0C:AB00                      		; ; out		(0x99),a
+     353   0C:AB00                      		; ; ld		a,7+128
+     354   0C:AB00                      		; ; out		(0x99),a
+     355   0C:AB00                      		
+     356   0C:AB00                      ; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+     357   0C:AB00                      		; ; call	test_star
+     358   0C:AB00                      
+     359   0C:AB00                      		; ; xor		a
+     360   0C:AB00                      		; ; out		(0x99),a
+     361   0C:AB00                      		; ; ld		a,7+128
+     362   0C:AB00                      		; ; out		(0x99),a
+     363   0C:AB00                      ; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+     364   0C:AB00                      
+     365   0C:AB00                      		
+     366   0C:AB00                      ; 1:		ld	a,(_jiffy)		; wait for vblank (and not for linit)
+     367   0C:AB00                      		; or	a
+     368   0C:AB00                      		; jr	z,1b
+     369   0C:AB00                      	
+     370   0C:AB00                      		; ld	hl,(xmap)
+     371   0C:AB00                      		; ld	bc,xship_rel
+     372   0C:AB00                      		; add hl,bc
+     373   0C:AB00                      		; ld	(xship),hl
+     374   0C:AB00                      
+     375   0C:AB00                      		; ld		a,(dxmap)
+     376   0C:AB00                      		; ld		(_dxmap),a
+     377   0C:AB00                      
+     378   0C:AB00                      		; jp      main_loop
+     379   0C:AB00                      
+     380   0C:AB00                      ; ;-------------------------------------
+     381   0C:AB00                      ; AFXPLAY:
+     382   0C:AB00                      		; ret
+     383   0C:AB00                      ; ;	include vuitpakker.asm
+     384   0C:AB00                      	; include print.asm
+     385   0C:AB00                      	; include plot_line.asm
+     386   0C:AB00                      	; include plot_line2.asm
+     387   0C:AB00                      	; include color_update.asm
+     388   0C:AB00                      ; ms_bllts_col_win:
+     389   0C:AB00                      	; include ms_bllts_frm_coll_wind.asm
+     390   0C:AB00                      	; include	ms_bllts.asm
+     391   0C:AB00                      		
+     392   0C:AB00                      ; ;-------------------------------------
+     393   0C:AB00                      
+     394   0C:AB00                      	
+     395   0C:AB00                      		; page 1
+     396   0C:AB00                      
+     397   0C:AB00                      		; include	ms_crtl.asm
+     398   0C:AB00                      		; include	put_ms_sprt.asm
+     399   0C:AB00                      		; include probe_level.asm				
+     400   0C:AB00                      		; include opening.asm		
+     401   0C:AB00                      ; outvram:
+     402   0C:AB00                      ; 2:		ld	a,d
+     403   0C:AB00                      		; ld	(_kBank4),a
+     404   0C:AB00                      		; ld	hl,0xA000
+     405   0C:AB00                      		; ld	bc,0x98
+     406   0C:AB00                      		; ld	a,32
+     407   0C:AB00                      ; 1:		otir
+     408   0C:AB00                      		; dec	a
+     409   0C:AB00                      		; jp	nz,1b
+     410   0C:AB00                      		; inc	d
+     411   0C:AB00                      		; dec	e
+     412   0C:AB00                      		; jr	nz,2b
+     413   0C:AB00                      		; ret
+     414   0C:AB00                      		
+     415   0C:AB00                      		; page 2
+     416   0C:AB00                      	; ; include mainhero_LMMM.asm
+     417   0C:AB00                      
      418   0C:AB00                      	
-     419   0C:AB00                      		; page 16
-     420   0C:AB00                      ; _opening:
-     421   0C:AB00                      		; incbin "opening.bin",0x0000,0x2000
-     422   0C:AB00                      		; page 17
-     423   0C:AB00                      		; incbin "opening.bin",0x2000,0x2000
-     424   0C:AB00                      		; page 18
-     425   0C:AB00                      		; incbin "opening.bin",0x4000,0x2000
-     426   0C:AB00                      		; page 19
-     427   0C:AB00                      		; incbin "opening.bin",0x6000,0x2000
-     428   0C:AB00                      		; page 20
-     429   0C:AB00                      		; incbin "opening.bin",0x8000,0x2000
-     430   0C:AB00                      		; page 21
-     431   0C:AB00                      		; incbin "opening.bin",0xA000,0x2000
-     432   0C:AB00                      		; page 22
-     433   0C:AB00                      		; incbin "opening.bin",0xC000;,0x2000
-     434   0C:AB00                      		; page 23
-     435   0C:AB00                      		; ; incbin "opening.bin",0xE000;,,0x2000
-     436   0C:AB00                      	
-     437   0C:AB00                      		; page 24
-     438   0C:AB00                      ; _scorebar:	
-     439   0C:AB00                      		; incbin scorebar.bin
-     440   0C:AB00                      	
-     441   0C:AB00                      		; page 25
-     442   0C:AB00                      ; _animated:	
-     443   0C:AB00                      		; incbin animated.bin,0x0000,0x2000
-     444   0C:AB00                      		; page 26
-     445   0C:AB00                      		; incbin animated.bin,0x2000,0x2000
-     446   0C:AB00                      
-     447   0C:AB00                      		; page 27
-     448   0C:AB00                      ; sprtdata:
-     449   0C:AB00                      		; incbin 	uridium_revA.bin,,16*32
-     450   0C:AB00                      		; incbin 	enemies_frm.bin
-     451   0C:AB00                      
-     452   0C:AB00                      		; page 28
-     453   0C:AB00                      ; color_base:
-     454   0C:AB00                      		; repeat 4
-     455   0C:AB00                      		; ds	16,8
-     456   0C:AB00                      		; ds	16,10+64
-     457   0C:AB00                      		; endrepeat
-     458   0C:AB00                      		; repeat 4
-     459   0C:AB00                      		; ds	16,8
-     460   0C:AB00                      		; ds	16,10+64
-     461   0C:AB00                      		; endrepeat
-     462   0C:AB00                      
-     463   0C:AB00                      		
-     464   0C:AB00                      		; incbin 	enemies_clr.bin
-     465   0C:AB00                      		
-     466   0C:AB00                      ; FINISH:
-     467   0C:AB00                      
-     468   0C:AB00                      
-     469   0C:AB00                      ; ;---------------------------------------------------------
-     470   0C:AB00                      ; ; Variables
-     471   0C:AB00                      ; ;---------------------------------------------------------
-     472   0C:AB00                      	
-     473   0C:AB00                      	
-     474   0C:AB00  (C000)              	MAP 0xC000
-     475   0C:AB00                      
-     476   0C:AB00  (0C:C000)           _levelmap:			#mapWidth*mapHeight
-     477   0C:AB00                      
-     478   0C:AB00  (0C:CA00)           slotvar				#1
-     479   0C:AB00  (0C:CA01)           slotram				#1
-     480   0C:AB00  (0C:CA02)           SEL_NTSC			#1
+     419   0C:AB00                      		; page 3
+     420   0C:AB00                      ; manta_color:
+     421   0C:AB00                      		; incbin mship03_clr.bin
+     422   0C:AB00                      ; ms_spt:
+     423   0C:AB00                      		; incbin mship03_frm.bin
+     424   0C:AB00                      		
+     425   0C:AB00                      		; page 4
+     426   0C:AB00                      ; _tiles0:
+     427   0C:AB00                      		; incbin "tiles.bin",0x0000,0x2000
+     428   0C:AB00                      		; page 5
+     429   0C:AB00                      		; incbin "tiles.bin",0x2000,0x2000
+     430   0C:AB00                      		; page 6
+     431   0C:AB00                      		; incbin "tiles.bin",0x4000,0x2000
+     432   0C:AB00                      		; page 7
+     433   0C:AB00                      		; incbin "tiles.bin",0x6000,0x2000
+     434   0C:AB00                      		; page 8
+     435   0C:AB00                      		; incbin "tiles.bin",0x8000,0x2000
+     436   0C:AB00                      		; page 9
+     437   0C:AB00                      		; incbin "tiles.bin",0xA000,0x2000
+     438   0C:AB00                      		; page 10
+     439   0C:AB00                      		; incbin "tiles.bin",0xC000,0x2000
+     440   0C:AB00                      		; page 11
+     441   0C:AB00                      		; incbin "tiles.bin",0xE000;,0x2000
+     442   0C:AB00                      
+     443   0C:AB00                      		; page 12
+     444   0C:AB00                      
+     445   0C:AB00                      		; page 15
+     446   0C:AB00                      ; _level:
+     447   0C:AB00                      		; incbin "datamap.bin"
+     448   0C:AB00                      	
+     449   0C:AB00                      		; page 16
+     450   0C:AB00                      ; _opening:
+     451   0C:AB00                      		; incbin "opening.bin",0x0000,0x2000
+     452   0C:AB00                      		; page 17
+     453   0C:AB00                      		; incbin "opening.bin",0x2000,0x2000
+     454   0C:AB00                      		; page 18
+     455   0C:AB00                      		; incbin "opening.bin",0x4000,0x2000
+     456   0C:AB00                      		; page 19
+     457   0C:AB00                      		; incbin "opening.bin",0x6000,0x2000
+     458   0C:AB00                      		; page 20
+     459   0C:AB00                      		; incbin "opening.bin",0x8000,0x2000
+     460   0C:AB00                      		; page 21
+     461   0C:AB00                      		; incbin "opening.bin",0xA000,0x2000
+     462   0C:AB00                      		; page 22
+     463   0C:AB00                      		; incbin "opening.bin",0xC000;,0x2000
+     464   0C:AB00                      		; page 23
+     465   0C:AB00                      		; ; incbin "opening.bin",0xE000;,,0x2000
+     466   0C:AB00                      	
+     467   0C:AB00                      		; page 24
+     468   0C:AB00                      ; _scorebar:	
+     469   0C:AB00                      		; incbin scorebar.bin
+     470   0C:AB00                      	
+     471   0C:AB00                      		; page 25
+     472   0C:AB00                      ; _animated:	
+     473   0C:AB00                      		; incbin animated.bin,0x0000,0x2000
+     474   0C:AB00                      		; page 26
+     475   0C:AB00                      		; incbin animated.bin,0x2000,0x2000
+     476   0C:AB00                      
+     477   0C:AB00                      		; page 27
+     478   0C:AB00                      ; sprtdata:
+     479   0C:AB00                      		; incbin 	uridium_revA.bin,,16*32
+     480   0C:AB00                      		; incbin 	enemies_frm.bin
      481   0C:AB00                      
-     482   0C:AB00                      ; joystick			#1
-     483   0C:AB00                      
-     484   0C:AB00                      ; _mcdivider			#1
-     485   0C:AB00                      
-     486   0C:AB00                      ; _mcx				#2	; relative with in the frame on the screen
-     487   0C:AB00                      ; _mcy				#2
-     488   0C:AB00                      
-     489   0C:AB00                      ; _mclx				#2	; absolute with the level in ram
-     490   0C:AB00                      ; _mcly				#2
-     491   0C:AB00                      
-     492   0C:AB00                      ; _mcframe			#1
-     493   0C:AB00                      ; _mcstate			#1
-     494   0C:AB00                      
-     495   0C:AB00                      ; _mcdx				#2
-     496   0C:AB00                      ; _mcdy				#2
+     482   0C:AB00                      		; page 28
+     483   0C:AB00                      ; color_base:
+     484   0C:AB00                      		; repeat 4
+     485   0C:AB00                      		; ds	16,8
+     486   0C:AB00                      		; ds	16,10+64
+     487   0C:AB00                      		; endrepeat
+     488   0C:AB00                      		; repeat 4
+     489   0C:AB00                      		; ds	16,8
+     490   0C:AB00                      		; ds	16,10+64
+     491   0C:AB00                      		; endrepeat
+     492   0C:AB00                      
+     493   0C:AB00                      		
+     494   0C:AB00                      		; incbin 	enemies_clr.bin
+     495   0C:AB00                      		
+     496   0C:AB00                      ; FINISH:
      497   0C:AB00                      
-     498   0C:AB00                      ; _mcprobe:			#1
-     499   0C:AB00                      ; _mcprobeb:			#1
-     500   0C:AB00                      
-     501   0C:AB00                      ; _ticxframe			#1
-     502   0C:AB00                      
-     503   0C:AB00                      ; _buffer:			#16
-     504   0C:AB00                      ; _fps:				#2
-     505   0C:AB00                      ; _nframes:			#2
-     506   0C:AB00                      ; _vbit16:			#2
+     498   0C:AB00                      
+     499   0C:AB00                      ; ;---------------------------------------------------------
+     500   0C:AB00                      ; ; Variables
+     501   0C:AB00                      ; ;---------------------------------------------------------
+     502   0C:AB00                      	
+     503   0C:AB00                      	
+     504   0C:AB00  (C000)              	MAP 0xC000
+     505   0C:AB00                      
+     506   0C:AB00  (0C:C000)           _levelmap:			#mapWidth*mapHeight
      507   0C:AB00                      
-     508   0C:AB00  (0C:CA03)           _ymappos:			#1
-     509   0C:AB00  (0C:CA04)           _xmappos:			#2
-     510   0C:AB00                      
-     511   0C:AB00                      ; _shadowbuff:		#2
-     512   0C:AB00                      
-     513   0C:AB00  (0C:CA06)           _displaypage:		#1
-     514   0C:AB00                      
-     515   0C:AB00                      ; _mccolorchange:		#1
-     516   0C:AB00  (0C:CA07)           _xoffset:			#1
-     517   0C:AB00                      ; _yoffset:			#1
+     508   0C:AB00  (0C:CA00)           slotvar				#1
+     509   0C:AB00  (0C:CA01)           slotram				#1
+     510   0C:AB00  (0C:CA02)           SEL_NTSC			#1
+     511   0C:AB00                      
+     512   0C:AB00                      ; joystick			#1
+     513   0C:AB00                      
+     514   0C:AB00                      ; _mcdivider			#1
+     515   0C:AB00                      
+     516   0C:AB00                      ; _mcx				#2	; relative with in the frame on the screen
+     517   0C:AB00                      ; _mcy				#2
      518   0C:AB00                      
-     519   0C:AB00                      ; __xoffset:			#1
-     520   0C:AB00                      ; __r18:				#1
+     519   0C:AB00                      ; _mclx				#2	; absolute with the level in ram
+     520   0C:AB00                      ; _mcly				#2
      521   0C:AB00                      
-     522   0C:AB00                      ; randSeed:			#2
-     523   0C:AB00                      ; cur_level:			#1
-     524   0C:AB00                      ; wave_count:			#1
-     525   0C:AB00                      ; landing_permission:	#1
-     526   0C:AB00                      ; assault_wave_timer:	#2
-     527   0C:AB00                      ; bullet_rate:		#1
-     528   0C:AB00                      ; _dxchng:			#1		; <>0 if direction changes
-     529   0C:AB00                      ; _dxmap:				#1		; previous dxmap
-     530   0C:AB00                      ; dxmap:				#1
-     531   0C:AB00                      ; xmap:				#2
-     532   0C:AB00                      ; _xmapx4:			#2		; xmap x 4
-     533   0C:AB00                      ; yship:				#1
-     534   0C:AB00                      ; xship:				#2
-     535   0C:AB00                      ; aniframe:			#1
-     536   0C:AB00                      ; ms_state:			#1
-     537   0C:AB00                      ; old_aniframe:		#1
-     538   0C:AB00                      ; anispeed:			#1
-     539   0C:AB00                      ; already_dead:		#1
-     540   0C:AB00                      ; lives_bin:			#1
-     541   0C:AB00                      
-     542   0C:AB00                      ; god_mode:			#1
-     543   0C:AB00                      ; visible_sprts:		#1
-     544   0C:AB00                      ; flip_flop:			#1
-     545   0C:AB00                      
-     546   0C:AB00                      ; ram_sat:			#3*4
-     547   0C:AB00                      
-     548   0C:AB00                      	; struct enemy_data
-     549   0C:AB00                      ; y				db	0
-     550   0C:AB00                      ; x				dw	0
-     551   0C:AB00                      ; xoff			db	0
-     552   0C:AB00                      ; yoff			db	0
-     553   0C:AB00                      ; xsize			db	0
-     554   0C:AB00                      ; ysize			db	0
-     555   0C:AB00                      ; status			db	0	; B7 = DWN/UP | B6 = RIGHT/LEFT | B5 = ok/wrong clr | B0 = Inactive/Active
-     556   0C:AB00                      ; cntr			db	0
-     557   0C:AB00                      ; kind			db	0
-     558   0C:AB00                      ; frame			db	0
-     559   0C:AB00                      ; color			db	0
-     560   0C:AB00                      ; color2			db	0
-     561   0C:AB00                      ; speed			dw	0
-     562   0C:AB00                      	; ends
-     563   0C:AB00                      	
-     564   0C:AB00                      ; any_object:			#0
-     565   0C:AB00                      ; ms_bullets:			#enemy_data*max_bullets
-     566   0C:AB00                      ; enem_bullets:		#enemy_data*max_enem_bullets
-     567   0C:AB00                      ; enemies:			#enemy_data*max_enem
-     568   0C:AB00                      ; endram:				#1
-     569   0C:AB00  (0000)              	ENDMAP
+     522   0C:AB00                      ; _mcframe			#1
+     523   0C:AB00                      ; _mcstate			#1
+     524   0C:AB00                      
+     525   0C:AB00                      ; _mcdx				#2
+     526   0C:AB00                      ; _mcdy				#2
+     527   0C:AB00                      
+     528   0C:AB00                      ; _mcprobe:			#1
+     529   0C:AB00                      ; _mcprobeb:			#1
+     530   0C:AB00                      
+     531   0C:AB00                      ; _ticxframe			#1
+     532   0C:AB00                      
+     533   0C:AB00                      ; _buffer:			#16
+     534   0C:AB00                      ; _fps:				#2
+     535   0C:AB00                      ; _nframes:			#2
+     536   0C:AB00                      ; _vbit16:			#2
+     537   0C:AB00                      
+     538   0C:AB00  (0C:CA03)           _ymappos:			#1
+     539   0C:AB00  (0C:CA04)           _xmappos:			#2
+     540   0C:AB00                      
+     541   0C:AB00                      ; _shadowbuff:		#2
+     542   0C:AB00                      
+     543   0C:AB00  (0C:CA06)           _displaypage:		#1
+     544   0C:AB00                      
+     545   0C:AB00                      ; _mccolorchange:		#1
+     546   0C:AB00  (0C:CA07)           _xoffset:			#1
+     547   0C:AB00                      ; _yoffset:			#1
+     548   0C:AB00                      
+     549   0C:AB00                      ; __xoffset:			#1
+     550   0C:AB00                      ; __r18:				#1
+     551   0C:AB00                      
+     552   0C:AB00                      ; randSeed:			#2
+     553   0C:AB00                      ; cur_level:			#1
+     554   0C:AB00                      ; wave_count:			#1
+     555   0C:AB00                      ; landing_permission:	#1
+     556   0C:AB00                      ; assault_wave_timer:	#2
+     557   0C:AB00                      ; bullet_rate:		#1
+     558   0C:AB00                      ; _dxchng:			#1		; <>0 if direction changes
+     559   0C:AB00                      ; _dxmap:				#1		; previous dxmap
+     560   0C:AB00                      ; dxmap:				#1
+     561   0C:AB00                      ; xmap:				#2
+     562   0C:AB00                      ; _xmapx4:			#2		; xmap x 4
+     563   0C:AB00                      ; yship:				#1
+     564   0C:AB00                      ; xship:				#2
+     565   0C:AB00                      ; aniframe:			#1
+     566   0C:AB00                      ; ms_state:			#1
+     567   0C:AB00                      ; old_aniframe:		#1
+     568   0C:AB00                      ; anispeed:			#1
+     569   0C:AB00                      ; already_dead:		#1
+     570   0C:AB00                      ; lives_bin:			#1
+     571   0C:AB00                      
+     572   0C:AB00                      ; god_mode:			#1
+     573   0C:AB00                      ; visible_sprts:		#1
+     574   0C:AB00                      ; flip_flop:			#1
+     575   0C:AB00                      
+     576   0C:AB00                      ; ram_sat:			#3*4
+     577   0C:AB00                      
+     578   0C:AB00                      	; struct enemy_data
+     579   0C:AB00                      ; y				db	0
+     580   0C:AB00                      ; x				dw	0
+     581   0C:AB00                      ; xoff			db	0
+     582   0C:AB00                      ; yoff			db	0
+     583   0C:AB00                      ; xsize			db	0
+     584   0C:AB00                      ; ysize			db	0
+     585   0C:AB00                      ; status			db	0	; B7 = DWN/UP | B6 = RIGHT/LEFT | B5 = ok/wrong clr | B0 = Inactive/Active
+     586   0C:AB00                      ; cntr			db	0
+     587   0C:AB00                      ; kind			db	0
+     588   0C:AB00                      ; frame			db	0
+     589   0C:AB00                      ; color			db	0
+     590   0C:AB00                      ; color2			db	0
+     591   0C:AB00                      ; speed			dw	0
+     592   0C:AB00                      	; ends
+     593   0C:AB00                      	
+     594   0C:AB00                      ; any_object:			#0
+     595   0C:AB00                      ; ms_bullets:			#enemy_data*max_bullets
+     596   0C:AB00                      ; enem_bullets:		#enemy_data*max_enem_bullets
+     597   0C:AB00                      ; enemies:			#enemy_data*max_enem
+     598   0C:AB00                      ; endram:				#1
+     599   0C:AB00  (0000)              	ENDMAP
 
     LABELS
 -------------------------------------------------
@@ -2290,11 +2320,11 @@ Errors: 0
 -------------------------------------------------
 
  Page: 00
-  Org: 00004000  Size: 00002000  Used: 00000628
+  Org: 00004000  Size: 00002000  Used: 00000648
 
    Address   Length Align   Label
-   00004000    1576         search_slot
-   00004628    6616       <empty>
+   00004000    1608         search_slot
+   00004648    6584       <empty>
 
  Page: 01
   Org: 00006000  Size: 00002000  Used: 00000000

@@ -129,14 +129,44 @@ mapinit
 		
 		ret
 vdptest:
-		ld	e,16
-		ld	d,32
-		ld	b,0
-		ld	hl,_tiles0+256*((16*3 + 9) & 31)
-		ld	a,:_tiles0+1
-		ld	(_kBank4),a
+		ld	d,160			; dest y
+		ld	e,0				; dest x
+		ld	b,1				; page
+		ld	c,16*3+9		; initial tile
+		ld	a,96			; number of tiles
+1:		push	af
+
+		ld	a,c
+[3]		rlca
+		and	00000111B
+		add	a,:_tiles0
+		ld	(_kBank4),a		; select tile bank
+
+		ld	a,c
+		and	00011111B
+		add	a,high _tiles0
+		ld	h,a				; select offset in the bank
+		ld	l,0
+		
+		push	de
+		push	bc
 		call	LMMC_tile
-1:		jp	1b
+		pop		bc
+		pop		de
+		
+		ld		a,16		; x=x+16
+		add		a,e
+		ld		e,a
+		jr		nc,2f
+
+		ld		a,16		; y=y+16
+		add		a,d
+		ld		d,a
+		
+2:		inc		c
+		pop	af
+		dec	a
+		jr	nz,1b
 		ret
 		
 		

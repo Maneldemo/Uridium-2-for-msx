@@ -101,14 +101,19 @@ C = blkproc(B,[16 16],fun1)';
 CC = uint8(zeros((fix(size(C,1)/256)+1)*256,16));
 CC(1:size(C,1),:) = C;
 
-n = size(CC,1)/256;
-D = [];
-x = 1;
-for i=1:n
-    D = [D CC(x:(x+255),:)];
-    x = x+256;
-end
+n = size(CC,1)/16;
 
+D = [];
+
+x = 1;
+for j=1:n/16
+    E = [];
+    for i=1:16
+        E = [E CC(x:(x+15),:)];
+        x = x+16;
+    end
+    D = [ D ; E];
+end
 
 figure
 image(D)
@@ -128,6 +133,14 @@ colormap(gray)
 fid = fopen('datamap.bin','wb');
 for i=1:(H/16)
     fwrite(fid,X(i,:)-1,'uchar');
+end
+fclose(fid);
+
+fid = fopen('levels\datamap.txt','wb');
+for i=1:(H/16)
+    for j=1:(W/16)
+        fprintf(fid,'   <tile gid="%i"/> \n',X(i,j));
+    end
 end
 fclose(fid);
 

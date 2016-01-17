@@ -15,8 +15,13 @@ _brdrs:
 		out (0x99),a
 
 		ld	d,0x40		; write access
-		call	plot_col64
+		call	plot_col16
 
+		ld		a,00010000B
+		out		(0x99),a
+		ld		a,7+128
+		out		(0x99),a
+		
 		ld		a,(_xoffset)
 		and		a
 		jr		nz,.x1_15
@@ -27,6 +32,10 @@ _brdrs:
 		call 	clear_slice
 
 .cont		
+		ld	d,0x50		; write access
+		call	plot_col16
+		call	plot_col32
+
 		ld	a,(_displaypage)
 [2] 	add a,a
 		or	1
@@ -66,23 +75,27 @@ plot_col64:
 	; hl -> tile in the map
 		repeat 2
 		push	hl
-		call	plot_col16
+		call	_plot_col16
 		pop		hl
 		inc h			; next line in the map
 		; inc l
 		endrepeat
 plot_col32:		
-		repeat 2
 		push	hl
-		call	plot_col16
+		call	_plot_col16
 		pop		hl
 		inc h			; next line in the map
 		; inc l
-		endrepeat
+plot_col16:
+		push	hl
+		call	_plot_col16
+		pop		hl
+		inc h			; next line in the map
+		; inc l
 		ret
 
 
-plot_col16:
+_plot_col16:
 		ld	a,(hl)
 [3]		rlca
 		and	00000111B

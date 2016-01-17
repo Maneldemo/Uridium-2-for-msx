@@ -41,7 +41,7 @@ _fake_isr
 		call	xscroll				; move the screen 			
 		call	_brdrs				; build a column right pointed by HL, clear a column left, move a stripe of screen
 		
-		; call _waitvdp				; no need ATM
+		call _waitvdp				; no need ATM
 		
 		ld	hl,(_xmappos)
 		inc	hl

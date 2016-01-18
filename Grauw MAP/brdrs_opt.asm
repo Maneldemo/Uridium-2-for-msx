@@ -1,18 +1,31 @@
 _brdrs:
+		ld		a,11100000B
+		out		(0x99),a
+		ld		a,7+128
+		out		(0x99),a
+
 		call	vdp_task
+
+		ld		a,00011100B
+		out		(0x99),a
+		ld		a,7+128
+		out		(0x99),a
+
 		call	brdrs
+		
 		ld		a,(_xoffset)
 		cp		15
 		call	z,colmn_patch
+
+		ld		a,11100000B
+		out		(0x99),a
+		ld		a,7+128
+		out		(0x99),a
+
 		ret
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;		
 
 vdp_task:
-		; ld		a,00010000B
-		; out		(0x99),a
-		; ld		a,7+128
-		; out		(0x99),a
-		
 		ld		a,(_xoffset)
 		and		a
 		jr		nz,.x1_15
@@ -86,47 +99,42 @@ colmn_patch:
 		add		a,h
 		ld 		h,a
 		
-		ld	a,(hl)			; first tile in the column
+		ld		a,(hl)			; first tile in the column
 [3]		rlca
-		and	00000111B
-		add	a,:_tiles0
-		ld	(_kBank4),a
-		ld	a,(hl)
-		and	00011111B
-		add	a,high _tiles0
-		ld	h,a
-		ld	a,(_xoffset)
-[4]		add	a,a
-		ld	l,a
+		and		00000111B
+		add		a,:_tiles0
+		ld		(_kBank4),a
+		ld		a,(hl)
+		and		00011111B
+		add		a,high _tiles0
+		ld		h,a
+		ld		l,0xF0
+		
+		ld		a,(_displaypage)
+		xor		1				; hidden page
+[2] 	add 	a,a
+		out 	(0x99),a 		; set bits 14-16
+		ld 		a,14+128
+		out 	(0x99),a
 
-		ld	a,(_displaypage)
-		xor	1				; hidden page
-[2] 	add a,a
-		out (0x99),a 		; set bits 14-16
-		ld a,14+128
-		out (0x99),a
-
-		ld	de,0x40F0		; write access, columns 240 on hidden page
+		ld		de,0x40EF		; write access, columns 239 on hidden page
 				
 		; hl -> tile column in the tile set
 	
-		repeat 2
-		ld a,e 			;set bits 0-7
-		out (0x99),a
-		ld a,d 			;set bits 8-13
-		out (0x99),a
-		outi			; 18
+		ld 		a,e 			;set bits 0-7
+		out 	(0x99),a
+		ld 		a,d 			;set bits 8-13
+		out 	(0x99),a
+		outi	
 		inc d
-		endrepeat	
+		ld 		a,e 			;set bits 0-7
+		out 	(0x99),a
+		ld 		a,d 			;set bits 8-13
+		out 	(0x99),a
+		outi	
 		ret
 
-		; possible optimization 55 cycles vs 57
-		; out (c),e
-		; out (c),d
-		; ld  a,(hl)
-		; out (0x98),a
-		; inc l
-		; inc d		
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 		
 plot_col64:

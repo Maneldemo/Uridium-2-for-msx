@@ -17,10 +17,11 @@ for g=0:7
 end
 
 
-[A,MAP] = imread('levels\test_level.png');
+[A,MAP] = imread('levels\test_level5.png');
 
 
 [ A MAP] = imapprox(A,MAP,pal, 'nodither');
+%[ A MAP] = imapprox(A,MAP,pal);
 pal = MAP;
 %MAP = pal;
 
@@ -43,7 +44,7 @@ InpTiles = im2col(B,'indexed',[16 16],'distinct');
 % if (0)
 % 	RGB = ind2rgb(InpTiles',MAP);
 % 	t = [RGB(:,:,1) RGB(:,:,2) RGB(:,:,3)];
-% 	[IDX, C] = kmeans(t, 256,'EmptyAction','singleton','Replicates',10);
+% 	[IDX, C] = kmeans(t, 256,'EmptyAction','singleton','Replicates',10,'OnlinePhase','on');
 % 	UniqueTiles = zeros(256,256,3);
 % 	UniqueTiles (:,:,1) = C(:,1:256);
 % 	UniqueTiles (:,:,2) = C(:,257:512);
@@ -78,12 +79,12 @@ UniqueTiles = UniqueTiles';
 K = size(UniqueTiles,2)
 T = UniqueTiles;
 
-%if (K<=256)
+% if (K<=256)
 %    T = [UniqueTiles zeros(256,256-K)];
 %    T = UniqueTiles;
-%else
+% else
 %    T = UniqueTiles(:,1:256) ;
-%end
+% end
 
 %TT = [T(1:16:256,:); T(2:16:256,:); T(3:16:256,:); T(4:16:256,:)]
 
@@ -158,6 +159,10 @@ for y=1:K
     t = uint8(TT(:,y));
     fwrite(fid,t,'uchar');
 end
+for y=K+1:256
+     fwrite(fid,zeros(256,1),'uchar');
+end
+
 fclose(fid);
 
 %figure;

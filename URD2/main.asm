@@ -39,7 +39,7 @@ _kBank4: 	equ 0B000h ;- B7FFh (B000h used)
 		include isr.asm
 		include fsmscroll.asm
 		include vdpcmds.asm
-		include brdrs.asm
+		include brdrs_opt.asm
 		
 		include checkkbd.asm
 		
@@ -184,9 +184,9 @@ _tiles0:
 		page 9
 		incbin "tiles.bin",0xA000,0x2000
 		page 10
-		incbin "tiles.bin",0xC000;,0x2000
-		; page 11
-		; incbin "tiles.bin",0xE000;,0x2000
+		incbin "tiles.bin",0xC000,0x2000
+		page 11
+		incbin "tiles.bin",0xE000,0x2000
 
 		page 12		
 _level

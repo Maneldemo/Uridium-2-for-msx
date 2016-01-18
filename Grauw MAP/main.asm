@@ -4,7 +4,7 @@
 ;
 ; Abstract: Horizontal scrolling on msx 2 is a sort of holy grail
 ; Here follows an overview on the approach followed in Uridium 2 beta 
-; and a simplified version of its scrolling engine.   
+; and a simplified version of its scrolling engine in screen 8.   
 ; We focus on side scrolling right to left, the extension to the other 
 ; direction is direct.
 ; The image to scroll is composed by tiles 16x16 pixels, the screen 
@@ -16,18 +16,19 @@
 ; used to show the screen window using  double buffering  
 ; (i.e. we plot on one page while we show the other page).
 ; This implies that the tiles have to stay in RAM or ROM. 
-; Moreover the access to the tiles will be demanded to the z80, as we will see 
-; later, leaving to the vdp the task of moving the screen. 
+; Moreover, as we will see later, the access to the tiles will be demanded to the z80,
+; leaving to the vdp the task of moving the screen. 
 ;
 ; The engine relies on a mega rom mapper with 8K pages (here Konami SCC) as a  
 ; full tile set of 256 tiles of 16x16 pixels takes 64KB of space.
 ; Naturally using a ram mapper or less tiles, other solutions are possible.
-; Each tile is stored column wise, this in order to simplify the task of the z80
-; which is in charge of plotting the new columns of pixels that enter the screen.
+; Each tile is stored column-wise (i.e. successinve bytes belog to the same column), 
+; this in order to simplify the task of the z80 which is in charge of plotting the 
+; new columns of pixels that enter the screen.
 ; 
-; The map is stored by lines (in RAM) and, to simplify line changes, has size 256x10 
+; The map is stored in RAM row-wise and, to simplify line changes, has map size is 256x10 
 ; Each byte in the map is a tile number.
-; As a tile is 16x16=256 bytes, a page in the rom mapper can host 8*1024/256  = 32 tiles
+; As a tile is 16x16=256 bytes, a page in the rom mapper can host exactly 8*1024/256  = 32 tiles.
 ; The full tile set of 256 tiles is spread across 8 pages of 8K each.
 ;
 ; The algorithm 
@@ -50,24 +51,40 @@
 ; When the z80 starts filling the 16th column of the right border on the visible screen  
 ; (column n. 255) the vdp has to copy the slice of pixels 16x160 that includes the column
 ; of pixels being plotted by the z80 from the visible page to the hidden page.
-; It happens that the vdp has to wait for the z80 to have plotted at least 4-5 pixels 
-; before the copy commands is issued or the copy will miss some pixels from that column.
-; The engine has solved the concurrency problem by issuing the copy command only 
-; after that the z80 has copied the last column of the first 4 tiles.
-; This causes a small loss in performances of the VDP that will miss a fraction of the 
-; VBLANK time (where the copy is faster).  
+; In order to maximize the parallelism, the vdp starts working before that the z80 has
+; started plotting its column, so 1-2 pixels at the top of column 255 get copied before the
+; z80 has updated them. 
+; Without a workaround, the black pixels would propagate in the screen slice by slice.
+; The engine has solved the concurrency problem by filling with valid data the two 2 wrong 
+; pixels once they have been copied on column 239 on the hidden page.
+; This causes a small loss in performances as the Z80 will copy those two bytes twice:
+; once on column 255 in the visible page, once on columns 239 on the hidden page.
+; anyway the patch occurs only when the screen offeset is equal to 15 and is overall acceptable 
+; as we set just 2 bytes in VRAM.
 ;
 ; Devil in the details (2)
 ;
 ; Why do we split the screen in slices instead of coping the whole 240x160 area to be moved?
 ; The problem is that the command engine of the VDP is affected by changes in R#18 
-; At each change in R#18 occurring while the VDP is coping there is the possibility that
+; At each change in R#18 occurring while the VDP is coping, there is the possibility that
 ; a black or while pixel appears. 
-; The sole solution is to move set R#18 only when the VDP command has been executed.
-; This implies that the copy of the screen has to be segmented in tasks that the VDO can 
+; The sole solution is to set R#18 only after the VDP command has been executed.
+; This implies that the copy of the screen has to be segmented in tasks that the VDP can 
 ; complete within a single frame, before R#18 has to be set again.
+; The height of the screen (160 pixels) has been choosen in oder to have that the VDP ends
+; its copy about at the end of the visible area (around line 163) also in NTSC mode
+; (in PAL the VDP command is completed much earlier).
+; This means that, also in NTSC, a line interrupt at line 160 could safely disable the screen 
+; and the sprites, swap page to show a score bar, wait hblank, enable the screen and reset R#18
+; without affecting the last VDP copy.
+; Moreover, the time between line 164 and 192 can be used to execute other VDP commands.
+; In the test rom, the RED color bar indicates the z80 usage, the GREEN color bar the vdp usage. 
+; Press space to swap between NTSC and PAL and see how things change accordingly
+;
 ; 
-; use sjasm42c to compile
+; Note: use sjasm42c to compile
+; In Sjasm42c ":label"  indicates the page in the mapper where label is located.
+;
 ;----------------------------------------------------------------------------
 
         output "urd2.rom"
@@ -107,7 +124,7 @@ _kBank4: 	equ 0B000h ;- B7FFh (B000h used)
 		include isr.asm
 		include fsmscroll.asm
 		include vdpcmds.asm
-		include brdrs.asm
+		include brdrs_opt.asm
 		
 		include checkkbd.asm
 		
@@ -212,9 +229,9 @@ _tiles0:
 		page 9
 		incbin "tiles.bin",0xA000,0x2000
 		page 10
-		incbin "tiles.bin",0xC000;,0x2000
-		; page 11
-		; incbin "tiles.bin",0xE000;,0x2000
+		incbin "tiles.bin",0xC000,0x2000
+		page 11
+		incbin "tiles.bin",0xE000,0x2000
 
 		page 12		
 _level

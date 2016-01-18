@@ -19,11 +19,6 @@ _fake_isr
 		push   iy         
 		push   ix         
 
-		ld		a,11100000B
-		out		(0x99),a
-		ld		a,7+128
-		out		(0x99),a
-
 		ld	hl,(_xmappos)			; corner top left of the screen window in the map in pixels
 		ld	a,15
 		and	l
@@ -41,7 +36,7 @@ _fake_isr
 		call	xscroll				; move the screen 			
 		call	_brdrs				; build a column right pointed by HL, clear a column left, move a stripe of screen
 		
-		; call _waitvdp				; no need ATM
+		call _waitvdp				; no need ATM
 		
 		ld	hl,(_xmappos)
 		inc	hl
@@ -50,7 +45,7 @@ _fake_isr
 		ld	h,a
 		ld	(_xmappos),hl			; scroll one pixel right
 
-		ld	hl,(_jiffy)
+		ld	hl,(_jiffy)				; timer
 		inc	hl
 		ld	(_jiffy),hl
 				

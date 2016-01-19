@@ -17,7 +17,7 @@ for g=0:7
 end
 
 
-[A,MAP] = imread('levels\test_level5.png');
+[A,MAP] = imread('levels\lev1.png');
 
 
 [ A MAP] = imapprox(A,MAP,pal, 'nodither');

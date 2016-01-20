@@ -1,50 +1,8 @@
 
 
-_isrinit:
-		ld	hl,0x0038
-		ld	(hl),0xC3
-		inc	hl
-		ld	(hl),low _scroll
-		inc	hl
-		ld	(hl),high _scroll
-
-; set interrupt line
-		LD    A,YSIZE-2
-		out (0x99),a
-		LD    A,19+128
-		out (0x99),a
-	
-; enable line interrupt
-		LD    A,(RG0SAV)
-		OR    00010000B
-		LD    (RG0SAV),A
-		out (0x99),a
-		LD    A,0+128
-		out (0x99),a
-		ret
-	
-; _intreset:
-		; di
-		; ld	hl,0x0038
-		; ld	(hl),0xC3
-		; inc	hl
-		; ld	(hl),low _fake_isr
-		; inc	hl
-		; ld	(hl),high _fake_isr
-
-; ; disable line interrupt		
-		; LD    A,(RG0SAV)
-		; and    11101111B
-		; LD    (RG0SAV),A
-		; out (0x99),a
-		; LD    A,0+128
-		; out (0x99),a
-		; ei
-		; ret
-	
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-	
-vblank
+_fake_isr
+		push	af
+		
 		; ld	a,(noscroll)
 		; or	a
 		; jr	z,1f
@@ -78,10 +36,15 @@ vblank
 		call	xscroll				; move the screen 			
 		call	_brdrs				; build a column right pointed by HL, clear a column left, move a stripe of screen
 		
+		call _waitvdp				; no need ATM
+
 		; ld		a,00000011B
 		; out		(0x99),a
 		; ld		a,7+128
 		; out		(0x99),a
+
+		call animtest
+		; call _waitvdp				; no need ATM
 		
 		ld	hl,(_xmappos)
 		inc	hl
@@ -94,10 +57,10 @@ vblank
 		inc	hl
 		ld	(_jiffy),hl
 				
-		; xor		a
-		; out		(0x99),a
-		; ld		a,7+128
-		; out		(0x99),a
+		xor		a
+		out		(0x99),a
+		ld		a,7+128
+		out		(0x99),a
 		
 		pop    ix         
 		pop    iy         
@@ -120,84 +83,80 @@ vblank
 		pop	af
 		ei
 		ret
+
+
+; _isrinit:
+		; di
+		; ld	hl,0x0038
+		; ld	(hl),0xC3
+		; inc	hl
+		; ld	(hl),low _scroll
+		; inc	hl
+		; ld	(hl),high _scroll
+
+; ; set interrupt line
+		; LD    A,YSIZE-1
+		; out (0x99),a
+		; LD    A,19+128
+		; out (0x99),a
+	
+; ; enable line interrupt
+		; LD    A,(RG0SAV)
+		; OR    00010000B
+		; LD    (RG0SAV),A
+		; out (0x99),a
+		; LD    A,0+128
+		; out (0x99),a
+		; ei
+		; ret
+	
+; _intreset:
+		; di
+		; ld	hl,0x0038
+		; ld	(hl),0xC3
+		; inc	hl
+		; ld	(hl),low _fake_isr
+		; inc	hl
+		; ld	(hl),high _fake_isr
+
+; ; disable line interrupt		
+		; LD    A,(RG0SAV)
+		; and    11101111B
+		; LD    (RG0SAV),A
+		; out (0x99),a
+		; LD    A,0+128
+		; out (0x99),a
+		; ei
+		; ret
+	
+; ;;;;;;;;;;;;;;;;;;;;;;
+; ; actual ISR handler
+; ;;;;;;;;;;;;;;;;;;;;;;
+
+; _scroll:
+		; push	af
 		
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;		
-
-lint:
-		xor		a
-		out	(099h),a
-		ld	a,18+128
-		out	(099h),a		
-
-		; ld a,00011111B		; 0XX11111B
-		ld a,3FH		; 0XX11111B
-		out (0x99),a
-		ld a,2+128			; R#2 
-		out (0x99),a		; score bar in page 1
-		
-		; ld	a,(noscroll)
-		; or	a
-		; jr	z,1f
-		
-		push   hl         
-		push   de         
-		push   bc         
-		exx               
-		ex     af,af'     
-		push   hl         
-		push   de         
-		push   bc         
-		push   af         
-		push   iy         
-		push   ix         
-
-		call _waitvdp				; no need in PAL
-		call animtest
-
-		pop    ix         
-		pop    iy         
-		pop    af         
-		pop    bc         
-		pop    de         
-		pop    hl         
-		ex     af,af'     
-		exx               
-		pop    bc         
-		pop    de         
-		pop    hl         
-
-		pop	 af
-		ei
-		ret
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;  actual ISR handler
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-_scroll:
-		push	af
-		
-		ld a,1 			; read S#1
-		out (0x99),a
-		ld a,128+15
-		out (0x99),a
+		; ld a,1 			; read S#1
+		; out (0x99),a
+		; ld a,128+15
+		; out (0x99),a
 		 
-		in	a,(0x99)
-		rra
-		jp	c,lint	
+		; in	a,(0x99)
+		; rra
+		; jp	c,lint	
 
-		xor	a 			; read S#0
-		out (0x99),a
-		ld a,128+15
-		out (0x99),a
+		; xor	a 			; read S#0
+		; out (0x99),a
+		; ld a,128+15
+		; out (0x99),a
 		 
-		in	a,(0x99)
-		rlca
-		jp	c,vblank
+		; in	a,(0x99)
+		; rlca
+		; jp	c,vblank
 		
-		pop	af			; none of them (?)
-		ei
-		ret
+		; pop	af			; none of them (?)
+		; ei
+		; ret
 	
 ; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;	
 ; ; manage score bar at YSIZE

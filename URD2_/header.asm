@@ -42,7 +42,7 @@ xship_rel:					equ (128-8)
 
 mapWidth	equ	256
 mapHeight	equ	10
-YSIZE		equ	10*16
+YSIZE		equ	10*16+8
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 

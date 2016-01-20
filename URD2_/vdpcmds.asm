@@ -58,13 +58,13 @@ LMMC_tile:
 
 
 animtest:
-		; ld		a,(_xoffset)		
-		; add		a,120
-		ld		d,120
-		ld		e,80
-		ld		a,(_xoffset)		
-		call	move_tile
-		ret
+	ld	a,(_xoffset)
+	add	a,128
+	ld	d,a
+	ld	e,80
+	ld	a,1
+	; call	move_tile
+	ret
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; input
@@ -80,13 +80,12 @@ animtest:
 
 move_tile:
 		ld	h,a
-		and	00001111B	
-[4]		add	a,a					
+		and	00001111B		
 		ld	l,a			; sx
 		ld	a,h
 		and	11110000B
 [4]		add	a,a			; tiles are under the lower border						
-		add		a,160+16
+		add		a,160
 		ld	h,a			; sy
 
 		ld 		a, 32

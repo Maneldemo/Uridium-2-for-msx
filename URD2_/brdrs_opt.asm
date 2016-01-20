@@ -6,10 +6,10 @@ _brdrs:
 
 		call	vdp_task
 
-		ld		a,00011100B
-		out		(0x99),a
-		ld		a,7+128
-		out		(0x99),a
+		; ld		a,00011100B
+		; out		(0x99),a
+		; ld		a,7+128
+		; out		(0x99),a
 
 		call	brdrs
 		
@@ -17,10 +17,10 @@ _brdrs:
 		cp		15
 		call	z,colmn_patch
 
-		ld		a,11100000B
-		out		(0x99),a
-		ld		a,7+128
-		out		(0x99),a
+		; ld		a,11100000B
+		; out		(0x99),a
+		; ld		a,7+128
+		; out		(0x99),a
 
 		ret
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;		

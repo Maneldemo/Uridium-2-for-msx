@@ -11,12 +11,11 @@ _cls:
 		ld		e,1
 		xor		a
 1:		out		(0x98),a
-		cpi
-		jp   		pe,1b
+        	cpi
+        	jp   		pe,1b
 		dec	e
 		jp		nz,1b
 		ret
-		
 _cls0:
 		ld		c,0
 		ld		d,c
@@ -29,23 +28,6 @@ _cls0:
 1:		out		(0x98),a
         cpi
         jp   	pe,1b
-		ret
-		
-font_cpy:		
-		ld		c,1
-		ld		de,160*256
-		call	_vdpsetvramwr
-		ld		hl,fonts
-		ld		a,:fonts
-		ld		d,3
-2:		ld		(_kBank4),a
-		ld		bc,0x98
-		ld		e,32
-1:		otir
-		dec	e
-		jr	nz,1b
-		dec	d
-		jr	nz,2b
 		ret
 		
 ;-------------------------------------

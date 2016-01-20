@@ -75,22 +75,17 @@ START:
 		;--- initialise ISR in RAM
 		
 		di
-		; ld	hl,0x0038
-		; ld	(hl),0xC3
-		; inc	hl
-		; ld	(hl),low _fake_isr
-		; inc	hl
-		; ld	(hl),high _fake_isr
-		
-		call	_isrinit
-		
+		ld	hl,0x0038
+		ld	(hl),0xC3
+		inc	hl
+		ld	(hl),low _fake_isr
+		inc	hl
+		ld	(hl),high _fake_isr
+
 		; copy the level map from ROM to RAM
 		
 		call	vdptest
-		call	font_cpy
 		call	mapinit
-		call	vdp_task		; patch
-		
 		
 		ld	hl,0
 		ld	(_jiffy),hl		
@@ -137,7 +132,7 @@ vdptest:
 		ld	d,160			; dest y
 		ld	e,0				; dest x
 		ld	b,1				; page
-		ld	c,176			; initial tile
+		ld	c,192			; initial tile
 		ld	a,32			; number of tiles
 1:		push	af
 
@@ -172,7 +167,6 @@ vdptest:
 		pop	af
 		dec	a
 		jr	nz,1b
-		
 		ret
 		
 		
@@ -195,17 +189,9 @@ _tiles0:
 		incbin "tiles.bin",0xE000,0x2000
 
 		page 12		
-_level:
-		incbin	datamap.bin	
-		
-		page 13		
-fonts:
-		incbin	fonts.bin,0x0000,0x2000
-		page 14
-		incbin 	fonts.bin,0x2000,0x2000
-		page 15
-		incbin 	fonts.bin,0x4000,0x2000
-		
+_level
+		incbin	datamap.bin		
+
 		; call	opening
 		
 

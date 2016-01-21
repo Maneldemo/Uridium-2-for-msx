@@ -10,31 +10,26 @@ LMMC_tile:
 		ld 		a, 17+128
 		out 	(0x99),a
 
-		ld		a,e
-		out 	(0x9B), a 			; dx
-		xor		a
-		out 	(0x9B), a			; dx (high)
-		ld 		a,d					; 
-		out 	(0x9B), a			; dy
-		ld 		a,b					; destination page
-		out 	(0x9B), a			; dy (high-> page 0 or 1)
-		
-		ld 		a,16
-		out 	(0x9B), a			; x block size
-		xor	a
-		out 	(0x9B), a
-
-		ld		a,16				
-		out 	(0x9B), a			; y block size
-		xor a
-		out 	(0x9B), a
-
 		ld		c,0x9B
-		outi						; 1st byte color
-		xor		a					; normal trace
+		out 	(c), e 			; dx
+		xor		a
+		out 	(0x9B), a		; dx (high)
+
+		out 	(c), d			; dy
+								; destination page
+		out 	(c), b			; dy (high-> page 0 or 1)
+		
+		ld 		b,16
+		out 	(c), b			; x block size
 		out 	(0x9B), a
 
-		ld		a,0xF0				; HMMC
+		out 	(c), b			; y block size
+		out 	(0x9B), a
+
+		outi					; 1st byte color
+		out 	(0x9B), a		; normal tracing
+
+		ld		a,0xF0			; HMMC
 		out 	(0x9B), a
 
 		ld 		a, 44 + 128
@@ -53,18 +48,20 @@ LMMC_tile:
 		dec		h
 		inc		l
 		jp		nz,1b
+
+		xor		a
+		out 	(0x99),a
+		ld 		a, 46+128
+		out 	(0x99),a		; patch: reset vdp commands
 		
 		ret
 
 
 animtest:
-		; ld		a,(_xoffset)		
-		; add		a,120
 		ld		d,120
 		ld		e,80
 		ld		a,(_xoffset)		
-		call	move_tile
-		ret
+		
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; input
@@ -79,15 +76,14 @@ animtest:
 ; odd tiles are the integer version
 
 move_tile:
-		ld	h,a
-		and	00001111B	
-[4]		add	a,a					
-		ld	l,a			; sx
-		ld	a,h
-		and	11110000B
-[4]		add	a,a			; tiles are under the lower border						
+		ld		h,a
+		and		00001111B	
+[4]		add		a,a					
+		ld		l,a			; sx
+		ld		a,h
+		and		11110000B	; tiles are under the lower border						
 		add		a,160+16
-		ld	h,a			; sy
+		ld		h,a			; sy
 
 		ld 		a, 32
 		out 	(0x99),a
@@ -99,7 +95,7 @@ move_tile:
 		; call _waitvdp				; no need ATM
 		
 		out		(c), l 				; sx
-		xor a
+		xor 	a
 		out		(0x9B), a 			; sx (high)
 		
 		out		(c), h 	     		; sy
@@ -107,7 +103,7 @@ move_tile:
 		out 	(0x9B), a 			; sy 	(high-> page 0 or 1)
 
 		out 	(c), d 				; dx
-		xor a
+		xor 	a
 		out 	(0x9B), a			; dx (high)
 		
 		out 	(c), e	 			; dy
@@ -116,7 +112,7 @@ move_tile:
 
 		ld 		l,16 				
 		out 	(c), l			; x block size
-		xor a
+		xor 	a
 		out 	(0x9B), a					
 		out 	(c), l			; y block size
 		out 	(0x9B), a
@@ -188,20 +184,21 @@ clear_slice:
 		ld 		a, 17+128
 		out 	(0x99),a
 		
+		ld 		c, 0x9B
+		
 		; call _waitvdp
 		
-		ld		a,e
-		out 	(0x9B), a 			; dx
+		out 	(c), e 			; dx
 		xor		a
-		out 	(0x9B), a			; dx (high)
+		out 	(0x9B), a		; dx (high)
 		
-		out 	(0x9B), a			; dy
-		ld 		a,d					; destination page
-		out 	(0x9B), a			; dy (high-> page 0 or 1)
+		out 	(0x9B), a		; dy
+								; destination page
+		out 	(c), d			; dy (high-> page 0 or 1)
 		
 		ld 		a,16
 		out 	(0x9B), a			; x block size
-		xor	a
+		xor		a
 		out 	(0x9B), a
 
 		ld		a,10*16				; mapHeight*16
@@ -209,7 +206,6 @@ clear_slice:
 		xor a
 		out 	(0x9B), a
 
-		xor		a
 		out 	(0x9B), a			; border_color
 		out 	(0x9B), a
 

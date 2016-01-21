@@ -124,16 +124,36 @@ vblank
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;		
 
 lint:
+		ld	a,(RG1SAV)
+		and	010111111B			; disable screen
+		ld	(RG1SAV),a
+		out	(0x99),a
+		ld	a,1+128
+		out	(0x99),a
+		
+		ld		a,11111100B
+		out		(0x99),a
+		ld		a,7+128
+		out		(0x99),a
+		
+		call _waitvdp
+		
 		xor		a
 		out	(099h),a
 		ld	a,18+128
 		out	(099h),a		
 
-		; ld a,00011111B		; 0XX11111B
-		ld a,3FH		; 0XX11111B
+		ld a,3FH			; 0XX11111B
 		out (0x99),a
 		ld a,2+128			; R#2 
 		out (0x99),a		; score bar in page 1
+
+		ld	a,(RG1SAV)
+		or 	01000010B		; enable screen
+		ld	(RG1SAV),a
+		out	(0x99),a
+		ld	a,1+128
+		out	(0x99),a
 		
 		; ld	a,(noscroll)
 		; or	a

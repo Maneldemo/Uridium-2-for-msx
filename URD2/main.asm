@@ -75,13 +75,7 @@ START:
 		;--- initialise ISR in RAM
 		
 		di
-		; ld	hl,0x0038
-		; ld	(hl),0xC3
-		; inc	hl
-		; ld	(hl),low _fake_isr
-		; inc	hl
-		; ld	(hl),high _fake_isr
-		
+	
 		call	_isrinit
 		
 		; copy the level map from ROM to RAM
@@ -89,7 +83,6 @@ START:
 		call	vdptest
 		call	font_cpy
 		call	mapinit
-		call	vdp_task		; patch
 		
 		
 		ld	hl,0
@@ -99,6 +92,7 @@ START:
 		
 		ei
 1:		halt
+		halt
 		ld	a,(_xoffset)		
 		and	a
 		jp	nz,1b
@@ -110,12 +104,14 @@ START:
 		jp	1b
 		
 PAL_ntsc
+		di
 		ld		a,(RG9SAV)		
 		xor		00000010B		; PAL or NTSC 
 		ld		(RG9SAV),a
 		out		(0x99),a
 		ld		a,9+128
 		out		(0x99),a
+		ei
 		ret
 
 mapinit		
@@ -133,14 +129,13 @@ mapinit
 		ld		(_xmappos),hl
 		
 		ret
+		
 vdptest:
 		ld	d,160			; dest y
 		ld	e,0				; dest x
-		ld	b,1				; page
-		ld	c,176			; initial tile
-		ld	a,32			; number of tiles
-1:		push	af
-
+		ld	c,160			; initial tile
+		ld	b,32			; number of tiles
+1:		
 		ld	a,c
 [3]		rlca
 		and	00000111B
@@ -155,9 +150,12 @@ vdptest:
 		
 		push	de
 		push	bc
+		ld		b,1				; page
 		call	LMMC_tile
 		pop		bc
 		pop		de
+		
+		inc		c
 		
 		ld		a,16		; x=x+16
 		add		a,e
@@ -168,11 +166,7 @@ vdptest:
 		add		a,d
 		ld		d,a
 		
-2:		inc		c
-		pop	af
-		dec	a
-		jr	nz,1b
-		
+2:		djnz	1b
 		ret
 		
 		

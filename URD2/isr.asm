@@ -113,10 +113,7 @@ vblank:
 		push   ix         
 
 		ld	hl,(_xmappos)			; corner top left of the screen window in the map in pixels
-		ld	a,15
-		and	l
-		ld	(_xoffset),a			; screen offset
-		
+
 		repeat 4
 		srl	h
 		rr	l
@@ -129,10 +126,7 @@ vblank:
 		call	xscroll				; move the screen 			
 		call	_brdrs				; build a column right pointed by HL, clear a column left, move a stripe of screen
 		
-		; ld		a,00000011B
-		; out		(0x99),a
-		; ld		a,7+128
-		; out		(0x99),a
+		; bdrclr 00000011B
 		
 		ld	hl,(_xmappos)
 		inc	hl
@@ -145,10 +139,7 @@ vblank:
 		inc	hl
 		ld	(_jiffy),hl
 				
-		; xor		a
-		; out		(0x99),a
-		; ld		a,7+128
-		; out		(0x99),a
+		; bdrclr 0
 		
 		pop    ix         
 		pop    iy         
@@ -211,7 +202,12 @@ lint:
 
 		call	set_displaypage	; update displaypage
 		
-[2]		call	waitHBLANK		; now we are at the start of HBLANK
+		ld	hl,(_xmappos)			; corner top left of the screen window in the map in pixels
+		ld	a,15
+		and	l
+		ld	(_xoffset),a			; screen offset
+		
+		call	waitHBLANK		; now we are at the start of HBLANK
 
 		call _waitvdp			; do not change R#18 if the VDP is copying !! NEEDED FOR NTSC
 		

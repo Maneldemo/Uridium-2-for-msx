@@ -57,61 +57,7 @@ LMMC_tile:
 		ret
 
 
-animtest:
-		ld	e,8
-		call	checkkbd
-		ld	a,l
-		and	128
-		jr	nz,notright
-		ld	a,(_xtest)
-		add	a,16
-		ld	(_xtest),a
-		jr	1f
-notright:
-		ld	a,l
-		and	16
-		jr	nz,1f
-		ld	a,(_xtest)
-		sub	a,16
-		ld	(_xtest),a
-1:		
-		ld		a,(_xtest)
-		ld		d,a
-		; ld		a,(_xoffset)
-		; add		a,d
-		; ld		d,a
-		ld	a,l
-		and	32
-		jr	nz,notup
-		ld	a,(_ytest)
-		sub	a,16
-		ld	(_ytest),a
-		jr	1f
-notup:
-		ld	a,l
-		and	64
-		jr	nz,1f
-		ld	a,(_ytest)
-		add	a,16
-		ld	(_ytest),a
-1:
-		ld	a,(_ytest)
-		ld		e,a
-		
-		; ld		a,(_xoffset)		
-; [4]		add		a,a					
-		; cp		d
-		
-		; if dx<_xoffset 	b = _displaypage
-		; if dx>=_xoffset	b = _displaypage xor 1
-
-		ld 		a,(_displaypage)	; destination page	
-		; jr		c,1f
-		; xor		1
-1:		ld		b,a		
-
-		ld		a,15		
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; input
 ; a = tile number	from page 0
@@ -122,8 +68,6 @@ notup:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ; destructible tiles have to be in range 0..n-1 in the tile set
-; even tiles are the destroyed version
-; odd tiles are the integer version
 
 move_tile:
 		ld		h,a

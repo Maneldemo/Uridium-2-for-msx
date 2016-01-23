@@ -4,7 +4,6 @@ _brdrs:
 		call	vdp_task
 
 		bdrclr 0
-		;00011100B
 
 		call	brdrs
 		
@@ -29,13 +28,10 @@ vdp_task:
 		jp 		clear_slice
 
 .x1_15:
-		add		a,240
-		ld		e,a
-		dec		a
 [4]		add		a,a
-		ld		d,a
-		add		a,16
-		ld		b,a
+		ld		b,a			; source slice
+		sub		a,16
+		ld		d,a			; destination slice
 		jp		move_slice
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;		

@@ -40,6 +40,7 @@ _kBank4: 	equ 0B000h ;- B7FFh (B000h used)
 		include fsmscroll.asm
 		include vdpcmds.asm
 		include brdrs_opt.asm
+		include anim_opt.asm
 		
 		include checkkbd.asm
 		

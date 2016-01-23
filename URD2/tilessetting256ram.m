@@ -17,8 +17,11 @@ for g=0:7
 end
 
 
-[A,MAP] = imread('levels\lev1.png');
+[A,MAP] = imread('levels\lev1_rev.png');
 
+if any(size(MAP)==0)
+    [A,MAP] = rgb2ind(A,256);
+end
 
 [ A MAP] = imapprox(A,MAP,pal, 'nodither');
 %[ A MAP] = imapprox(A,MAP,pal);

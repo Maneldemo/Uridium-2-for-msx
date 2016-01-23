@@ -45,12 +45,26 @@ mapHeight	equ	10
 YSIZE		equ	10*16
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
+debug equ 1
 
 	macro setpage_a
 		ld	(_kBank3),a
 		inc	a
 		ld	(_kBank4),a
 	endmacro
+	
+	macro bdrclr n
+		if debug
+		ifdif	n,0	
+			ld		a,n
+		else
+			xor	a
+		endif
+		out		(0x99),a
+		ld		a,7+128
+		out		(0x99),a	
+		endif
+	endmacro
+	
 	
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;  

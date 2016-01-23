@@ -1,6 +1,7 @@
 
 
-_isrinit:
+isr_set:
+		di
 		ld	hl,0x0038
 		ld	(hl),0xC3
 		inc	hl
@@ -8,43 +9,93 @@ _isrinit:
 		inc	hl
 		ld	(hl),high _scroll
 
-; set interrupt line
-		LD    A,YSIZE-2
+		ld    A,YSIZE-2
 		out (0x99),a
-		LD    A,19+128
-		out (0x99),a
+		ld    A,19+128
+		out (0x99),a	; set interrupt line
 	
-; enable line interrupt
-		LD    A,(RG0SAV)
-		OR    00010000B
-		LD    (RG0SAV),A
+		ld    A,(RG0SAV)
+		or    00010000B
+		ld    (RG0SAV),A
 		out (0x99),a
-		LD    A,0+128
-		out (0x99),a
+		ld    A,0+128
+		out (0x99),a	; enable line interrupt
 		ret
 	
-; _intreset:
-		; di
-		; ld	hl,0x0038
-		; ld	(hl),0xC3
-		; inc	hl
-		; ld	(hl),low _fake_isr
-		; inc	hl
-		; ld	(hl),high _fake_isr
+isr_reset:
+		di
+		ld	hl,0x0038
+		ld	(hl),0xC3
+		inc	hl
+		ld	(hl),low _fake_isr
+		inc	hl
+		ld	(hl),high _fake_isr
 
-; ; disable line interrupt		
-		; LD    A,(RG0SAV)
-		; and    11101111B
-		; LD    (RG0SAV),A
-		; out (0x99),a
-		; LD    A,0+128
-		; out (0x99),a
-		; ei
-		; ret
-	
+		ld    A,(RG0SAV)
+		and    11101111B
+		ld    (RG0SAV),A
+		out (0x99),a
+		ld    A,0+128
+		out (0x99),a	; disable line interrupt		
+		ei
+		ret
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;  actual ISR handler
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+_scroll:
+		push	af
+		
+		ld a,1 			; read S#1
+		out (0x99),a
+		ld a,128+15
+		out (0x99),a
+		 
+		in	a,(0x99)
+		rra
+		jp	c,lint	
+
+		xor	a 			; read S#0
+		out (0x99),a
+		ld a,128+15
+		out (0x99),a
+		 
+		in	a,(0x99)
+		rlca
+		jp	c,vblank
+		
+		pop	af			; none of them (?)
+		ei
+		ret
+
+_fake_isr:
+		push	af
+
+		xor	a 			; read S#0
+		out (0x99),a
+		ld a,128+15
+		out (0x99),a
+		 
+		in	a,(0x99)
+		
+		pop	af			
+		ei
+		ret
+		
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;  VBLANK
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	
-vblank
+vblank:
+		ld	a,(RG8SAV)
+		and	011111101B		
+		ld	(RG8SAV),a
+		out	(0x99),a
+		ld	a,8+128
+		out	(0x99),a			; enable sprites
+
 		; ld	a,(noscroll)
 		; or	a
 		; jr	z,1f
@@ -121,8 +172,11 @@ vblank
 		ei
 		ret
 		
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;		
-
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;  Line Interrupt
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	; -hperiod number of CPU cycles per HBlank [228]
+	; -vperiod number of CPU cycles per VBlank in NTSC [59736]
 lint:
 		ld	a,(RG1SAV)
 		and	010111111B			; disable screen
@@ -130,35 +184,7 @@ lint:
 		out	(0x99),a
 		ld	a,1+128
 		out	(0x99),a
-		
-		ld		a,11111100B
-		out		(0x99),a
-		ld		a,7+128
-		out		(0x99),a
-		
-		call _waitvdp
-		
-		xor		a
-		out	(099h),a
-		ld	a,18+128
-		out	(099h),a		
 
-		ld a,3FH			; 0XX11111B
-		out (0x99),a
-		ld a,2+128			; R#2 
-		out (0x99),a		; score bar in page 1
-
-		ld	a,(RG1SAV)
-		or 	01000010B		; enable screen
-		ld	(RG1SAV),a
-		out	(0x99),a
-		ld	a,1+128
-		out	(0x99),a
-		
-		; ld	a,(noscroll)
-		; or	a
-		; jr	z,1f
-		
 		push   hl         
 		push   de         
 		push   bc         
@@ -170,8 +196,37 @@ lint:
 		push   af         
 		push   iy         
 		push   ix         
+		
+		ld		a,(RG8SAV)
+		or		000000010B		
+		ld		(RG8SAV),a
+		out		(0x99),a
+		ld		a,8+128
+		out		(0x99),a		; disable sprites
+		
+		ld a,3FH				; 0XX11111B
+		out (0x99),a
+		ld a,2+128				; R#2 
+		out (0x99),a			; score bar in page 1
 
-		call _waitvdp				; no need in PAL
+		call	set_displaypage	; update displaypage
+		
+[2]		call	waitHBLANK		; now we are at the start of HBLANK
+
+		call _waitvdp			; do not change R#18 if the VDP is copying !! NEEDED FOR NTSC
+		
+		xor		a
+		out	(099h),a
+		ld	a,18+128
+		out	(099h),a			; score bar fixed 
+		
+		ld	a,(RG1SAV)
+		or 	01000010B			; enable screen
+		ld	(RG1SAV),a
+		out	(0x99),a
+		ld	a,1+128
+		out	(0x99),a
+		
 		call animtest
 
 		pop    ix         
@@ -189,53 +244,24 @@ lint:
 		pop	 af
 		ei
 		ret
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;  actual ISR handler
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-_scroll:
-		push	af
-		
-		ld a,1 			; read S#1
-		out (0x99),a
-		ld a,128+15
-		out (0x99),a
-		 
-		in	a,(0x99)
-		rra
-		jp	c,lint	
-
-		xor	a 			; read S#0
-		out (0x99),a
-		ld a,128+15
-		out (0x99),a
-		 
-		in	a,(0x99)
-		rlca
-		jp	c,vblank
-		
-		pop	af			; none of them (?)
-		ei
-		ret
 	
 ; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;	
 ; ; manage score bar at YSIZE
 ; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;	
-; waitHBLANK
-		; ld a,2 				; read S#2
-		; out (0x99),a
-		; ld a,128+15
-		; out (0x99),a		; poll for HBLANK
+waitHBLANK:
+		ld a,2 				; read S#2
+		out (0x99),a
+		ld a,128+15
+		out (0x99),a		; poll for HBLANK
 		 
-; ; 1:	in	a,(0x99)		; we are in HBLANK already, so wait until end of HBLANK
-; ; 		and	0x20
-; ; 		jp	nz,1b			
+1:		in	a,(0x99)		; if 1 we are in HBLANK already, so wait until end of HBLANK
+		and	0x20
+		jp	nz,1b			
 
-; 2:		in	a,(0x99)		; wait until end of the active area
-		; and	0x20
-		; jp	z,2b
-		; ret
+1:		in	a,(0x99)		; wait until end of the active area
+		and	0x20
+		jp	z,1b
+		ret
 	
 ; lint:	
 		; ; call	waitHBLANK
@@ -254,9 +280,9 @@ _scroll:
 		; ld a,2+128			; R#2 
 		; out (0x99),a		; score bar in page 0
 
-		; LD    A,mapHeight*16-(YSIZE-2)	; SCROLL DOWN
+		; ld    A,mapHeight*16-(YSIZE-2)	; SCROLL DOWN
 		; out (0x99),a
-		; LD    A,23+128
+		; ld    A,23+128
 		; out (0x99),a
 
 		; xor		a
@@ -540,16 +566,16 @@ _scroll:
 		; ld a,2+128
 		; out (0x99),a
 		
-		; LD    A,(_yoffset)		; SCROLL DOWN
+		; ld    A,(_yoffset)		; SCROLL DOWN
 		; out (0x99),a
 		; add    A,YSIZE-1
 		; ld		l,a
-		; LD    A,23+128
+		; ld    A,23+128
 		; out (0x99),a
 
 		; ld    a,l
 		; out (0x99),a			; set interrupt line
-		; LD    A,19+128
+		; ld    A,19+128
 		; out (0x99),a
 		
 		; ld	a,(_xoffset)		; set R#18 only if not scrolling

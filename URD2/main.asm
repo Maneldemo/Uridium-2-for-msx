@@ -76,7 +76,7 @@ START:
 		
 		di
 	
-		call	_isrinit
+		call	isr_set
 		
 		; copy the level map from ROM to RAM
 		
@@ -89,6 +89,8 @@ START:
 		ld	(_jiffy),hl		
 		xor	a
 		ld	(_displaypage),a		
+		ld	(_xtest),a
+		ld	(_ytest),a
 		
 		ei
 1:		halt
@@ -516,6 +518,9 @@ _levelmap:			#mapWidth*mapHeight
 slotvar				#1
 slotram				#1
 SEL_NTSC			#1
+
+_xtest:				#1
+_ytest:				#1
 
 ; joystick			#1
 

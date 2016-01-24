@@ -1,37 +1,73 @@
+	
+		; ld		a,(_xoffset)		
+; [4]		add		a,a					
+		; cp		d
+		
+		; if _xoffset*16 =>dx 	
+			; b = _displaypage
+		; else	
+			; b = _displaypage xor 1
+
+		; jr		nc,1f
+		
+		; ld 		a,(_displaypage)	; destination page	
+		; xor		1
+		; ld		b,a	
+		; ld		a,16
+		; add		a,d
+		; ld		d,a
+		; ld		a,14	
+		; jp move_tile
+		
+; 1:		ld 		a,(_displaypage)	; destination page	
+		; ld		b,a		
+		; ld		a,15	
+		; jp move_tile
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
 animtest:
+		ld	a,(anim_buffer.flag)
+		and	a
+		jr	nz,.manage_buffer
 
-		call movemarker
-		
-		ld		a,(_xoffset)		
-[4]		add		a,a					
-		cp		d
-		
-		; if _xoffset*16 =>dx 	
-		;	b = _displaypage
-		; else	
-		; 	b = _displaypage xor 1
+		call 	movemarker
 
-		jr		nc,1f
+		ld	a,e
+		ld	(anim_buffer.dy),a
+		
+		ld	a,d
+		sub	a,16
+		ld	(anim_buffer.dx),a
 		
 		ld 		a,(_displaypage)	; destination page	
-		xor		1
-		ld		b,a	
-		ld		a,16
-		add		a,d
-		ld		d,a
-		ld		a,14	
-		jp move_tile
-		
-1:		ld 		a,(_displaypage)	; destination page	
 		ld		b,a		
+		xor		1
+		ld		(anim_buffer.page),a
+		
 		ld		a,15	
+		ld		(anim_buffer.tile),a
+		ld		(anim_buffer.flag),a
+		
 		jp move_tile
 
-
+	
+.manage_buffer:
+		xor	a
+		ld	(anim_buffer.flag),a
+		
+		ld	a,(anim_buffer.dy)
+		ld	e,a
+		
+		ld	a,(anim_buffer.dx)
+		ld	d,a
+		
+		ld	a,(anim_buffer.page)
+		ld	b,a
+		
+		ld	a,15	; c
+		jp move_tile
 		
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; test code to move a marker

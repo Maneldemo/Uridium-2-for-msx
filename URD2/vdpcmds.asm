@@ -86,8 +86,8 @@ move_tile:
 
 		ld 		c, 0x9B
 		
-		; call _waitvdp				; no need ATM
-		
+		call _waitvdp				; do not change R#18 if the VDP is copying !! NEEDED FOR NTSC
+				
 		out		(c), l 				; sx
 		xor 	a
 		out		(0x9B), a 			; sx (high)

@@ -208,8 +208,6 @@ lint:
 		ld	(_xoffset),a			; screen offset
 		
 		call	waitHBLANK		; now we are at the start of HBLANK
-
-		call _waitvdp			; do not change R#18 if the VDP is copying !! NEEDED FOR NTSC
 		
 		xor		a
 		out	(099h),a

@@ -523,6 +523,12 @@ SEL_NTSC			#1
 _xtest:				#1
 _ytest:				#1
 
+anim_buffer.flag:		#1
+anim_buffer.dy:			#1
+anim_buffer.dx:			#1
+anim_buffer.tile:		#1
+anim_buffer.page:		#1
+
 ; joystick			#1
 
 ; _mcdivider			#1

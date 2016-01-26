@@ -123,7 +123,7 @@ vblank:
 		add	hl,de					; HL = corner top right of the screen window in the map in tiles
 		
 		call	pageswap			; test for page swap
-		call	xscroll				; move the screen 			
+		call	xscroll				; move the screen ! Not if VDP commands are being executed			
 		call	_brdrs				; build a column right pointed by HL, clear a column left, move a stripe of screen
 		
 		; bdrclr 00000011B
@@ -154,11 +154,6 @@ vblank:
 		pop    hl         
 
 1:		
-		xor	a 			; read S#0
-		out (0x99),a
-		ld a,128+15
-		out (0x99),a
-		in	a,(0x99)
 		pop	af
 		ei
 		ret
@@ -202,10 +197,10 @@ lint:
 
 		call	set_displaypage	; update displaypage
 		
-		ld	hl,(_xmappos)			; corner top left of the screen window in the map in pixels
+		ld	hl,(_xmappos)		; corner top left of the screen window in the map in pixels
 		ld	a,15
 		and	l
-		ld	(_xoffset),a			; screen offset
+		ld	(_xoffset),a		; screen offset
 		
 		call	waitHBLANK		; now we are at the start of HBLANK
 		

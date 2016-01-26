@@ -12,14 +12,6 @@ xscroll:
 		ret
 
 pageswap:
-		; ld		a,(_xmappos)
-		; and		16
-		; add 	a,a 		;x32
-		; or		 00011111B
-		; out 	(0x99),a
-		; ld 		a,2+128
-		; out 	(0x99),a
-		; ret
 
 		ld		a,(_displaypage)
 		and		a

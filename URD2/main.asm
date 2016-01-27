@@ -515,6 +515,20 @@ fonts:
 	MAP 0xC000
 
 _levelmap:			#mapWidth*mapHeight
+_sliceflag:			#16		; while scrolling right, 
+							; if flag(n)>0, slice n+1 on displaypage has 
+							; been copied to slice n in !displaypage
+							; flag(0) is set when the hidden border on 
+							; !displaypage has been built on slice 15
+							;
+							; while scrolling left,  
+							; if flag(n)>0, slice n on displaypage has 
+							; been copied to slice n+1 in !displaypage
+							; flag(15) is set when the hidden border on 
+							; !displaypage has been built on slice 0
+							;
+							; _sliceflag is reset at page swap
+_sliceflag_reset:	#1		; is set, _sliceflag is reset				
 
 slotvar				#1
 slotram				#1

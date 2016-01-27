@@ -17,6 +17,10 @@ _brdrs:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;		
 
 vdp_task:
+
+		; XXXXX
+		; add here _sliceflag management 
+
 		ld		a,(_xoffset)
 		and		a
 		jr		nz,.x1_15

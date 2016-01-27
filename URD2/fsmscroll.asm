@@ -25,10 +25,16 @@ pageswap:
 		
 		
 set_displaypage:
+		ld		a,(_displaypage)
+		ld		l,a
 		ld		a,(_xmappos)
 		and		16
 		jr		z,1f
 		ld		a,1
 1:		ld		(_displaypage),a		
+		xor	l
+		ret	z
+		; page has changed !
+		ld	(_sliceflag_reset),a
 		ret
 		

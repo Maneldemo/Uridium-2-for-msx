@@ -128,6 +128,9 @@ vblank:
 		
 		; bdrclr 00000011B
 		
+		; XXXXX
+		; add here _sliceflag_reset testing
+		
 		ld	hl,(_xmappos)
 		inc	hl
 		ld	a,15

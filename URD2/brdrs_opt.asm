@@ -20,6 +20,18 @@ vdp_task:
 
 		; XXXXX
 		; add here _sliceflag management 
+		
+		ld		a,(_xoffset)
+		add		a,low _sliceflag
+		ld		e,a
+		ld		a,high _sliceflag
+		adc		a,0
+		ld		d,a
+		ld		a,(de)
+		and		a
+		ret		nz
+		dec		a
+		ld		(de),a
 
 		ld		a,(_xoffset)
 		and		a

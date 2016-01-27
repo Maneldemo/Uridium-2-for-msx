@@ -49,7 +49,8 @@ _kBank4: 	equ 0B000h ;- B7FFh (B000h used)
 ;-------------------------------------
 START:
 		xor	a
-		ld	(SEL_NTSC),a		; PAL MODE
+		inc	a
+		ld	(SEL_NTSC),a		; NTSC MODE
 		call	set_scr			; set video mode to screen 8
 		di
 		
@@ -96,6 +97,8 @@ START:
 		ei
 1:		halt
 		halt
+		call changespeed
+		
 		ld	a,(_xoffset)		
 		and	a
 		jp	nz,1b
@@ -130,7 +133,9 @@ mapinit
 		ld		l,a		
 		ld		(_ymappos),a
 		ld		(_xmappos),hl
-		
+		ld		(_xmappos+2),a	; 24 bit	
+		ld		hl,256
+		ld		(_xspeed),hl
 		ret
 		
 vdptest:
@@ -570,7 +575,8 @@ anim_buffer.page:		#1
 ; _vbit16:			#2
 
 _ymappos:			#1
-_xmappos:			#2
+_xmappos:			#3	; 24 bit
+_xspeed:			#2
 
 ; _shadowbuff:		#2
 

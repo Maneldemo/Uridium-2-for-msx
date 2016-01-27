@@ -112,3 +112,37 @@ notup:
 		ld	a,(_ytest)
 		ld		e,a
 		ret
+		
+		
+		
+		
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; test code to move a marker
+;
+; returns
+; _xspeed change pressing P and O	
+
+changespeed:		
+		ld	e,4
+		call	checkkbd
+
+		bit 5,l
+		jr	nz,.notright
+		ld	hl,(_xspeed)
+		inc	hl
+		ld	a,h
+		cp	1
+		ret	nc
+		ld	(_xspeed),hl
+		ret
+		
+.notright:
+		bit 4,l
+		jr	nz,1f
+		ld	hl,(_xspeed)
+		dec	hl
+		ld	a,255
+		cp	h
+		ret	z
+		ld	(_xspeed),hl
+		ret		

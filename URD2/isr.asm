@@ -112,6 +112,7 @@ vblank:
 		push   iy         
 		push   ix         
 
+		
 		ld	hl,(_xmappos)			; corner top left of the screen window in the map in pixels
 
 		repeat 4
@@ -126,16 +127,36 @@ vblank:
 		call	xscroll				; move the screen ! Not if VDP commands are being executed			
 		call	_brdrs				; build a column right pointed by HL, clear a column left, move a stripe of screen
 		
+		
 		; bdrclr 00000011B
+		; call _waitvdp
+		; bdrclr 0B
 		
-		; XXXXX
 		; add here _sliceflag_reset testing
+		ld	a,(_sliceflag_reset)
+		and	a
+		jr	z,1f
 		
-		ld	hl,(_xmappos)
-		inc	hl
-		ld	a,15
-		and	h
-		ld	h,a
+		ld	bc,16			; clear _sliceflag and _sliceflag_reset
+		ld	hl,_sliceflag
+		ld	(hl),0
+		ld	de,_sliceflag+1
+		ldir
+1:
+
+		ld	de,(_xspeed)
+		ld	a,(_xmappos+2)
+		add	a,e
+		ld	(_xmappos+2),a
+		ld	e,d
+		bit	7,d
+		ld	d,0
+		jr	z,1f
+		ld	d,-1
+1:		ld	hl,(_xmappos)
+		adc	hl,de
+		ld	a,h
+		and	15
 		ld	(_xmappos),hl			; scroll one pixel right
 
 		ld	hl,(_jiffy)				; timer

@@ -119,8 +119,8 @@ move_tile:
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; input
-; b = sx	from not _displaypage
-; d = dx	to _displaypage
+; b = sx	from  _displaypage
+; d = dx	to not _displaypage
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 move_slice:

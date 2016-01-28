@@ -79,6 +79,7 @@ animtest:
 movemarker:		
 		ld	e,8
 		call	checkkbd
+		ld	(joystick),a
 
 		bit 7,l
 		jr	nz,notright
@@ -100,6 +101,7 @@ notright:
 		jr	nz,notup
 		ld	a,(_ytest)
 		sub	a,16
+		jp	c,1f
 		ld	(_ytest),a
 		jr	1f
 notup:
@@ -107,6 +109,8 @@ notup:
 		jr	nz,1f
 		ld	a,(_ytest)
 		add	a,16
+		cp	10*16
+		jr	z,1f
 		ld	(_ytest),a
 1:
 		ld	a,(_ytest)
@@ -115,34 +119,3 @@ notup:
 		
 		
 		
-		
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-; test code to move a marker
-;
-; returns
-; _xspeed change pressing P and O	
-
-changespeed:		
-		ld	e,4
-		call	checkkbd
-
-		bit 5,l
-		jr	nz,.notright
-		ld	hl,(_xspeed)
-		inc	hl
-		ld	a,h
-		cp	1
-		ret	nc
-		ld	(_xspeed),hl
-		ret
-		
-.notright:
-		bit 4,l
-		jr	nz,1f
-		ld	hl,(_xspeed)
-		dec	hl
-		ld	a,255
-		cp	h
-		ret	z
-		ld	(_xspeed),hl
-		ret		

@@ -1,0 +1,14 @@
+		ld	de,(_xspeed)
+		ld	a,(_xmappos+2)
+		add	a,e
+		ld	(_xmappos+2),a
+		ld	e,d
+		bit	7,d
+		ld	d,0
+		jr	z,1f
+		ld	d,-1
+1:		ld	hl,(_xmappos)
+		adc	hl,de
+		ld	a,h
+		and	15
+		ld	(_xmappos),hl			; scroll one pixel right

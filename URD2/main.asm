@@ -97,7 +97,6 @@ START:
 		ei
 1:		halt
 		halt
-		call changespeed
 		
 		ld	a,(_xoffset)		
 		and	a
@@ -109,7 +108,7 @@ START:
 		call	z,PAL_ntsc
 		jp	1b
 		
-PAL_ntsc
+PAL_ntsc:
 		di
 		ld		a,(RG9SAV)		
 		xor		00000010B		; PAL or NTSC 
@@ -120,7 +119,7 @@ PAL_ntsc
 		ei
 		ret
 
-mapinit		
+mapinit:		
 		ld	a, :_level
 		ld	(_kBank4),a
 		ld		hl,_level
@@ -520,6 +519,7 @@ fonts:
 	MAP 0xC000
 
 _levelmap:			#mapWidth*mapHeight
+; do not change position in ram
 _sliceflag:			#16		; while scrolling right, 
 							; if flag(n)>0, slice n+1 on displaypage has 
 							; been copied to slice n in !displaypage
@@ -533,6 +533,7 @@ _sliceflag:			#16		; while scrolling right,
 							; !displaypage has been built on slice 0
 							;
 							; _sliceflag is reset at page swap
+; do not change position in ram
 _sliceflag_reset:	#1		; is set, _sliceflag is reset				
 
 slotvar				#1
@@ -548,7 +549,7 @@ anim_buffer.dx:			#1
 anim_buffer.tile:		#1
 anim_buffer.page:		#1
 
-; joystick			#1
+joystick			#1
 
 ; _mcdivider			#1
 

@@ -22,14 +22,16 @@ vdp_task:
 		; add here _sliceflag management 
 		
 		ld		a,(_xoffset)
-		add		a,low _sliceflag
+		; add		a,low _sliceflag
+		; ld		e,a
+		; ld		a,high _sliceflag
+		; adc		a,0
+		; ld		d,a
 		ld		e,a
-		ld		a,high _sliceflag
-		adc		a,0
-		ld		d,a
+		ld		d,high _sliceflag
 		ld		a,(de)
 		and		a
-		ret		nz
+		ret		nz		; avoid twice the same VDP command
 		dec		a
 		ld		(de),a
 

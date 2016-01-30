@@ -50,12 +50,7 @@ LMMC_tile:
 		ld		b,16
 		dec		a
 		jp		nz,1b
-
-		; xor		a
-		; out 	(0x99),a
-		; ld 		a, 46+128
-		; out 	(0x99),a		; patch: reset vdp commands
-		
+	
 		ret
 
 

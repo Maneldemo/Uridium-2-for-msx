@@ -1,4 +1,4 @@
-Sjasm Z80 Assembler v0.42c - www.xl2s.tk             [2016.01.30 - 15:31:48]
+Sjasm Z80 Assembler v0.42c - www.xl2s.tk             [2016.01.30 - 17:23:21]
 
 main.asm
 Errors: 0
@@ -1525,163 +1525,158 @@ Errors: 0
       50.  00:4479  06 10               		ld		b,16
       51.  00:447B  3D                  		dec		a
       52.  00:447C  C2 71 44            		jp		nz,1b
-      53.  00:447F                      
-      54.  00:447F                      		; xor		a
-      55.  00:447F                      		; out 	(0x99),a
-      56.  00:447F                      		; ld 		a, 46+128
-      57.  00:447F                      		; out 	(0x99),a		; patch: reset vdp commands
-      58.  00:447F                      		
-      59.  00:447F  C9                  		ret
-      60.  00:4480                      
-      61.  00:4480                      
-      62.  00:4480                      	
-      63.  00:4480                      ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-      64.  00:4480                      ; input
-      65.  00:4480                      ; a = tile number	from page 0
-      66.  00:4480                      ; 
-      67.  00:4480                      ; d = dx	
-      68.  00:4480                      ; e = dy	
-      69.  00:4480                      ; b = destination page 
-      70.  00:4480                      ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-      71.  00:4480                      
-      72.  00:4480                      ; destructible tiles have to be in range 0..n-1 in the tile set
-      73.  00:4480                      
-      74.  00:4480                      move_tile:
-      75.  00:4480  67                  		ld		h,a
-      76.  00:4481  E6 0F               		and		00001111B	
-      77.  00:4483  87 87 87 87         [4]		add		a,a					
-      78.  00:4487  6F                  		ld		l,a			; sx
-      79.  00:4488  7C                  		ld		a,h
-      80.  00:4489  E6 F0               		and		11110000B	; tiles are under the lower border						
-      81.  00:448B  C6 B0               		add		a,160+16
-      82.  00:448D  67                  		ld		h,a			; sy
-      83.  00:448E                      
-      84.  00:448E  3E 20               		ld 		a, 32
-      85.  00:4490  D3 99               		out 	(0x99),a
-      86.  00:4492  3E 91               		ld 		a, 17+128
-      87.  00:4494  D3 99               		out 	(0x99),a
-      88.  00:4496                      
-      89.  00:4496  0E 9B               		ld 		c, 0x9B
-      90.  00:4498                      		
-      91.  00:4498  CD 4D 42            		call _waitvdp				; do not change R#18 if the VDP is copying !! NEEDED FOR NTSC
-      92.  00:449B                      				
-      93.  00:449B  ED 69               		out		(c), l 				; sx
-      94.  00:449D  AF                  		xor 	a
-      95.  00:449E  D3 9B               		out		(0x9B), a 			; sx (high)
-      96.  00:44A0                      		
-      97.  00:44A0  ED 61               		out		(c), h 	     		; sy
-      98.  00:44A2  3E 01               		ld		a,1					; source page
-      99.  00:44A4  D3 9B               		out 	(0x9B), a 			; sy 	(high-> page 0 or 1)
-     100.  00:44A6                      
-     101.  00:44A6  ED 51               		out 	(c), d 				; dx
-     102.  00:44A8  AF                  		xor 	a
-     103.  00:44A9  D3 9B               		out 	(0x9B), a			; dx (high)
-     104.  00:44AB                      		
-     105.  00:44AB  ED 59               		out 	(c), e	 			; dy
-     106.  00:44AD  ED 41               		out 	(c), b				; dy 	(high-> page 0 or 1)
-     107.  00:44AF                      
-     108.  00:44AF  2E 10               		ld 		l,16 				
-     109.  00:44B1  ED 69               		out 	(c), l			; x block size
-     110.  00:44B3  AF                  		xor 	a
-     111.  00:44B4  D3 9B               		out 	(0x9B), a					
-     112.  00:44B6  ED 69               		out 	(c), l			; y block size
-     113.  00:44B8  D3 9B               		out 	(0x9B), a
-     114.  00:44BA  D3 9B               		out 	(0x9B), a
-     115.  00:44BC  D3 9B               		out 	(0x9B), a
-     116.  00:44BE                      
-     117.  00:44BE  3E D0               		ld		a,11010000B
-     118.  00:44C0  D3 9B               		out 	(0x9B), a			; command HMMM
-     119.  00:44C2  C9                  		ret
-     120.  00:44C3                      
-     121.  00:44C3                      
-     122.  00:44C3                      ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-     123.  00:44C3                      ; input
-     124.  00:44C3                      ; b = sx	from  _displaypage
-     125.  00:44C3                      ; d = dx	to not _displaypage
-     126.  00:44C3                      ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-     127.  00:44C3                      
-     128.  00:44C3                      move_slice:
-     129.  00:44C3  3E 20               		ld 		a, 32
-     130.  00:44C5  D3 99               		out 	(0x99),a
-     131.  00:44C7  3E 91               		ld 		a, 17+128
-     132.  00:44C9  D3 99               		out 	(0x99),a
-     133.  00:44CB                      
-     134.  00:44CB  0E 9B               		ld 		c, 0x9B
-     135.  00:44CD                      		
-     136.  00:44CD                      		; call _waitvdp				; no need ATM
-     137.  00:44CD                      		
-     138.  00:44CD  ED 41               		out		(c), b 				; sx
-     139.  00:44CF  AF                  		xor a
-     140.  00:44D0  D3 9B               		out		(0x9B), a 			; sx (high)
-     141.  00:44D2                      		
-     142.  00:44D2  D3 9B               		out		(0x9B), a 			; sy
-     143.  00:44D4  3A 22 CA            		ld 		a,(_displaypage)	; source page
-     144.  00:44D7  D3 9B               		out 	(0x9B), a 			; sy 	(high-> page 0 or 1)
-     145.  00:44D9                      
-     146.  00:44D9  ED 51               		out 	(c), d 				; dx
-     147.  00:44DB  AF                  		xor a
-     148.  00:44DC  D3 9B               		out 	(0x9B), a			; dx (high)
-     149.  00:44DE                      		
-     150.  00:44DE  D3 9B               		out 	(0x9B), a 			; dy
-     151.  00:44E0  3A 22 CA            		ld 		a,(_displaypage)	; destination page
-     152.  00:44E3  EE 01               		xor	1				
-     153.  00:44E5  D3 9B               		out 	(0x9B), a			; dy 	(high-> page 0 or 1)
-     154.  00:44E7                      
-     155.  00:44E7  3E 10               		ld 		a,16 				; block size
-     156.  00:44E9  D3 9B               		out 	(0x9B), a
-     157.  00:44EB  AF                  		xor a
-     158.  00:44EC  D3 9B               		out 	(0x9B), a	
-     159.  00:44EE  3E A0               		ld		a,10*16				; mapHeight*16
-     160.  00:44F0  D3 9B               		out 	(0x9B), a			; y block size
-     161.  00:44F2  AF                  		xor		a
-     162.  00:44F3  D3 9B               		out 	(0x9B), a
-     163.  00:44F5  D3 9B               		out 	(0x9B), a
-     164.  00:44F7  D3 9B               		out 	(0x9B), a
-     165.  00:44F9                      
-     166.  00:44F9  3E D0               		ld		a,11010000B
-     167.  00:44FB  D3 9B               		out 	(0x9B), a			; command HMMM
-     168.  00:44FD  C9                  		ret
-     169.  00:44FE                      		
-     170.  00:44FE                      ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-     171.  00:44FE                      ; input
-     172.  00:44FE                      ; d = page
-     173.  00:44FE                      ; e = dx
-     174.  00:44FE                      ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-     175.  00:44FE                      		
-     176.  00:44FE                      clear_slice:
-     177.  00:44FE  3E 24               		ld 		a, 36
-     178.  00:4500  D3 99               		out 	(0x99),a
-     179.  00:4502  3E 91               		ld 		a, 17+128
-     180.  00:4504  D3 99               		out 	(0x99),a
-     181.  00:4506                      		
-     182.  00:4506  0E 9B               		ld 		c, 0x9B
-     183.  00:4508                      		
-     184.  00:4508                      		; call _waitvdp
-     185.  00:4508                      		
-     186.  00:4508  ED 59               		out 	(c), e 			; dx
-     187.  00:450A  AF                  		xor		a
-     188.  00:450B  D3 9B               		out 	(0x9B), a		; dx (high)
-     189.  00:450D                      		
-     190.  00:450D  D3 9B               		out 	(0x9B), a		; dy
-     191.  00:450F                      								; destination page
-     192.  00:450F  ED 51               		out 	(c), d			; dy (high-> page 0 or 1)
-     193.  00:4511                      		
-     194.  00:4511  3E 10               		ld 		a,16
-     195.  00:4513  D3 9B               		out 	(0x9B), a			; x block size
-     196.  00:4515  AF                  		xor		a
-     197.  00:4516  D3 9B               		out 	(0x9B), a
-     198.  00:4518                      
-     199.  00:4518  3E A0               		ld		a,10*16				; mapHeight*16
-     200.  00:451A  D3 9B               		out 	(0x9B), a			; y block size
-     201.  00:451C  AF                  		xor a
-     202.  00:451D  D3 9B               		out 	(0x9B), a
-     203.  00:451F                      
-     204.  00:451F  D3 9B               		out 	(0x9B), a			; border_color
-     205.  00:4521  D3 9B               		out 	(0x9B), a
-     206.  00:4523                      
-     207.  00:4523  3E C0               		ld		a,11000000B
-     208.  00:4525  D3 9B               		out 	(0x9B), a			; command HMMV
-     209.  00:4527  C9                  		ret
+      53.  00:447F                      	
+      54.  00:447F  C9                  		ret
+      55.  00:4480                      
+      56.  00:4480                      
+      57.  00:4480                      	
+      58.  00:4480                      ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+      59.  00:4480                      ; input
+      60.  00:4480                      ; a = tile number	from page 0
+      61.  00:4480                      ; 
+      62.  00:4480                      ; d = dx	
+      63.  00:4480                      ; e = dy	
+      64.  00:4480                      ; b = destination page 
+      65.  00:4480                      ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+      66.  00:4480                      
+      67.  00:4480                      ; destructible tiles have to be in range 0..n-1 in the tile set
+      68.  00:4480                      
+      69.  00:4480                      move_tile:
+      70.  00:4480  67                  		ld		h,a
+      71.  00:4481  E6 0F               		and		00001111B	
+      72.  00:4483  87 87 87 87         [4]		add		a,a					
+      73.  00:4487  6F                  		ld		l,a			; sx
+      74.  00:4488  7C                  		ld		a,h
+      75.  00:4489  E6 F0               		and		11110000B	; tiles are under the lower border						
+      76.  00:448B  C6 B0               		add		a,160+16
+      77.  00:448D  67                  		ld		h,a			; sy
+      78.  00:448E                      
+      79.  00:448E  3E 20               		ld 		a, 32
+      80.  00:4490  D3 99               		out 	(0x99),a
+      81.  00:4492  3E 91               		ld 		a, 17+128
+      82.  00:4494  D3 99               		out 	(0x99),a
+      83.  00:4496                      
+      84.  00:4496  0E 9B               		ld 		c, 0x9B
+      85.  00:4498                      		
+      86.  00:4498  CD 4D 42            		call _waitvdp				; do not change R#18 if the VDP is copying !! NEEDED FOR NTSC
+      87.  00:449B                      				
+      88.  00:449B  ED 69               		out		(c), l 				; sx
+      89.  00:449D  AF                  		xor 	a
+      90.  00:449E  D3 9B               		out		(0x9B), a 			; sx (high)
+      91.  00:44A0                      		
+      92.  00:44A0  ED 61               		out		(c), h 	     		; sy
+      93.  00:44A2  3E 01               		ld		a,1					; source page
+      94.  00:44A4  D3 9B               		out 	(0x9B), a 			; sy 	(high-> page 0 or 1)
+      95.  00:44A6                      
+      96.  00:44A6  ED 51               		out 	(c), d 				; dx
+      97.  00:44A8  AF                  		xor 	a
+      98.  00:44A9  D3 9B               		out 	(0x9B), a			; dx (high)
+      99.  00:44AB                      		
+     100.  00:44AB  ED 59               		out 	(c), e	 			; dy
+     101.  00:44AD  ED 41               		out 	(c), b				; dy 	(high-> page 0 or 1)
+     102.  00:44AF                      
+     103.  00:44AF  2E 10               		ld 		l,16 				
+     104.  00:44B1  ED 69               		out 	(c), l			; x block size
+     105.  00:44B3  AF                  		xor 	a
+     106.  00:44B4  D3 9B               		out 	(0x9B), a					
+     107.  00:44B6  ED 69               		out 	(c), l			; y block size
+     108.  00:44B8  D3 9B               		out 	(0x9B), a
+     109.  00:44BA  D3 9B               		out 	(0x9B), a
+     110.  00:44BC  D3 9B               		out 	(0x9B), a
+     111.  00:44BE                      
+     112.  00:44BE  3E D0               		ld		a,11010000B
+     113.  00:44C0  D3 9B               		out 	(0x9B), a			; command HMMM
+     114.  00:44C2  C9                  		ret
+     115.  00:44C3                      
+     116.  00:44C3                      
+     117.  00:44C3                      ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+     118.  00:44C3                      ; input
+     119.  00:44C3                      ; b = sx	from  _displaypage
+     120.  00:44C3                      ; d = dx	to not _displaypage
+     121.  00:44C3                      ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+     122.  00:44C3                      
+     123.  00:44C3                      move_slice:
+     124.  00:44C3  3E 20               		ld 		a, 32
+     125.  00:44C5  D3 99               		out 	(0x99),a
+     126.  00:44C7  3E 91               		ld 		a, 17+128
+     127.  00:44C9  D3 99               		out 	(0x99),a
+     128.  00:44CB                      
+     129.  00:44CB  0E 9B               		ld 		c, 0x9B
+     130.  00:44CD                      		
+     131.  00:44CD                      		; call _waitvdp				; no need ATM
+     132.  00:44CD                      		
+     133.  00:44CD  ED 41               		out		(c), b 				; sx
+     134.  00:44CF  AF                  		xor a
+     135.  00:44D0  D3 9B               		out		(0x9B), a 			; sx (high)
+     136.  00:44D2                      		
+     137.  00:44D2  D3 9B               		out		(0x9B), a 			; sy
+     138.  00:44D4  3A 22 CA            		ld 		a,(_displaypage)	; source page
+     139.  00:44D7  D3 9B               		out 	(0x9B), a 			; sy 	(high-> page 0 or 1)
+     140.  00:44D9                      
+     141.  00:44D9  ED 51               		out 	(c), d 				; dx
+     142.  00:44DB  AF                  		xor a
+     143.  00:44DC  D3 9B               		out 	(0x9B), a			; dx (high)
+     144.  00:44DE                      		
+     145.  00:44DE  D3 9B               		out 	(0x9B), a 			; dy
+     146.  00:44E0  3A 22 CA            		ld 		a,(_displaypage)	; destination page
+     147.  00:44E3  EE 01               		xor	1				
+     148.  00:44E5  D3 9B               		out 	(0x9B), a			; dy 	(high-> page 0 or 1)
+     149.  00:44E7                      
+     150.  00:44E7  3E 10               		ld 		a,16 				; block size
+     151.  00:44E9  D3 9B               		out 	(0x9B), a
+     152.  00:44EB  AF                  		xor a
+     153.  00:44EC  D3 9B               		out 	(0x9B), a	
+     154.  00:44EE  3E A0               		ld		a,10*16				; mapHeight*16
+     155.  00:44F0  D3 9B               		out 	(0x9B), a			; y block size
+     156.  00:44F2  AF                  		xor		a
+     157.  00:44F3  D3 9B               		out 	(0x9B), a
+     158.  00:44F5  D3 9B               		out 	(0x9B), a
+     159.  00:44F7  D3 9B               		out 	(0x9B), a
+     160.  00:44F9                      
+     161.  00:44F9  3E D0               		ld		a,11010000B
+     162.  00:44FB  D3 9B               		out 	(0x9B), a			; command HMMM
+     163.  00:44FD  C9                  		ret
+     164.  00:44FE                      		
+     165.  00:44FE                      ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+     166.  00:44FE                      ; input
+     167.  00:44FE                      ; d = page
+     168.  00:44FE                      ; e = dx
+     169.  00:44FE                      ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+     170.  00:44FE                      		
+     171.  00:44FE                      clear_slice:
+     172.  00:44FE  3E 24               		ld 		a, 36
+     173.  00:4500  D3 99               		out 	(0x99),a
+     174.  00:4502  3E 91               		ld 		a, 17+128
+     175.  00:4504  D3 99               		out 	(0x99),a
+     176.  00:4506                      		
+     177.  00:4506  0E 9B               		ld 		c, 0x9B
+     178.  00:4508                      		
+     179.  00:4508                      		; call _waitvdp
+     180.  00:4508                      		
+     181.  00:4508  ED 59               		out 	(c), e 			; dx
+     182.  00:450A  AF                  		xor		a
+     183.  00:450B  D3 9B               		out 	(0x9B), a		; dx (high)
+     184.  00:450D                      		
+     185.  00:450D  D3 9B               		out 	(0x9B), a		; dy
+     186.  00:450F                      								; destination page
+     187.  00:450F  ED 51               		out 	(c), d			; dy (high-> page 0 or 1)
+     188.  00:4511                      		
+     189.  00:4511  3E 10               		ld 		a,16
+     190.  00:4513  D3 9B               		out 	(0x9B), a			; x block size
+     191.  00:4515  AF                  		xor		a
+     192.  00:4516  D3 9B               		out 	(0x9B), a
+     193.  00:4518                      
+     194.  00:4518  3E A0               		ld		a,10*16				; mapHeight*16
+     195.  00:451A  D3 9B               		out 	(0x9B), a			; y block size
+     196.  00:451C  AF                  		xor a
+     197.  00:451D  D3 9B               		out 	(0x9B), a
+     198.  00:451F                      
+     199.  00:451F  D3 9B               		out 	(0x9B), a			; border_color
+     200.  00:4521  D3 9B               		out 	(0x9B), a
+     201.  00:4523                      
+     202.  00:4523  3E C0               		ld		a,11000000B
+     203.  00:4525  D3 9B               		out 	(0x9B), a			; command HMMV
+     204.  00:4527  C9                  		ret
       42   00:4528                      		include brdrs_opt.asm
        1.  00:4528                      _brdrs:
        2.  00:4528                      		bdrclr 11100000B

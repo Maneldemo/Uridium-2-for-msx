@@ -112,6 +112,8 @@ vblank:
 		push   iy         
 		push   ix         
 
+		call	pageswap			; test for page swap
+		call	reset_sliceflag
 		
 		ld	hl,(_xmappos)			; corner top left of the screen window in the map in pixels
 
@@ -120,27 +122,40 @@ vblank:
 		rr	l
 		endrepeat					; corner top left of the screen window in the map in tiles
 		
+		ld		a,(_xspeed+1)
+		rlc a
+		jp	c,.scroll_left
+		
+.scroll_right		
 		ld	de,_levelmap+16
 		add	hl,de					; HL = corner top right of the screen window in the map in tiles
-		
-		call	pageswap			; test for page swap
+
 		call	xscroll				; move the screen ! Not if VDP commands are being executed			
-		call	reset_sliceflag
-		call	_brdrs				; build a column right pointed by HL, clear a column left, move a stripe of screen
-		
+		call	brdrs_right			; build a column right pointed by HL, clear a column left, move a stripe of screen
 		
 		bdrclr 00000011B
-		; call _waitvdp
-		bdrclr 0
 		
+		jp	.return
+		
+.scroll_left
+		ld	de,_levelmap+1
+		add	hl,de					; HL = corner top left of the screen window in the map in tiles
+		call	xscroll				; move the screen ! Not if VDP commands are being executed			
+
+		call	brdrs_left			; build a column left pointed by HL, clear a column right, move a stripe of screen
+		
+		bdrclr 00000011B
+		
+.return
 		call 	changexpos
 		call 	changespeed
-
+		
 		ld	hl,(_jiffy)				; timer
 		inc	hl
 		ld	(_jiffy),hl
 				
-		; bdrclr 0
+		; call _waitvdp
+		bdrclr 0
 		
 		pop    ix         
 		pop    iy         
@@ -213,7 +228,10 @@ lint:
 		ld	a,1+128
 		out	(0x99),a
 		
-		call animtest
+		ld	e,8
+		call	checkkbd
+		ld	(joystick),a
+		; call 	animtest
 
 		pop    ix         
 		pop    iy         

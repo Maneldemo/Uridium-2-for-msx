@@ -1,37 +1,67 @@
-_brdrs:
+brdrs_left:
 		bdrclr 11100000B
-
-		call	vdp_task
-
+		call	vdp_task_left
 		bdrclr 0
-
-		call	brdrs
-		
+		call	_brdrs_left
 		ld		a,(_xoffset)
 		cp		15
 		call	z,colmn_patch
-
 		bdrclr 11100000B
+		ret
 
+brdrs_right:
+		bdrclr 11100000B
+		call	vdp_task_right
+		bdrclr 0
+		call	_brdrs_right
+		ld		a,(_xoffset)
+		cp		15
+		call	z,colmn_patch
+		bdrclr 11100000B
 		ret
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;		
-
-vdp_task:
-
-		; XXXXX
-		; add here _sliceflag management 
+vdp_task_left:
+		;  _sliceflag management 
+		; NOTE _sliceflag has to be byte aligned!!
 		
 		ld		a,(_xoffset)
-		; add		a,low _sliceflag
-		; ld		e,a
-		; ld		a,high _sliceflag
-		; adc		a,0
-		; ld		d,a
 		ld		e,a
 		ld		d,high _sliceflag
 		ld		a,(de)
 		and		a
-		ret		nz		; avoid twice the same VDP command
+		; ret		nz		; avoid twice the same VDP command
+		dec		a
+		ld		(de),a
+
+		ld		a,(_xoffset)
+		cp		15
+		jr		nz,.x0_14
+.x15:		
+		ld		a,(_displaypage)
+		xor		1
+		ld		d,a
+		ld		e,0
+		jp 		clear_slice
+
+.x0_14:
+[4]		add		a,a
+		ld		b,a			; source slice
+		add		a,16
+		ld		d,a			; destination slice
+		jp		move_slice
+
+
+vdp_task_right:
+
+		;  _sliceflag management 
+		; NOTE _sliceflag has to be byte aligned!!
+		
+		ld		a,(_xoffset)
+		ld		e,a
+		ld		d,high _sliceflag
+		ld		a,(de)
+		and		a
+		; ret		nz		; avoid twice the same VDP command
 		dec		a
 		ld		(de),a
 
@@ -53,10 +83,50 @@ vdp_task:
 		jp		move_slice
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;		
+	; hl -> tile column in the map
+_brdrs_left:
+		ld		a,(_xoffset)
+		ld		e,a
+		add		a,240
+		ld		ixl,a
+
+		ld	c,0x98
+				
+		ld	a,(_displaypage)
+[2] 	add a,a
+		out (0x99),a 	; set bits 14-16
+		ld a,14+128
+		out (0x99),a
+
+		ld	d,0x40		; write access
+		call plot_col64
+
+		ld	a,(_displaypage)
+[2] 	add a,a
+		or	1
+		out (0x99),a 	; set bits 14-16
+		ld a,14+128
+		out (0x99),a
+
+		ld	d,0x40		; write access	
+		call	plot_col64
+		
+		ld	a,(_displaypage)
+[2] 	add a,a
+		or	2
+		out (0x99),a 	; set bits 14-16
+		ld a,14+128
+		out (0x99),a
+
+		ld	d,0x40		; write access	
+		call	plot_col32
+				
+		ret
+
 
 	; hl -> tile column in the map
 		
-brdrs:
+_brdrs_right:
 		ld		a,(_xoffset)
 		ld		ixl,a
 		add		a,240

@@ -78,7 +78,7 @@ changespeed:
 		or	a
 		ld	de,256+1
 		sbc	hl,de
-		ret	p		; if hl>1 exit
+		ret	p		; if hl>1.0 exit
 		add	hl,de
 		ld	(_xspeed),hl
 		ret
@@ -90,7 +90,7 @@ changespeed:
 		ld	hl,(_xspeed)
 		dec	hl
 		inc	h
-		ret	m		; if hl<-1 exit
+		ret	m		; if hl<-1.0 exit
 		dec	h
 		ld	(_xspeed),hl
 		ret		

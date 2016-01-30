@@ -636,8 +636,8 @@ joystick			#1
 ; _vbit16:			#2
 
 _ymappos:			#1
-_xmappos:			#3	; 24 bit
-_xspeed:			#2
+_xmappos:			#3	; 24 bit = 12.8 bit
+_xspeed:			#2	; 16 bit = 8.8 bit
 
 ; _shadowbuff:		#2
 

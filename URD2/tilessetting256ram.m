@@ -17,7 +17,8 @@ for g=0:7
 end
 
 
-[A,MAP] = imread('levels\lev1_rev.png');
+%[A,MAP] = imread('levels\lev1_rev.png');
+[A,MAP] = imread('levels\lev_tst.png');
 
 if any(size(MAP)==0)
     [A,MAP] = rgb2ind(A,256);

@@ -73,14 +73,19 @@ changespeed:
 		
 		bit 7,l
 		jr	nz,.notright
+
 		ld	hl,(_xspeed)
-		inc	hl
-		or	a
-		ld	de,256+1
-		sbc	hl,de
+		ld	a,h
+		dec	h
 		ret	p		; if hl>1.0 exit
-		add	hl,de
+		inc	hl
+		inc	h
 		ld	(_xspeed),hl
+		xor	h
+		rlc	a		
+		ret	nc		;dir change neg to pos
+		ld	a,1
+		ld		(_sliceflag_reset),a 	; direction has changed !
 		ret
 		
 .notright:
@@ -88,12 +93,18 @@ changespeed:
 		ret	nz
 		
 		ld	hl,(_xspeed)
+		ld	a,h
 		dec	hl
 		inc	h
 		ret	m		; if hl<-1.0 exit
 		dec	h
 		ld	(_xspeed),hl
-		ret		
+		xor	h
+		rlc	a		
+		ret	nc		; dir change pos to neg			
+		ld	a,1
+		ld		(_sliceflag_reset),a 	; direction has changed !
+		ret
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 				
 changexpos:

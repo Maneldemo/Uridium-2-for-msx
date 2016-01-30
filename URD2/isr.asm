@@ -154,7 +154,7 @@ vblank:
 		inc	hl
 		ld	(_jiffy),hl
 				
-		; call _waitvdp
+		call _waitvdp
 		bdrclr 0
 		
 		pop    ix         

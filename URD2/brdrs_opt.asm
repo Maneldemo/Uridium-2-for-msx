@@ -29,11 +29,12 @@ vdp_task_left:
 		ld		d,high _sliceflag
 		ld		a,(de)
 		and		a
-		; ret		nz		; avoid twice the same VDP command
+		ret		nz		; avoid twice the same VDP command
 		dec		a
 		ld		(de),a
 
-		ld		a,(_xoffset)
+		ld		a,e
+		and		15
 		cp		15
 		jr		nz,.x0_14
 .x15:		
@@ -61,12 +62,12 @@ vdp_task_right:
 		ld		d,high _sliceflag
 		ld		a,(de)
 		and		a
-		; ret		nz		; avoid twice the same VDP command
+		ret		nz		; avoid twice the same VDP command
 		dec		a
 		ld		(de),a
 
-		ld		a,(_xoffset)
-		and		a
+		ld		a,e
+		and		15
 		jr		nz,.x1_15
 .x0:		
 		ld		a,(_displaypage)

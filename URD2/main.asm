@@ -93,6 +93,7 @@ START:
 		ld	(_displaypage),a		
 		ld	(_xtest),a
 		ld	(_ytest),a
+		ld	(anim_buffer.flag),a
 		
 		ei
 1:		halt
@@ -120,21 +121,80 @@ PAL_ntsc:
 		ret
 
 mapinit:		
-		ld	a, :_level
-		ld	(_kBank4),a
+		ld		a, :_level
+		ld		(_kBank4),a
 		ld		hl,_level
 		ld		de,_levelmap
 		ld		bc,mapWidth*mapHeight
 		ldir
 		
 		xor		a
-		ld		h,a
-		ld		l,a		
 		ld		(_ymappos),a
-		ld		(_xmappos),hl
 		ld		(_xmappos+2),a	; 24 bit	
-		ld		hl,256
+		ld		hl,16
 		ld		(_xspeed),hl
+		ld		hl,768
+		ld		(_xmappos),hl
+		; ret
+
+buildmap:
+		ld	hl,(_xmappos)
+
+		repeat 4
+		srl	h
+		rr	l
+		endrepeat					; corner top left of the screen window in the map in tiles
+		
+		ld	de,_levelmap+1
+		add	hl,de					; HL = corner top right of the screen window in the map in tiles
+		
+		ld	de,0			; dest y,x
+		ld	b,15*10
+1:		
+		ld		a,(hl)
+		push	hl
+		
+[3]		rlca
+		and	00000111B
+		add	a,:_tiles0
+		ld	(_kBank4),a		; select tile bank
+
+		ld	a,(hl)
+		and	00011111B
+		add	a,high _tiles0
+		ld	h,a				; select offset in the bank
+		ld	l,0
+		
+		push	de
+		push	bc
+		ld		b,0				; page
+		call	LMMC_tile
+		pop		bc
+		pop		de
+		
+		pop		hl
+
+		inc	hl
+
+		ld		a,16		; x=x+16
+		add		a,e
+		ld		e,a
+		
+		cp		15*16
+		jr		c,2f
+
+		ld		e,0			; x = 0
+		
+		ld		a,16		; y=y+16
+		add		a,d
+		ld		d,a
+
+		ld		a,-15
+		add		a,l
+		ld		l,a
+		inc		h
+		
+2:		djnz	1b
 		ret
 		
 vdptest:

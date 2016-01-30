@@ -37,6 +37,7 @@ LMMC_tile:
 		ld 		a, 17+128
 		out 	(0x99),a
 		
+		
 		ld		de,15
 		ld		b,e					; 15 other bytes
 		ld		a,16
@@ -44,15 +45,16 @@ LMMC_tile:
 1:		add		hl,de
 		outi						; other byte color
 		jp		nz,1b
-		ld		b,a					; 16 other bytes
-		dec		h
-		inc		l
+		dec	h
+		inc	hl
+		ld		b,16
+		dec		a
 		jp		nz,1b
 
-		xor		a
-		out 	(0x99),a
-		ld 		a, 46+128
-		out 	(0x99),a		; patch: reset vdp commands
+		; xor		a
+		; out 	(0x99),a
+		; ld 		a, 46+128
+		; out 	(0x99),a		; patch: reset vdp commands
 		
 		ret
 

@@ -195,17 +195,13 @@ lint:
 		out (0x99),a
 		ld a,2+128				; R#2 
 		out (0x99),a			; score bar in page 1
-
-		call	set_displaypage	; update displaypage
 		
-		ld	hl,(_xmappos)		; corner top left of the screen window in the map in pixels
-		ld	a,15
-		and	l
-		ld	(_xoffset),a		; screen offset
+
+		call	set_displaypage	; update displaypage and _xoffset
 		
 		call	waitHBLANK		; now we are at the start of HBLANK
 		
-		xor		a
+		xor	a
 		out	(099h),a
 		ld	a,18+128
 		out	(099h),a			; score bar fixed 

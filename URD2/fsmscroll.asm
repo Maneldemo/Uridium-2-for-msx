@@ -25,24 +25,33 @@ pageswap:
 		
 		
 set_displaypage:
+		ld		hl,(_xmappos)		; corner top left of the screen window in the map in pixels
+		ld		a,15
+		and		l
+		ld		(_xoffset),a		; screen offset
+
 		ld		a,(_displaypage)
-		ld		l,a
-		ld		a,(_xmappos)
-		and		16
+		ld		h,a
+
+		ld		a,16
+		and		l
+		
 		jr		z,1f
+		
 		ld		a,1
-1:		ld		(_displaypage),a		
-		xor	l
-		ret	z			
-		ld	(_sliceflag_reset),a 	; page has changed !
+		
+1:		ld		(_displaypage),a
+		xor		h
+		ret		z	
+		ld		(_sliceflag_reset),a 	; page has changed !
 		ret
 
 reset_sliceflag:
-		ld	a,(_sliceflag_reset)
-		and	a
-		ret	z	;  _sliceflag_reset testing
+		ld		a,(_sliceflag_reset)
+		and		a
+		ret		z	; _sliceflag_reset testing
 
-		exx		; clear _sliceflag and _sliceflag_reset
+		exx			; clear _sliceflag and _sliceflag_reset
 		ld	bc,16			
 		ld	hl,_sliceflag
 		ld	de,_sliceflag+1
@@ -66,9 +75,11 @@ changespeed:
 		jr	nz,.notright
 		ld	hl,(_xspeed)
 		inc	hl
-		ld	a,h
-		cp	1
-		ret	nc
+		or	a
+		ld	de,256+1
+		sbc	hl,de
+		ret	p		; if hl>1 exit
+		add	hl,de
 		ld	(_xspeed),hl
 		ret
 		
@@ -78,9 +89,9 @@ changespeed:
 		
 		ld	hl,(_xspeed)
 		dec	hl
-		ld	a,-1
-		cp	h
-		ret	p
+		inc	h
+		ret	m		; if hl<-1 exit
+		dec	h
 		ld	(_xspeed),hl
 		ret		
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

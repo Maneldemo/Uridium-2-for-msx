@@ -127,7 +127,7 @@ vblank:
 		jp	c,.scroll_left
 		
 .scroll_right		
-		ld	de,_levelmap+16
+		ld	de,_levelmap+15
 		add	hl,de					; HL = corner top right of the screen window in the map in tiles
 
 		call	xscroll				; move the screen ! Not if VDP commands are being executed			
@@ -138,7 +138,7 @@ vblank:
 		jp	.return
 		
 .scroll_left
-		ld	de,_levelmap+1
+		ld	de,_levelmap+0
 		add	hl,de					; HL = corner top left of the screen window in the map in tiles
 		call	xscroll				; move the screen ! Not if VDP commands are being executed			
 

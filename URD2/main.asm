@@ -145,23 +145,15 @@ buildmap:
 		rr	l
 		endrepeat					; corner top left of the screen window in the map in tiles
 		
-		ld	de,_levelmap+1
+		ld	de,_levelmap
 		add	hl,de					; HL = corner top right of the screen window in the map in tiles
 		
 		ld	de,0			; dest y,x
 		ld	b,15*10
 1:		
-		ld		a,(hl)
+		set_tile (hl)
 		push	hl
-		
-[3]		rlca
-		and	00000111B
-		add	a,:_tiles0
-		ld	(_kBank4),a		; select tile bank
 
-		ld	a,(hl)
-		and	00011111B
-		add	a,high _tiles0
 		ld	h,a				; select offset in the bank
 		ld	l,0
 		
@@ -203,18 +195,11 @@ vdptest:
 		ld	c,160			; initial tile
 		ld	b,32			; number of tiles
 1:		
-		ld	a,c
-[3]		rlca
-		and	00000111B
-		add	a,:_tiles0
-		ld	(_kBank4),a		; select tile bank
+		set_tile c
 
-		ld	a,c
-		and	00011111B
-		add	a,high _tiles0
 		ld	h,a				; select offset in the bank
 		ld	l,0
-		
+
 		push	de
 		push	bc
 		ld		b,1				; page

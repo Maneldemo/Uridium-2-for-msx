@@ -4,8 +4,8 @@ brdrs_left:
 		bdrclr 0
 		call	_brdrs_left
 		ld		a,(_xoffset)
-		cp		15
-		call	z,colmn_patch
+		and		a
+		call	z,colmn_patch_left
 		bdrclr 11100000B
 		ret
 
@@ -16,7 +16,7 @@ brdrs_right:
 		call	_brdrs_right
 		ld		a,(_xoffset)
 		cp		15
-		call	z,colmn_patch
+		call	z,colmn_patch_right
 		bdrclr 11100000B
 		ret
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;		
@@ -34,7 +34,6 @@ vdp_task_left:
 		ld		(de),a
 
 		ld		a,e
-		and		15
 		cp		15
 		jr		nz,.x0_14
 .x15:		
@@ -67,7 +66,7 @@ vdp_task_right:
 		ld		(de),a
 
 		ld		a,e
-		and		15
+		and		a
 		jr		nz,.x1_15
 .x0:		
 		ld		a,(_displaypage)
@@ -171,19 +170,13 @@ _brdrs_right:
 	
 	; hl -> tile column in the map + 10
 	
-colmn_patch:
+colmn_patch_right:
 		ld		a,-10		; return to the start of the column
 		add		a,h
 		ld 		h,a
 		
-		ld		a,(hl)			; first tile in the column
-[3]		rlca
-		and		00000111B
-		add		a,:_tiles0
-		ld		(_kBank4),a
-		ld		a,(hl)
-		and		00011111B
-		add		a,high _tiles0
+		set_tile (hl)		; first tile in the column
+
 		ld		h,a
 		ld		l,0xF0
 		
@@ -197,7 +190,7 @@ colmn_patch:
 		ld		de,0x40EF		; write access, columns 239 on hidden page
 				
 		; hl -> tile column in the tile set
-	
+1:	
 		ld 		a,e 			;set bits 0-7
 		out 	(0x99),a
 		ld 		a,d 			;set bits 8-13
@@ -211,7 +204,28 @@ colmn_patch:
 		outi	
 		ret
 
+colmn_patch_left:
+		; ld		a,-10		; return to the start of the column
+		; add		a,h
+		; ld 		h,a
+		
+		; set_tile (hl)		; first tile in the column
 
+		; ld		h,a
+		; ld		l,0x00
+		
+		; ld		a,(_displaypage)
+		; xor		1				; hidden page
+; [2] 	add 	a,a
+		; out 	(0x99),a 		; set bits 14-16
+		; ld 		a,14+128
+		; out 	(0x99),a
+
+		; ld		de,0x401F		; write access, columns 63 on hidden page
+
+		hl -> tile column in the tile set
+		; call	1b
+		ret
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 		
 plot_col64:
@@ -228,14 +242,8 @@ plot_col16:
 
 
 _plot_col16:
-		ld	a,(hl)
-[3]		rlca
-		and	00000111B
-		add	a,:_tiles0
-		ld	(_kBank4),a
-		ld	a,(hl)
-		and	00011111B
-		add	a,high _tiles0
+		set_tile (hl)
+
 		ld	h,a
 		ld	a,(_xoffset)
 [4]		add	a,a

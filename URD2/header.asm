@@ -66,5 +66,15 @@ debug equ 1
 		endif
 	endmacro
 	
-	
+	macro set_tile reg
+		ld	a,reg
+[3]		rlca
+		and	00000111B
+		add	a,:_tiles0
+		ld	(_kBank4),a		; select tile bank
+
+		ld	a,reg
+		and	00011111B
+		add	a,high _tiles0
+	endmacro
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;  

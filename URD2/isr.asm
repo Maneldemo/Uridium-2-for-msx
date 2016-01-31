@@ -140,8 +140,8 @@ vblank:
 .scroll_left
 		ld	de,_levelmap+0
 		add	hl,de					; HL = corner top left of the screen window in the map in tiles
+		
 		call	xscroll				; move the screen ! Not if VDP commands are being executed			
-
 		call	brdrs_left			; build a column left pointed by HL, clear a column right, move a stripe of screen
 		
 		bdrclr 00000011B

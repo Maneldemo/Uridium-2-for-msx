@@ -85,7 +85,8 @@ changespeed:
 		rlc	a		
 		ret	nc		;dir change neg to pos
 		ld	a,1
-		ld		(_sliceflag_reset),a 	; direction has changed !
+		ld		(_dxchng),a 			; direction has changed !
+		ld		(_sliceflag_reset),a 	; reset slice flags
 		ret
 		
 .notright:
@@ -103,7 +104,9 @@ changespeed:
 		rlc	a		
 		ret	nc		; dir change pos to neg			
 		ld	a,1
-		ld		(_sliceflag_reset),a 	; direction has changed !
+		ld	a,1
+		ld		(_dxchng),a 			; direction has changed !
+		ld		(_sliceflag_reset),a 	; reset slice flags
 		ret
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 				

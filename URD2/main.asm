@@ -621,8 +621,9 @@ joystick			#1
 ; _vbit16:			#2
 
 _ymappos:			#1
-_xmappos:			#3	; 24 bit = 12.8 bit
-_xspeed:			#2	; 16 bit = 8.8 bit
+_xmappos:			#3		; 24 bit = 12.8 bit
+_xspeed:			#2		; 16 bit = 8.8 bit
+_dxchng:			#1		; <>0 if direction changes
 
 ; _shadowbuff:		#2
 
@@ -641,7 +642,7 @@ _xoffset:			#1
 ; landing_permission:	#1
 ; assault_wave_timer:	#2
 ; bullet_rate:		#1
-; _dxchng:			#1		; <>0 if direction changes
+
 ; _dxmap:				#1		; previous dxmap
 ; dxmap:				#1
 ; xmap:				#2

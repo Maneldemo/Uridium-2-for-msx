@@ -19,6 +19,7 @@ brdrs_right:
 		call	z,colmn_patch_right
 		bdrclr 11100000B
 		ret
+		
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;		
 vdp_task_left:
 		;  _sliceflag management 

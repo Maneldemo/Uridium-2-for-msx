@@ -37,9 +37,15 @@ animtest:
 		ld	a,e
 		ld	(anim_buffer.dy),a
 		
+		ld		a,(_xspeed+1)
+		rlc a
 		ld	a,d
+		jp	c,.scroll_left
 		sub	a,16
-		ld	(anim_buffer.dx),a
+		jr		1f
+.scroll_left:
+		add	a,16
+1:		ld	(anim_buffer.dx),a
 		
 		ld 		a,(_displaypage)	; destination page	
 		ld		b,a		

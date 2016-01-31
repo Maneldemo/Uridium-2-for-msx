@@ -11,12 +11,12 @@
 ; // 8 	   RIGHT DOWN  UP  LEFT   DEL   INS   HOME SPACE
 
 checkkbd:
-		di
+		; di
 		in	a,(0aah)
 		and 011110000B			; upper 4 bits contain info to preserve
 		or	e
 		out (0aah),a
 		in	a,(0a9h)
 		ld	l,a
-		ei
+		; ei
 		ret

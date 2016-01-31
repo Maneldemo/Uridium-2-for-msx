@@ -168,10 +168,10 @@ _brdrs_right:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;		
 	; small patch on last column
 	
-	; hl -> tile column in the map + 10
+	; hl -> tile column in the map + mapHeight
 	
 colmn_patch_right:
-		ld		a,-10		; return to the start of the column
+		ld		a,-mapHeight		; return to the start of the column
 		add		a,h
 		ld 		h,a
 		
@@ -190,42 +190,48 @@ colmn_patch_right:
 		ld		de,0x40EF		; write access, columns 239 on hidden page
 				
 		; hl -> tile column in the tile set
-1:	
+set2pixs:	
 		ld 		a,e 			;set bits 0-7
 		out 	(0x99),a
 		ld 		a,d 			;set bits 8-13
 		out 	(0x99),a
 		outi	
-		inc d
+		inc 	d
 		ld 		a,e 			;set bits 0-7
 		out 	(0x99),a
 		ld 		a,d 			;set bits 8-13
 		out 	(0x99),a
 		outi	
 		ret
+
+	; small patch on first column
+	
+	; hl -> tile column in the map + mapHeight
 
 colmn_patch_left:
-		; ld		a,-10		; return to the start of the column
-		; add		a,h
-		; ld 		h,a
+		ld		a,-mapHeight		; return to the start of the column
+		add		a,h
+		ld 		h,a
 		
-		; set_tile (hl)		; first tile in the column
+		set_tile (hl)		; first tile in the column
 
-		; ld		h,a
-		; ld		l,0x00
+		ld		h,a
+		ld		l,0x00
 		
-		; ld		a,(_displaypage)
-		; xor		1				; hidden page
-; [2] 	add 	a,a
-		; out 	(0x99),a 		; set bits 14-16
-		; ld 		a,14+128
-		; out 	(0x99),a
+		ld		a,(_displaypage)
+		xor		1				; hidden page
+[2] 	add 	a,a
+		out 	(0x99),a 		; set bits 14-16
+		ld 		a,14+128
+		out 	(0x99),a
 
-		; ld		de,0x401F		; write access, columns 63 on hidden page
+		ld		de,0x4010		; write access, columns 16 on hidden page
 
-		hl -> tile column in the tile set
-		; call	1b
-		ret
+		; hl -> tile column in the tile set
+		call	set2pixs
+		inc		d
+		jp		set2pixs
+		
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 		
 plot_col64:

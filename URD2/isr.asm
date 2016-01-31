@@ -154,7 +154,7 @@ vblank:
 		inc	hl
 		ld	(_jiffy),hl
 				
-		call _waitvdp
+		; call _waitvdp
 		bdrclr 0
 		
 		pop    ix         
@@ -231,7 +231,11 @@ lint:
 		ld	e,8
 		call	checkkbd
 		ld	(joystick),a
-		; call 	animtest
+		
+		ld	e,6
+		call	checkkbd
+		and		1				; SHIFT
+		call 	z,animtest
 
 		pop    ix         
 		pop    iy         

@@ -22,6 +22,12 @@ brdrs_right:
 		
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;		
 vdp_task_left:
+		ld		a,(_dxchng)
+		and		a
+		; ld		a,0
+		; ld		(_dxchng),a
+		jr		nz,.x15
+
 		;  _sliceflag management 
 		; NOTE _sliceflag has to be byte aligned!!
 		
@@ -34,6 +40,7 @@ vdp_task_left:
 		dec		a
 		ld		(de),a
 
+		
 		ld		a,e
 		cp		15
 		jr		nz,.x0_14
@@ -53,7 +60,12 @@ vdp_task_left:
 
 
 vdp_task_right:
-
+		ld		a,(_dxchng)
+		and		a
+		; ld		a,0
+		; ld		(_dxchng),a
+		jr		nz,.x0
+		
 		;  _sliceflag management 
 		; NOTE _sliceflag has to be byte aligned!!
 		

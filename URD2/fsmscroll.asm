@@ -82,10 +82,9 @@ changespeed:
 		inc	h
 		ld	(_xspeed),hl
 		xor	h
-		rlc	a		
-		ret	nc		;dir change neg to pos
-		ld	a,1
+		and	128							;dir change neg to pos
 		ld		(_dxchng),a 			; direction has changed !
+		ret	z		
 		ld		(_sliceflag_reset),a 	; reset slice flags
 		ret
 		
@@ -101,11 +100,9 @@ changespeed:
 		dec	h
 		ld	(_xspeed),hl
 		xor	h
-		rlc	a		
-		ret	nc		; dir change pos to neg			
-		ld	a,1
-		ld	a,1
+		and	128							;dir change neg to pos
 		ld		(_dxchng),a 			; direction has changed !
+		ret	z
 		ld		(_sliceflag_reset),a 	; reset slice flags
 		ret
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

@@ -45,7 +45,7 @@ mapHeight	equ	10
 YSIZE		equ	10*16
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-debug equ 0
+debug equ 1
 
 	macro setpage_a
 		ld	(_kBank3),a

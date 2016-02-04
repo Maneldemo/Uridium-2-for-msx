@@ -24,9 +24,10 @@ brdrs_right:
 vdp_task_left:
 		ld		a,(_dxchng)
 		and		a
-		; ld		a,0
-		; ld		(_dxchng),a
-		jr		nz,.x15
+		jr		nz,.left_dxchng
+		ld		a,(_dxchng2)
+		and		a
+		jr		nz,.left_dxchng2
 
 		;  _sliceflag management 
 		; NOTE _sliceflag has to be byte aligned!!
@@ -58,13 +59,25 @@ vdp_task_left:
 		ld		d,a			; destination slice
 		jp		move_slice
 
-
+.left_dxchng:
+		call	vdp_task_left.x15
+		ld	a,1
+		ld	(_dxchng2),a
+		ret
+.left_dxchng2:
+		ld		a,14
+		call	vdp_task_left.x0_14
+		xor		a
+		ld	(_dxchng2),a
+		ret
+		
 vdp_task_right:
 		ld		a,(_dxchng)
 		and		a
-		; ld		a,0
-		; ld		(_dxchng),a
-		jr		nz,.x0
+		jr		nz,.right_dxchng
+		ld		a,(_dxchng2)
+		and		a
+		jr		nz,.right_dxchng2
 		
 		;  _sliceflag management 
 		; NOTE _sliceflag has to be byte aligned!!
@@ -94,6 +107,18 @@ vdp_task_right:
 		sub		a,16
 		ld		d,a			; destination slice
 		jp		move_slice
+
+.right_dxchng:
+		call	vdp_task_right.x0
+		ld	a,1
+		ld	(_dxchng2),a
+		ret
+.right_dxchng2:
+		ld		a,1
+		call	vdp_task_right.x1_15
+		xor		a
+		ld	(_dxchng2),a
+		ret
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;		
 	; hl -> tile column in the map

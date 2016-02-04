@@ -154,7 +154,7 @@ vblank:
 		inc	hl
 		ld	(_jiffy),hl
 				
-		call _waitvdp
+		; call _waitvdp
 		bdrclr 0
 		
 		pop    ix         
@@ -210,10 +210,14 @@ lint:
 		out (0x99),a
 		ld a,2+128				; R#2 
 		out (0x99),a			; score bar in page 1
-		
 
-		call	set_displaypage	; update displaypage and _xoffset
+		ld	e,8
+		call	checkkbd
+		ld	(joystick),a
 		
+		call	set_displaypage	; update displaypage and _xoffset
+[2]		call	waitHBLANK		; now we are at the start of HBLANK
+		call 	_waitvdp		; do not update r#18 if the vdp is copying
 		call	waitHBLANK		; now we are at the start of HBLANK
 		
 		xor	a
@@ -227,10 +231,8 @@ lint:
 		out	(0x99),a
 		ld	a,1+128
 		out	(0x99),a
-		
-		ld	e,8
-		call	checkkbd
-		ld	(joystick),a
+
+
 		
 		ld	e,6
 		call	checkkbd

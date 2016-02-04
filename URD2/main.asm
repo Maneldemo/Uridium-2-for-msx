@@ -94,13 +94,18 @@ START:
 		ld	(_xtest),a
 		ld	(_ytest),a
 		ld	(anim_buffer.flag),a
+		ld	(_dxchng),a
+		ld	(_dxchng2),a
+		dec	a
+		ld	(_sliceflag_reset),a
+		call	reset_sliceflag
 		
 		ei
 1:		halt
 		halt
 		
-		ld	a,(_xoffset)		
-		and	a
+		ld	a,(_jiffy)		
+		and	31
 		jp	nz,1b
 		
 		ld	e,8
@@ -624,6 +629,7 @@ _ymappos:			#1
 _xmappos:			#3		; 24 bit = 12.8 bit
 _xspeed:			#2		; 16 bit = 8.8 bit
 _dxchng:			#1		; <>0 if direction changes
+_dxchng2:			#1		; <>0 at second frame after direction has changed
 
 ; _shadowbuff:		#2
 

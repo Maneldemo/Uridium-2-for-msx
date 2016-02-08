@@ -33,7 +33,13 @@ animtest:
 		jr	nz,.manage_buffer
 
 		call 	movemarker
-
+		; ld		a,(_xoffset)		
+		; and		15
+; [4]		add		a,a					
+		; cp		d
+		; jr		nz,1f
+		; bdrclr 255
+; 1:		
 		ld	a,e
 		ld	(anim_buffer.dy),a
 		
@@ -83,9 +89,8 @@ animtest:
 ; e = dy	
 
 movemarker:		
-		ld	e,8
-		call	checkkbd
-		ld	(joystick),a
+		ld	a,(joystick)
+		ld	l,a
 
 		bit 7,l
 		jr	nz,notright

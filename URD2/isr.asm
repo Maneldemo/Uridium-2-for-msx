@@ -150,6 +150,11 @@ vblank:
 		call 	changexpos
 		call 	changespeed
 		
+		if debug		
+		ld	hl,256	;XXXX
+		ld	(_xspeed),hl
+		endif
+		
 		ld	hl,(_jiffy)				; timer
 		inc	hl
 		ld	(_jiffy),hl

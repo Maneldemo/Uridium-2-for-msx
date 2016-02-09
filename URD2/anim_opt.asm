@@ -28,31 +28,37 @@
 
 
 animtest:
+		; ld		a,(_xoffset)		
+; [4]		add		a,a					
+		; ld		h,a
+
 		ld	a,(anim_buffer.flag)
 		and	a
 		jr	nz,.manage_buffer
-
-		call 	movemarker
-		; ld		a,(_xoffset)		
-		; and		15
-; [4]		add		a,a					
-		; cp		d
-		; jr		nz,1f
-		; bdrclr 255
-; 1:		
-		ld	a,e
-		ld	(anim_buffer.dy),a
 		
 		ld		a,(_xspeed+1)
 		rlc a
-		ld	a,d
 		jp	c,.scroll_left
-		sub	a,16
-		jr		1f
-.scroll_left:
-		add	a,16
-1:		ld	(anim_buffer.dx),a
 		
+.scroll_right:			
+		call 	movemarker
+		ld	a,e
+		ld	(anim_buffer.dy),a
+
+2:		ld	a,d
+		sub	a,16
+		ld	(anim_buffer.dx),a
+		jr		1f
+		
+.scroll_left:
+		call 	movemarker
+		ld	a,e
+		ld	(anim_buffer.dy),a
+
+2:		ld	a,d
+		add	a,16
+		ld	(anim_buffer.dx),a
+1:		
 		ld 		a,(_displaypage)	; destination page	
 		ld		b,a		
 		xor		1
@@ -96,6 +102,10 @@ movemarker:
 		jr	nz,notright
 		ld	a,(_xtest)
 		add	a,16
+		cp	240
+		jr	z,1f
+		; cp	h
+		; jr	z,1f
 		ld	(_xtest),a
 		jr	1f
 notright:
@@ -103,6 +113,9 @@ notright:
 		jr	nz,1f
 		ld	a,(_xtest)
 		sub	a,16
+		jr	z,1f
+		; cp	h
+		; jr	z,1f
 		ld	(_xtest),a
 1:		
 		ld		a,(_xtest)

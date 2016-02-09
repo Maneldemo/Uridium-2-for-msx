@@ -1,4 +1,4 @@
-Sjasm Z80 Assembler v0.42c - www.xl2s.tk             [2016.02.08 - 23:41:29]
+Sjasm Z80 Assembler v0.42c - www.xl2s.tk             [2016.02.09 - 23:50:30]
 
 main.asm
 Errors: 0
@@ -115,7 +115,7 @@ Errors: 0
       30   00:4000                      		
       31   00:4000                              org 4000h
       32   00:4000                              dw  4241h,START,0,0,0,0,0,0
-      32   00:4000  41 42 D4 48 00 00 00 00 00 00 00 00 00 00 00 00 
+      32   00:4000  41 42 E5 48 00 00 00 00 00 00 00 00 00 00 00 00 
       33   00:4010                      
       34   00:4010                      	;-------------------------------------		
       35   00:4010                      
@@ -948,7 +948,7 @@ Errors: 0
      217.  00:4366  D3 99               		out (0x99),a			; score bar in page 1
      218.  00:4368                      
      219.  00:4368  1E 08               		ld	e,8
-     220.  00:436A  CD C9 48            		call	checkkbd
+     220.  00:436A  CD DA 48            		call	checkkbd
      221.  00:436D  32 1B CA            		ld	(joystick),a
      222.  00:4370                      		
      223.  00:4370  CD E4 43            		call	set_displaypage	; update displaypage and _xoffset
@@ -971,7 +971,7 @@ Errors: 0
      240.  00:4394                      
      241.  00:4394                      		
      242.  00:4394  1E 06               		ld	e,6
-     243.  00:4396  CD C9 48            		call	checkkbd
+     243.  00:4396  CD DA 48            		call	checkkbd
      244.  00:4399  E6 01               		and		1				; SHIFT
      245.  00:439B  CC 39 48            		call 	z,animtest
      246.  00:439E                      
@@ -2188,336 +2188,349 @@ Errors: 0
       28.  00:4839                      
       29.  00:4839                      
       30.  00:4839                      animtest:
-      31.  00:4839  3A 16 CA            		ld	a,(anim_buffer.flag)
-      32.  00:483C  A7                  		and	a
-      33.  00:483D  20 2D               		jr	nz,.manage_buffer
-      34.  00:483F                      
-      35.  00:483F  CD 81 48            		call 	movemarker
-      36.  00:4842                      		; ld		a,(_xoffset)		
-      37.  00:4842                      		; and		15
-      38.  00:4842                      ; [4]		add		a,a					
-      39.  00:4842                      		; cp		d
-      40.  00:4842                      		; jr		nz,1f
-      41.  00:4842                      		; bdrclr 255
-      42.  00:4842                      ; 1:		
-      43.  00:4842  7B                  		ld	a,e
-      44.  00:4843  32 17 CA            		ld	(anim_buffer.dy),a
-      45.  00:4846                      		
-      46.  00:4846  3A 21 CA            		ld		a,(_xspeed+1)
-      47.  00:4849  CB 07               		rlc a
-      48.  00:484B  7A                  		ld	a,d
-      49.  00:484C  DA 53 48            		jp	c,.scroll_left
-      50.  00:484F  D6 10               		sub	a,16
-      51.  00:4851  18 02               		jr		1f
-      52.  00:4853                      .scroll_left:
-      53.  00:4853  C6 10               		add	a,16
-      54.  00:4855  32 18 CA            1:		ld	(anim_buffer.dx),a
-      55.  00:4858                      		
-      56.  00:4858  3A 24 CA            		ld 		a,(_displaypage)	; destination page	
-      57.  00:485B  47                  		ld		b,a		
-      58.  00:485C  EE 01               		xor		1
-      59.  00:485E  32 1A CA            		ld		(anim_buffer.page),a
-      60.  00:4861                      		
-      61.  00:4861  3E 0F               		ld		a,15	
-      62.  00:4863  32 19 CA            		ld		(anim_buffer.tile),a
-      63.  00:4866  32 16 CA            		ld		(anim_buffer.flag),a
-      64.  00:4869                      		
-      65.  00:4869  C3 AF 44            		jp move_tile
-      66.  00:486C                      
-      67.  00:486C                      	
-      68.  00:486C                      .manage_buffer:
-      69.  00:486C  AF                  		xor	a
-      70.  00:486D  32 16 CA            		ld	(anim_buffer.flag),a
-      71.  00:4870                      		
-      72.  00:4870  3A 17 CA            		ld	a,(anim_buffer.dy)
-      73.  00:4873  5F                  		ld	e,a
-      74.  00:4874                      		
-      75.  00:4874  3A 18 CA            		ld	a,(anim_buffer.dx)
-      76.  00:4877  57                  		ld	d,a
-      77.  00:4878                      		
-      78.  00:4878  3A 1A CA            		ld	a,(anim_buffer.page)
-      79.  00:487B  47                  		ld	b,a
-      80.  00:487C                      		
-      81.  00:487C  3E 0F               		ld	a,15	; c
-      82.  00:487E  C3 AF 44            		jp move_tile
-      83.  00:4881                      		
-      84.  00:4881                      ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-      85.  00:4881                      ; test code to move a marker
-      86.  00:4881                      ;
-      87.  00:4881                      ; returns
-      88.  00:4881                      ; d = dx	
-      89.  00:4881                      ; e = dy	
-      90.  00:4881                      
-      91.  00:4881                      movemarker:		
-      92.  00:4881  3A 1B CA            		ld	a,(joystick)
-      93.  00:4884  6F                  		ld	l,a
-      94.  00:4885                      
-      95.  00:4885  CB 7D               		bit 7,l
-      96.  00:4887  20 0A               		jr	nz,notright
-      97.  00:4889  3A 14 CA            		ld	a,(_xtest)
-      98.  00:488C  C6 10               		add	a,16
-      99.  00:488E  32 14 CA            		ld	(_xtest),a
-     100.  00:4891  18 0C               		jr	1f
-     101.  00:4893                      notright:
-     102.  00:4893  CB 65               		bit 4,l
-     103.  00:4895  20 08               		jr	nz,1f
-     104.  00:4897  3A 14 CA            		ld	a,(_xtest)
-     105.  00:489A  D6 10               		sub	a,16
-     106.  00:489C  32 14 CA            		ld	(_xtest),a
-     107.  00:489F                      1:		
-     108.  00:489F  3A 14 CA            		ld		a,(_xtest)
-     109.  00:48A2  57                  		ld		d,a
-     110.  00:48A3                      
-     111.  00:48A3  CB 6D               		bit 5,l
-     112.  00:48A5  20 0D               		jr	nz,notup
-     113.  00:48A7  3A 15 CA            		ld	a,(_ytest)
-     114.  00:48AA  D6 10               		sub	a,16
-     115.  00:48AC  DA C4 48            		jp	c,1f
-     116.  00:48AF  32 15 CA            		ld	(_ytest),a
-     117.  00:48B2  18 10               		jr	1f
-     118.  00:48B4                      notup:
-     119.  00:48B4  CB 75               		bit 6,l
-     120.  00:48B6  20 0C               		jr	nz,1f
-     121.  00:48B8  3A 15 CA            		ld	a,(_ytest)
-     122.  00:48BB  C6 10               		add	a,16
-     123.  00:48BD  FE A0               		cp	10*16
-     124.  00:48BF  28 03               		jr	z,1f
-     125.  00:48C1  32 15 CA            		ld	(_ytest),a
-     126.  00:48C4                      1:
-     127.  00:48C4  3A 15 CA            		ld	a,(_ytest)
-     128.  00:48C7  5F                  		ld		e,a
-     129.  00:48C8  C9                  		ret
-     130.  00:48C9                      		
-     131.  00:48C9                      		
-     132.  00:48C9                      		
-      44   00:48C9                      		
-      45   00:48C9                      		include checkkbd.asm
-       1.  00:48C9                      
-       2.  00:48C9                      ; // Line Bit_7 Bit_6 Bit_5 Bit_4 Bit_3 Bit_2 Bit_1 Bit_0
-       3.  00:48C9                      ; // 0 	   "7"  "6"   "5"   "4"   "3"   "2"   "1"   "0"
-       4.  00:48C9                      ; // 1 	   ";"  "]"   "["   "\"   "="   "-"   "9"   "8"
-       5.  00:48C9                      ; // 2 	   "B"  "A"   ???   "/"   "."   ","   "'"   "`"
-       6.  00:48C9                      ; // 3 	   "J"  "I"   "H"   "G"   "F"   "E"   "D"   "C"
-       7.  00:48C9                      ; // 4 	   "R"  "Q"   "P"   "O"   "N"   "M"   "L"   "K"
-       8.  00:48C9                      ; // 5 	   "Z"  "Y"   "X"   "W"   "V"   "U"   "T"   "S"
-       9.  00:48C9                      ; // 6 	   F3 	 F2    F1  CODE   CAP  GRAPH  CTRL SHIFT
-      10.  00:48C9                      ; // 7 	   RET  SEL    BS  STOP   TAB   ESC    F5    F4
-      11.  00:48C9                      ; // 8 	   RIGHT DOWN  UP  LEFT   DEL   INS   HOME SPACE
-      12.  00:48C9                      
-      13.  00:48C9                      checkkbd:
-      14.  00:48C9                      		; di
-      15.  00:48C9  DB AA               		in	a,(0aah)
-      16.  00:48CB  E6 F0               		and 011110000B			; upper 4 bits contain info to preserve
-      17.  00:48CD  B3                  		or	e
-      18.  00:48CE  D3 AA               		out (0aah),a
-      19.  00:48D0  DB A9               		in	a,(0a9h)
-      20.  00:48D2  6F                  		ld	l,a
-      21.  00:48D3                      		; ei
-      22.  00:48D3  C9                  		ret
-      46   00:48D4                      		
-      47   00:48D4                      ;-------------------------------------
-      48   00:48D4                      ; Entry point
-      49   00:48D4                      ;-------------------------------------
-      50   00:48D4                      START:
-      51   00:48D4  AF                  		xor	a
-      52   00:48D5  3C                  		inc	a
-      53   00:48D6  32 13 CA            		ld	(SEL_NTSC),a		; NTSC MODE
-      54   00:48D9  CD 0A 42            		call	set_scr			; set video mode to screen 8
-      55   00:48DC  F3                  		di
-      56   00:48DD                      		
-      57   00:48DD                      ;-------------------------------------
-      58   00:48DD                      ;   Power-up routine for 32K ROM
-      59   00:48DD                      ;   set pages and sub slot
-      60   00:48DD                      ;-------------------------------------
-      61   00:48DD  CD 10 40                    call    search_slot
-      62   00:48E0  CD 2F 40                    call    search_slotram	
-      63   00:48E3  CD 61 40            		call	setrompage2		; ROM in page 1 & 2
-      64   00:48E6  CD 5B 40            		call	setrampage0		; RAM in page 0 & 3
-      65   00:48E9                      
-      66   00:48E9                      
-      67   00:48E9                      		; activate  the fist 24K of rom
-      68   00:48E9  AF                  		xor	a			   
-      69   00:48EA  32 00 50            		ld	(_kBank1),a
-      70   00:48ED  3C                  		inc	a
-      71   00:48EE  32 00 70            		ld	(_kBank2),a
-      72   00:48F1  3C                  		inc	a
-      73   00:48F2  32 00 90            		ld	(_kBank3),a
-      74   00:48F5                      		
-      75   00:48F5  CD 78 41            		call	_cls
-      76   00:48F8                      		
-      77   00:48F8                      		;--- initialise ISR in RAM
-      78   00:48F8                      		
-      79   00:48F8  F3                  		di
-      80   00:48F9                      	
-      81   00:48F9  CD 5C 42            		call	isr_set
-      82   00:48FC                      		
-      83   00:48FC                      		; copy the level map from ROM to RAM
-      84   00:48FC                      		
-      85   00:48FC  CD C2 49            		call	vdptest
-      86   00:48FF  CD A5 41            		call	font_cpy
-      87   00:4902  CD 4E 49            		call	mapinit
-      88   00:4905                      		
-      89   00:4905                      		
-      90   00:4905  21 00 00            		ld	hl,0
-      91   00:4908  22 9E FC            		ld	(_jiffy),hl		
-      92   00:490B  AF                  		xor	a
-      93   00:490C  32 24 CA            		ld	(_displaypage),a		
-      94   00:490F  32 14 CA            		ld	(_xtest),a
-      95   00:4912  32 15 CA            		ld	(_ytest),a
-      96   00:4915  32 16 CA            		ld	(anim_buffer.flag),a
-      97   00:4918  32 22 CA            		ld	(_dxchng),a
-      98   00:491B  32 23 CA            		ld	(_dxchng2),a
-      99   00:491E  3D                  		dec	a
-     100   00:491F  32 10 CA            		ld	(_sliceflag_reset),a
-     101   00:4922  CD 01 44            		call	reset_sliceflag
-     102   00:4925                      		
-     103   00:4925  FB                  		ei
-     104   00:4926  76                  1:		halt
-     105   00:4927  76                  		halt
-     106   00:4928                      		
-     107   00:4928  3A 9E FC            		ld	a,(_jiffy)		
-     108   00:492B  E6 1F               		and	31
-     109   00:492D  C2 26 49            		jp	nz,1b
-     110   00:4930                      		
-     111   00:4930  1E 08               		ld	e,8
-     112   00:4932  CD C9 48            		call	checkkbd
-     113   00:4935  E6 01               		and	1				; space
-     114   00:4937  CC 3D 49            		call	z,PAL_ntsc
-     115   00:493A  C3 26 49            		jp	1b
-     116   00:493D                      		
-     117   00:493D                      PAL_ntsc:
-     118   00:493D  F3                  		di
-     119   00:493E  3A E8 FF            		ld		a,(RG9SAV)		
-     120   00:4941  EE 02               		xor		00000010B		; PAL or NTSC 
-     121   00:4943  32 E8 FF            		ld		(RG9SAV),a
-     122   00:4946  D3 99               		out		(0x99),a
-     123   00:4948  3E 89               		ld		a,9+128
-     124   00:494A  D3 99               		out		(0x99),a
-     125   00:494C  FB                  		ei
-     126   00:494D  C9                  		ret
-     127   00:494E                      
-     128   00:494E                      mapinit:		
-     129   00:494E  3E 0C               		ld		a, :_level
-     130   00:4950  32 00 B0            		ld		(_kBank4),a
-     131   00:4953  21 00 A0            		ld		hl,_level
-     132   00:4956  11 00 C0            		ld		de,_levelmap
-     133   00:4959  01 00 0A            		ld		bc,mapWidth*mapHeight
-     134   00:495C  ED B0               		ldir
-     135   00:495E                      		
-     136   00:495E  AF                  		xor		a
-     137   00:495F  32 1C CA            		ld		(_ymappos),a
-     138   00:4962  32 1F CA            		ld		(_xmappos+2),a	; 24 bit	
-     139   00:4965  21 10 00            		ld		hl,16
-     140   00:4968  22 20 CA            		ld		(_xspeed),hl
-     141   00:496B  21 00 03            		ld		hl,768
-     142   00:496E  22 1D CA            		ld		(_xmappos),hl
-     143   00:4971                      		; ret
-     144   00:4971                      
-     145   00:4971                      buildmap:
-     146   00:4971  2A 1D CA            		ld	hl,(_xmappos)
-     147   00:4974                      
-     148   00:4974                      		repeat 4
-     149   00:4974                    < 		srl	h
-     150   00:4974                    < 		rr	l
-     151   00:4974                    < 		endrepeat					; corner top left of the screen window in the map in tiles
-     151   00:4974  CB 3C CB 1D CB 3C CB 1D CB 3C CB 1D CB 3C CB 1D 
-     152   00:4984                      		
-     153   00:4984  11 00 C0            		ld	de,_levelmap
-     154   00:4987  19                  		add	hl,de					; HL = corner top right of the screen window in the map in tiles
-     155   00:4988                      		
-     156   00:4988  11 00 00            		ld	de,0			; dest y,x
-     157   00:498B  06 96               		ld	b,15*10
-     158   00:498D                      1:		
-     159   00:498D                      		set_tile (hl)
-     159   00:498D  7E                >   ld a,reg
-     159   00:498E  07 07 07          > [3]  rlca
-     159   00:4991  E6 07             >   and 00000111B
-     159   00:4993  C6 04             >   add a,:_tiles0
-     159   00:4995  32 00 B0          >   ld (_kBank4),a
-     159   00:4998                    > 
-     159   00:4998  7E                >   ld a,reg
-     159   00:4999  E6 1F             >   and 00011111B
-     159   00:499B  C6 A0             >   add a,high _tiles0
-     160   00:499D  E5                  		push	hl
-     161   00:499E                      
-     162   00:499E  67                  		ld	h,a				; select offset in the bank
-     163   00:499F  2E 00               		ld	l,0
-     164   00:49A1                      		
-     165   00:49A1  D5                  		push	de
-     166   00:49A2  C5                  		push	bc
-     167   00:49A3  06 00               		ld		b,0				; page
-     168   00:49A5  CD 6D 44            		call	LMMC_tile
-     169   00:49A8  C1                  		pop		bc
-     170   00:49A9  D1                  		pop		de
-     171   00:49AA                      		
-     172   00:49AA  E1                  		pop		hl
-     173   00:49AB                      
-     174   00:49AB  23                  		inc	hl
-     175   00:49AC                      
-     176   00:49AC  3E 10               		ld		a,16		; x=x+16
-     177   00:49AE  83                  		add		a,e
-     178   00:49AF  5F                  		ld		e,a
-     179   00:49B0                      		
-     180   00:49B0  FE F0               		cp		15*16
-     181   00:49B2  38 0B               		jr		c,2f
-     182   00:49B4                      
-     183   00:49B4  1E 00               		ld		e,0			; x = 0
-     184   00:49B6                      		
-     185   00:49B6  3E 10               		ld		a,16		; y=y+16
-     186   00:49B8  82                  		add		a,d
-     187   00:49B9  57                  		ld		d,a
-     188   00:49BA                      
-     189   00:49BA  3E F1               		ld		a,-15
-     190   00:49BC  85                  		add		a,l
-     191   00:49BD  6F                  		ld		l,a
-     192   00:49BE  24                  		inc		h
-     193   00:49BF                      		
-     194   00:49BF  10 CC               2:		djnz	1b
-     195   00:49C1  C9                  		ret
-     196   00:49C2                      		
-     197   00:49C2                      vdptest:
-     198   00:49C2  16 A0               		ld	d,160			; dest y
-     199   00:49C4  1E 00               		ld	e,0				; dest x
-     200   00:49C6  0E A0               		ld	c,160			; initial tile
-     201   00:49C8  06 20               		ld	b,32			; number of tiles
-     202   00:49CA                      1:		
-     203   00:49CA                      		set_tile c
-     203   00:49CA  79                >   ld a,reg
-     203   00:49CB  07 07 07          > [3]  rlca
-     203   00:49CE  E6 07             >   and 00000111B
-     203   00:49D0  C6 04             >   add a,:_tiles0
-     203   00:49D2  32 00 B0          >   ld (_kBank4),a
-     203   00:49D5                    > 
-     203   00:49D5  79                >   ld a,reg
-     203   00:49D6  E6 1F             >   and 00011111B
-     203   00:49D8  C6 A0             >   add a,high _tiles0
-     204   00:49DA                      
-     205   00:49DA  67                  		ld	h,a				; select offset in the bank
-     206   00:49DB  2E 00               		ld	l,0
-     207   00:49DD                      
-     208   00:49DD  D5                  		push	de
-     209   00:49DE  C5                  		push	bc
-     210   00:49DF  06 01               		ld		b,1				; page
-     211   00:49E1  CD 6D 44            		call	LMMC_tile
-     212   00:49E4  C1                  		pop		bc
-     213   00:49E5  D1                  		pop		de
-     214   00:49E6                      		
-     215   00:49E6  0C                  		inc		c
-     216   00:49E7                      		
-     217   00:49E7  3E 10               		ld		a,16		; x=x+16
-     218   00:49E9  83                  		add		a,e
-     219   00:49EA  5F                  		ld		e,a
-     220   00:49EB  30 04               		jr		nc,2f
-     221   00:49ED                      
-     222   00:49ED  3E 10               		ld		a,16		; y=y+16
-     223   00:49EF  82                  		add		a,d
-     224   00:49F0  57                  		ld		d,a
-     225   00:49F1                      		
-     226   00:49F1  10 D7               2:		djnz	1b
-     227   00:49F3  C9                  		ret
-     228   00:49F4                      		
-     229   00:49F4                      		
-     230   00:49F4  (04)                		page 4
+      31.  00:4839                      		; ld		a,(_xoffset)		
+      32.  00:4839                      ; [4]		add		a,a					
+      33.  00:4839                      		; ld		h,a
+      34.  00:4839                      
+      35.  00:4839  3A 16 CA            		ld	a,(anim_buffer.flag)
+      36.  00:483C  A7                  		and	a
+      37.  00:483D  20 38               		jr	nz,.manage_buffer
+      38.  00:483F                      		
+      39.  00:483F  3A 21 CA            		ld		a,(_xspeed+1)
+      40.  00:4842  CB 07               		rlc a
+      41.  00:4844  DA 56 48            		jp	c,.scroll_left
+      42.  00:4847                      		
+      43.  00:4847                      .scroll_right:			
+      44.  00:4847  CD 8C 48            		call 	movemarker
+      45.  00:484A  7B                  		ld	a,e
+      46.  00:484B  32 17 CA            		ld	(anim_buffer.dy),a
+      47.  00:484E                      
+      48.  00:484E  7A                  2:		ld	a,d
+      49.  00:484F  D6 10               		sub	a,16
+      50.  00:4851  32 18 CA            		ld	(anim_buffer.dx),a
+      51.  00:4854  18 0D               		jr		1f
+      52.  00:4856                      		
+      53.  00:4856                      .scroll_left:
+      54.  00:4856  CD 8C 48            		call 	movemarker
+      55.  00:4859  7B                  		ld	a,e
+      56.  00:485A  32 17 CA            		ld	(anim_buffer.dy),a
+      57.  00:485D                      
+      58.  00:485D  7A                  2:		ld	a,d
+      59.  00:485E  C6 10               		add	a,16
+      60.  00:4860  32 18 CA            		ld	(anim_buffer.dx),a
+      61.  00:4863                      1:		
+      62.  00:4863  3A 24 CA            		ld 		a,(_displaypage)	; destination page	
+      63.  00:4866  47                  		ld		b,a		
+      64.  00:4867  EE 01               		xor		1
+      65.  00:4869  32 1A CA            		ld		(anim_buffer.page),a
+      66.  00:486C                      		
+      67.  00:486C  3E 0F               		ld		a,15	
+      68.  00:486E  32 19 CA            		ld		(anim_buffer.tile),a
+      69.  00:4871  32 16 CA            		ld		(anim_buffer.flag),a
+      70.  00:4874                      		
+      71.  00:4874  C3 AF 44            		jp move_tile
+      72.  00:4877                      
+      73.  00:4877                      	
+      74.  00:4877                      .manage_buffer:
+      75.  00:4877  AF                  		xor	a
+      76.  00:4878  32 16 CA            		ld	(anim_buffer.flag),a
+      77.  00:487B                      		
+      78.  00:487B  3A 17 CA            		ld	a,(anim_buffer.dy)
+      79.  00:487E  5F                  		ld	e,a
+      80.  00:487F                      		
+      81.  00:487F  3A 18 CA            		ld	a,(anim_buffer.dx)
+      82.  00:4882  57                  		ld	d,a
+      83.  00:4883                      		
+      84.  00:4883  3A 1A CA            		ld	a,(anim_buffer.page)
+      85.  00:4886  47                  		ld	b,a
+      86.  00:4887                      		
+      87.  00:4887  3E 0F               		ld	a,15	; c
+      88.  00:4889  C3 AF 44            		jp move_tile
+      89.  00:488C                      		
+      90.  00:488C                      ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+      91.  00:488C                      ; test code to move a marker
+      92.  00:488C                      ;
+      93.  00:488C                      ; returns
+      94.  00:488C                      ; d = dx	
+      95.  00:488C                      ; e = dy	
+      96.  00:488C                      
+      97.  00:488C                      movemarker:		
+      98.  00:488C  3A 1B CA            		ld	a,(joystick)
+      99.  00:488F  6F                  		ld	l,a
+     100.  00:4890                      
+     101.  00:4890  CB 7D               		bit 7,l
+     102.  00:4892  20 0E               		jr	nz,notright
+     103.  00:4894  3A 14 CA            		ld	a,(_xtest)
+     104.  00:4897  C6 10               		add	a,16
+     105.  00:4899  FE F0               		cp	240
+     106.  00:489B  28 13               		jr	z,1f
+     107.  00:489D                      		; cp	h
+     108.  00:489D                      		; jr	z,1f
+     109.  00:489D  32 14 CA            		ld	(_xtest),a
+     110.  00:48A0  18 0E               		jr	1f
+     111.  00:48A2                      notright:
+     112.  00:48A2  CB 65               		bit 4,l
+     113.  00:48A4  20 0A               		jr	nz,1f
+     114.  00:48A6  3A 14 CA            		ld	a,(_xtest)
+     115.  00:48A9  D6 10               		sub	a,16
+     116.  00:48AB  28 03               		jr	z,1f
+     117.  00:48AD                      		; cp	h
+     118.  00:48AD                      		; jr	z,1f
+     119.  00:48AD  32 14 CA            		ld	(_xtest),a
+     120.  00:48B0                      1:		
+     121.  00:48B0  3A 14 CA            		ld		a,(_xtest)
+     122.  00:48B3  57                  		ld		d,a
+     123.  00:48B4                      
+     124.  00:48B4  CB 6D               		bit 5,l
+     125.  00:48B6  20 0D               		jr	nz,notup
+     126.  00:48B8  3A 15 CA            		ld	a,(_ytest)
+     127.  00:48BB  D6 10               		sub	a,16
+     128.  00:48BD  DA D5 48            		jp	c,1f
+     129.  00:48C0  32 15 CA            		ld	(_ytest),a
+     130.  00:48C3  18 10               		jr	1f
+     131.  00:48C5                      notup:
+     132.  00:48C5  CB 75               		bit 6,l
+     133.  00:48C7  20 0C               		jr	nz,1f
+     134.  00:48C9  3A 15 CA            		ld	a,(_ytest)
+     135.  00:48CC  C6 10               		add	a,16
+     136.  00:48CE  FE A0               		cp	10*16
+     137.  00:48D0  28 03               		jr	z,1f
+     138.  00:48D2  32 15 CA            		ld	(_ytest),a
+     139.  00:48D5                      1:
+     140.  00:48D5  3A 15 CA            		ld	a,(_ytest)
+     141.  00:48D8  5F                  		ld		e,a
+     142.  00:48D9  C9                  		ret
+     143.  00:48DA                      		
+     144.  00:48DA                      		
+     145.  00:48DA                      		
+      44   00:48DA                      		
+      45   00:48DA                      		include checkkbd.asm
+       1.  00:48DA                      
+       2.  00:48DA                      ; // Line Bit_7 Bit_6 Bit_5 Bit_4 Bit_3 Bit_2 Bit_1 Bit_0
+       3.  00:48DA                      ; // 0 	   "7"  "6"   "5"   "4"   "3"   "2"   "1"   "0"
+       4.  00:48DA                      ; // 1 	   ";"  "]"   "["   "\"   "="   "-"   "9"   "8"
+       5.  00:48DA                      ; // 2 	   "B"  "A"   ???   "/"   "."   ","   "'"   "`"
+       6.  00:48DA                      ; // 3 	   "J"  "I"   "H"   "G"   "F"   "E"   "D"   "C"
+       7.  00:48DA                      ; // 4 	   "R"  "Q"   "P"   "O"   "N"   "M"   "L"   "K"
+       8.  00:48DA                      ; // 5 	   "Z"  "Y"   "X"   "W"   "V"   "U"   "T"   "S"
+       9.  00:48DA                      ; // 6 	   F3 	 F2    F1  CODE   CAP  GRAPH  CTRL SHIFT
+      10.  00:48DA                      ; // 7 	   RET  SEL    BS  STOP   TAB   ESC    F5    F4
+      11.  00:48DA                      ; // 8 	   RIGHT DOWN  UP  LEFT   DEL   INS   HOME SPACE
+      12.  00:48DA                      
+      13.  00:48DA                      checkkbd:
+      14.  00:48DA                      		; di
+      15.  00:48DA  DB AA               		in	a,(0aah)
+      16.  00:48DC  E6 F0               		and 011110000B			; upper 4 bits contain info to preserve
+      17.  00:48DE  B3                  		or	e
+      18.  00:48DF  D3 AA               		out (0aah),a
+      19.  00:48E1  DB A9               		in	a,(0a9h)
+      20.  00:48E3  6F                  		ld	l,a
+      21.  00:48E4                      		; ei
+      22.  00:48E4  C9                  		ret
+      46   00:48E5                      		
+      47   00:48E5                      ;-------------------------------------
+      48   00:48E5                      ; Entry point
+      49   00:48E5                      ;-------------------------------------
+      50   00:48E5                      START:
+      51   00:48E5  AF                  		xor	a
+      52   00:48E6  3C                  		inc	a
+      53   00:48E7  32 13 CA            		ld	(SEL_NTSC),a		; NTSC MODE
+      54   00:48EA  CD 0A 42            		call	set_scr			; set video mode to screen 8
+      55   00:48ED  F3                  		di
+      56   00:48EE                      		
+      57   00:48EE                      ;-------------------------------------
+      58   00:48EE                      ;   Power-up routine for 32K ROM
+      59   00:48EE                      ;   set pages and sub slot
+      60   00:48EE                      ;-------------------------------------
+      61   00:48EE  CD 10 40                    call    search_slot
+      62   00:48F1  CD 2F 40                    call    search_slotram	
+      63   00:48F4  CD 61 40            		call	setrompage2		; ROM in page 1 & 2
+      64   00:48F7  CD 5B 40            		call	setrampage0		; RAM in page 0 & 3
+      65   00:48FA                      
+      66   00:48FA                      
+      67   00:48FA                      		; activate  the fist 24K of rom
+      68   00:48FA  AF                  		xor	a			   
+      69   00:48FB  32 00 50            		ld	(_kBank1),a
+      70   00:48FE  3C                  		inc	a
+      71   00:48FF  32 00 70            		ld	(_kBank2),a
+      72   00:4902  3C                  		inc	a
+      73   00:4903  32 00 90            		ld	(_kBank3),a
+      74   00:4906                      		
+      75   00:4906  CD 78 41            		call	_cls
+      76   00:4909                      		
+      77   00:4909                      		;--- initialise ISR in RAM
+      78   00:4909                      		
+      79   00:4909  F3                  		di
+      80   00:490A                      	
+      81   00:490A  CD 5C 42            		call	isr_set
+      82   00:490D                      		
+      83   00:490D                      		; copy the level map from ROM to RAM
+      84   00:490D                      		
+      85   00:490D  CD D3 49            		call	vdptest
+      86   00:4910  CD A5 41            		call	font_cpy
+      87   00:4913  CD 5F 49            		call	mapinit
+      88   00:4916                      		
+      89   00:4916                      		
+      90   00:4916  21 00 00            		ld	hl,0
+      91   00:4919  22 9E FC            		ld	(_jiffy),hl		
+      92   00:491C  AF                  		xor	a
+      93   00:491D  32 24 CA            		ld	(_displaypage),a		
+      94   00:4920  32 14 CA            		ld	(_xtest),a
+      95   00:4923  32 15 CA            		ld	(_ytest),a
+      96   00:4926  32 16 CA            		ld	(anim_buffer.flag),a
+      97   00:4929  32 22 CA            		ld	(_dxchng),a
+      98   00:492C  32 23 CA            		ld	(_dxchng2),a
+      99   00:492F  3D                  		dec	a
+     100   00:4930  32 10 CA            		ld	(_sliceflag_reset),a
+     101   00:4933  CD 01 44            		call	reset_sliceflag
+     102   00:4936                      		
+     103   00:4936  FB                  		ei
+     104   00:4937  76                  1:		halt
+     105   00:4938  76                  		halt
+     106   00:4939                      		
+     107   00:4939  3A 9E FC            		ld	a,(_jiffy)		
+     108   00:493C  E6 1F               		and	31
+     109   00:493E  C2 37 49            		jp	nz,1b
+     110   00:4941                      		
+     111   00:4941  1E 08               		ld	e,8
+     112   00:4943  CD DA 48            		call	checkkbd
+     113   00:4946  E6 01               		and	1				; space
+     114   00:4948  CC 4E 49            		call	z,PAL_ntsc
+     115   00:494B  C3 37 49            		jp	1b
+     116   00:494E                      		
+     117   00:494E                      PAL_ntsc:
+     118   00:494E  F3                  		di
+     119   00:494F  3A E8 FF            		ld		a,(RG9SAV)		
+     120   00:4952  EE 02               		xor		00000010B		; PAL or NTSC 
+     121   00:4954  32 E8 FF            		ld		(RG9SAV),a
+     122   00:4957  D3 99               		out		(0x99),a
+     123   00:4959  3E 89               		ld		a,9+128
+     124   00:495B  D3 99               		out		(0x99),a
+     125   00:495D  FB                  		ei
+     126   00:495E  C9                  		ret
+     127   00:495F                      
+     128   00:495F                      mapinit:		
+     129   00:495F  3E 0C               		ld		a, :_level
+     130   00:4961  32 00 B0            		ld		(_kBank4),a
+     131   00:4964  21 00 A0            		ld		hl,_level
+     132   00:4967  11 00 C0            		ld		de,_levelmap
+     133   00:496A  01 00 0A            		ld		bc,mapWidth*mapHeight
+     134   00:496D  ED B0               		ldir
+     135   00:496F                      		
+     136   00:496F  AF                  		xor		a
+     137   00:4970  32 1C CA            		ld		(_ymappos),a
+     138   00:4973  32 1F CA            		ld		(_xmappos+2),a	; 24 bit	
+     139   00:4976  21 10 00            		ld		hl,16
+     140   00:4979  22 20 CA            		ld		(_xspeed),hl
+     141   00:497C  21 00 03            		ld		hl,768
+     142   00:497F  22 1D CA            		ld		(_xmappos),hl
+     143   00:4982                      		; ret
+     144   00:4982                      
+     145   00:4982                      buildmap:
+     146   00:4982  2A 1D CA            		ld	hl,(_xmappos)
+     147   00:4985                      
+     148   00:4985                      		repeat 4
+     149   00:4985                    < 		srl	h
+     150   00:4985                    < 		rr	l
+     151   00:4985                    < 		endrepeat					; corner top left of the screen window in the map in tiles
+     151   00:4985  CB 3C CB 1D CB 3C CB 1D CB 3C CB 1D CB 3C CB 1D 
+     152   00:4995                      		
+     153   00:4995  11 00 C0            		ld	de,_levelmap
+     154   00:4998  19                  		add	hl,de					; HL = corner top right of the screen window in the map in tiles
+     155   00:4999                      		
+     156   00:4999  11 00 00            		ld	de,0			; dest y,x
+     157   00:499C  06 96               		ld	b,15*10
+     158   00:499E                      1:		
+     159   00:499E                      		set_tile (hl)
+     159   00:499E  7E                >   ld a,reg
+     159   00:499F  07 07 07          > [3]  rlca
+     159   00:49A2  E6 07             >   and 00000111B
+     159   00:49A4  C6 04             >   add a,:_tiles0
+     159   00:49A6  32 00 B0          >   ld (_kBank4),a
+     159   00:49A9                    > 
+     159   00:49A9  7E                >   ld a,reg
+     159   00:49AA  E6 1F             >   and 00011111B
+     159   00:49AC  C6 A0             >   add a,high _tiles0
+     160   00:49AE  E5                  		push	hl
+     161   00:49AF                      
+     162   00:49AF  67                  		ld	h,a				; select offset in the bank
+     163   00:49B0  2E 00               		ld	l,0
+     164   00:49B2                      		
+     165   00:49B2  D5                  		push	de
+     166   00:49B3  C5                  		push	bc
+     167   00:49B4  06 00               		ld		b,0				; page
+     168   00:49B6  CD 6D 44            		call	LMMC_tile
+     169   00:49B9  C1                  		pop		bc
+     170   00:49BA  D1                  		pop		de
+     171   00:49BB                      		
+     172   00:49BB  E1                  		pop		hl
+     173   00:49BC                      
+     174   00:49BC  23                  		inc	hl
+     175   00:49BD                      
+     176   00:49BD  3E 10               		ld		a,16		; x=x+16
+     177   00:49BF  83                  		add		a,e
+     178   00:49C0  5F                  		ld		e,a
+     179   00:49C1                      		
+     180   00:49C1  FE F0               		cp		15*16
+     181   00:49C3  38 0B               		jr		c,2f
+     182   00:49C5                      
+     183   00:49C5  1E 00               		ld		e,0			; x = 0
+     184   00:49C7                      		
+     185   00:49C7  3E 10               		ld		a,16		; y=y+16
+     186   00:49C9  82                  		add		a,d
+     187   00:49CA  57                  		ld		d,a
+     188   00:49CB                      
+     189   00:49CB  3E F1               		ld		a,-15
+     190   00:49CD  85                  		add		a,l
+     191   00:49CE  6F                  		ld		l,a
+     192   00:49CF  24                  		inc		h
+     193   00:49D0                      		
+     194   00:49D0  10 CC               2:		djnz	1b
+     195   00:49D2  C9                  		ret
+     196   00:49D3                      		
+     197   00:49D3                      vdptest:
+     198   00:49D3  16 A0               		ld	d,160			; dest y
+     199   00:49D5  1E 00               		ld	e,0				; dest x
+     200   00:49D7  0E A0               		ld	c,160			; initial tile
+     201   00:49D9  06 20               		ld	b,32			; number of tiles
+     202   00:49DB                      1:		
+     203   00:49DB                      		set_tile c
+     203   00:49DB  79                >   ld a,reg
+     203   00:49DC  07 07 07          > [3]  rlca
+     203   00:49DF  E6 07             >   and 00000111B
+     203   00:49E1  C6 04             >   add a,:_tiles0
+     203   00:49E3  32 00 B0          >   ld (_kBank4),a
+     203   00:49E6                    > 
+     203   00:49E6  79                >   ld a,reg
+     203   00:49E7  E6 1F             >   and 00011111B
+     203   00:49E9  C6 A0             >   add a,high _tiles0
+     204   00:49EB                      
+     205   00:49EB  67                  		ld	h,a				; select offset in the bank
+     206   00:49EC  2E 00               		ld	l,0
+     207   00:49EE                      
+     208   00:49EE  D5                  		push	de
+     209   00:49EF  C5                  		push	bc
+     210   00:49F0  06 01               		ld		b,1				; page
+     211   00:49F2  CD 6D 44            		call	LMMC_tile
+     212   00:49F5  C1                  		pop		bc
+     213   00:49F6  D1                  		pop		de
+     214   00:49F7                      		
+     215   00:49F7  0C                  		inc		c
+     216   00:49F8                      		
+     217   00:49F8  3E 10               		ld		a,16		; x=x+16
+     218   00:49FA  83                  		add		a,e
+     219   00:49FB  5F                  		ld		e,a
+     220   00:49FC  30 04               		jr		nc,2f
+     221   00:49FE                      
+     222   00:49FE  3E 10               		ld		a,16		; y=y+16
+     223   00:4A00  82                  		add		a,d
+     224   00:4A01  57                  		ld		d,a
+     225   00:4A02                      		
+     226   00:4A02  10 D7               2:		djnz	1b
+     227   00:4A04  C9                  		ret
+     228   00:4A05                      		
+     229   00:4A05                      		
+     230   00:4A05  (04)                		page 4
      231   04:A000                      _tiles0:
      232   04:A000  (2000)              		incbin "tiles.bin",0x0000,0x2000
      233   04:C000  (05)                		page 5
@@ -3098,17 +3111,18 @@ Errors: 0
 00:000046E8   plot_col16
 00:000046EF   _plot_col16
 00:00004839   animtest
-00:00004853   animtest.scroll_left
-00:0000486C   animtest.manage_buffer
-00:00004881   movemarker
-00:00004893   notright
-00:000048B4   notup
-00:000048C9   checkkbd
-00:000048D4   START
-00:0000493D   PAL_ntsc
-00:0000494E   mapinit
-00:00004971 X buildmap
-00:000049C2   vdptest
+00:00004847 X animtest.scroll_right
+00:00004856   animtest.scroll_left
+00:00004877   animtest.manage_buffer
+00:0000488C   movemarker
+00:000048A2   notright
+00:000048C5   notup
+00:000048DA   checkkbd
+00:000048E5   START
+00:0000494E   PAL_ntsc
+00:0000495F   mapinit
+00:00004982 X buildmap
+00:000049D3   vdptest
 04:0000A000   _tiles0
 0C:0000A000   _level
 0D:0000A000   fonts
@@ -3147,11 +3161,11 @@ Errors: 0
 -------------------------------------------------
 
  Page: 00
-  Org: 00004000  Size: 00002000  Used: 000009F4
+  Org: 00004000  Size: 00002000  Used: 00000A05
 
    Address   Length Align   Label
-   00004000    2548         search_slot
-   000049F4    5644       <empty>
+   00004000    2565         search_slot
+   00004A05    5627       <empty>
 
  Page: 01
   Org: 00006000  Size: 00002000  Used: 00000000

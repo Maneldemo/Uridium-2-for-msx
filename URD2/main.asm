@@ -89,10 +89,11 @@ START:
 		
 		ld	hl,0
 		ld	(_jiffy),hl		
-		xor	a
-		ld	(_displaypage),a		
+		ld	a,32
 		ld	(_xtest),a
+		xor	a
 		ld	(_ytest),a
+		ld	(_displaypage),a		
 		ld	(anim_buffer.flag),a
 		ld	(_dxchng),a
 		ld	(_dxchng2),a
@@ -136,7 +137,7 @@ mapinit:
 		xor		a
 		ld		(_ymappos),a
 		ld		(_xmappos+2),a	; 24 bit	
-		ld		hl,16
+		ld		hl,256
 		ld		(_xspeed),hl
 		ld		hl,768
 		ld		(_xmappos),hl
@@ -600,6 +601,7 @@ anim_buffer.tile:		#1
 anim_buffer.page:		#1
 
 joystick			#1
+keys0_7				#1
 
 ; _mcdivider			#1
 

@@ -68,10 +68,10 @@ reset_sliceflag:
 ; _xspeed change pressing right and left
 
 changespeed:		
-		ld	a,(joystick)
+		ld	a,(keys0_7)
 		ld	l,a
 		
-		bit 7,l
+		bit 2,l			; press 2 for right
 		jr	nz,.notright
 
 		ld	hl,(_xspeed)
@@ -89,7 +89,7 @@ changespeed:
 		ret
 		
 .notright:
-		bit 4,l
+		bit 1,l			; press 1 for left
 		ret	nz
 		
 		ld	hl,(_xspeed)

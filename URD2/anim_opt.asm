@@ -42,22 +42,22 @@ animtest:
 		
 .scroll_right:			
 		call 	movemarker
-		ld	a,e
-		ld	(anim_buffer.dy),a
+		ld		a,e
+		ld		(anim_buffer.dy),a
 
-2:		ld	a,d
-		sub	a,16
-		ld	(anim_buffer.dx),a
+2:		ld		a,d
+		sub		a,16
+		ld		(anim_buffer.dx),a
 		jr		1f
 		
 .scroll_left:
 		call 	movemarker
-		ld	a,e
-		ld	(anim_buffer.dy),a
+		ld		a,e
+		ld		(anim_buffer.dy),a
 
-2:		ld	a,d
-		add	a,16
-		ld	(anim_buffer.dx),a
+2:		ld		a,d
+		add		a,16
+		ld		(anim_buffer.dx),a
 1:		
 		ld 		a,(_displaypage)	; destination page	
 		ld		b,a		
@@ -65,8 +65,11 @@ animtest:
 		ld		(anim_buffer.page),a
 		
 		ld		a,15	
-		ld		(anim_buffer.tile),a
 		ld		(anim_buffer.flag),a
+
+		ld		a,(_xoffset)
+		and		15
+		ld		(anim_buffer.tile),a
 		
 		jp move_tile
 
@@ -84,7 +87,7 @@ animtest:
 		ld	a,(anim_buffer.page)
 		ld	b,a
 		
-		ld	a,15	; c
+		ld	a,(anim_buffer.tile)
 		jp move_tile
 		
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

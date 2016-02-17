@@ -218,9 +218,13 @@ lint:
 
 		ld	e,8
 		call	checkkbd
-		ld	(joystick),a
+		ld	(joystick),a		
+		ld	e,0
+		call	checkkbd
+		ld	(keys0_7),a
 		
-		call	set_displaypage	; update displaypage and _xoffset
+		; call	set_displaypage	; update displaypage and _xoffset
+		
 [2]		call	waitHBLANK		; now we are at the start of HBLANK
 		call 	_waitvdp		; do not update r#18 if the vdp is copying
 		call	waitHBLANK		; now we are at the start of HBLANK
@@ -243,7 +247,9 @@ lint:
 		call	checkkbd
 		and		1				; SHIFT
 		call 	z,animtest
-
+		
+		call	set_displaypage	; update displaypage and _xoffset
+		
 		pop    ix         
 		pop    iy         
 		pop    af         

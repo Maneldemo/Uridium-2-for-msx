@@ -16,7 +16,7 @@ for g=0:7
     end
 end
 
-[A1,MAP] = imread('16x16_font.png');
+[A1,MAP] = imread('test_16x16_font.png');
 
 figure
 image(A1);

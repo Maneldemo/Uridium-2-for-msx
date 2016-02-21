@@ -41,6 +41,10 @@ animtest:
 		jp	c,.scroll_left
 		
 .scroll_right:			
+		ld		a,(_xoffset)	
+		cp		15
+		jp		z,.intercept_right
+		
 		call 	movemarker
 		ld		a,e
 		ld		(anim_buffer.dy),a
@@ -51,6 +55,10 @@ animtest:
 		jr		1f
 		
 .scroll_left:
+		ld		a,(_xoffset)	
+		and		a
+		jp		z,.intercept_left
+		
 		call 	movemarker
 		ld		a,e
 		ld		(anim_buffer.dy),a
@@ -72,7 +80,9 @@ animtest:
 		ld		(anim_buffer.tile),a
 		
 		jp move_tile
-
+.intercept_right:
+.intercept_left:
+		ret
 	
 .manage_buffer:
 		xor	a

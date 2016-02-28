@@ -5,8 +5,8 @@ close all
 % y = 191*y/max(y);
 % y = [ bitand([191:1:(191+192)],255) y];
 % 
-L = 512;
-x = [0:(L-1)];
+
+x = [0:511];
 
 y = (212-2*x);
 
@@ -24,7 +24,7 @@ while ~isempty(i)
     i = find(y<0);
 end
 
-y = bitand(y(1:L),255);
+y = bitand(y(1:1024),255);
 
 plot(x,y);
 grid on;

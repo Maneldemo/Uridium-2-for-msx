@@ -2,7 +2,7 @@
 
 		defpage	 0,0x4000, 0x2000		; page 0 main code 
 		defpage	 1,0x6000, 0x2000		; page 1 
-		defpage	 2..31					; swapped data 
+		defpage	 2..7					; swapped data 
 	
 		;	konami scc
 		
@@ -18,7 +18,7 @@ _kBank4: 	equ 0B000h ;- B7FFh (B000h used)
 
 screeninit:
 		ld		a,8
-		call	005fh		; screen 1
+		call	005fh		
 		ld		hl,0h
 		call	0053h		
 
@@ -37,6 +37,14 @@ outvram:
 		inc	d
 		dec	e
 		jr	nz,2b
+		
+		ld	e,256-212
+		ld	b,0
+		xor	a
+1:		out	(0x98),a
+		djnz	1b
+		dec	e
+		jr	nz,1b
 		ret
 		
 		
@@ -54,11 +62,14 @@ START:
 
 		halt              ; allow ISR
 		
-		ld     de,sintab
-1:   	call   raster_wave
-		call   #009c      
-		jr     z,1b    
-		
+		ld     	de,sintab
+1:   	call   	raster_wave
+		call   	#009c      
+		jr     	z,1b    
+		inc		de
+		ld		hl,-(endsintab-212)
+		adc		hl,de
+		jr		nz,1b
 		ret    
 ;S#2		
 ;b6	VR: Vertical scanning line timing flag
@@ -84,8 +95,9 @@ raster_wave:
 		ld		h,d
 		ld		l,e
 		
+		outi		
 .loop:		
-
+		
 1:   	in     a,(#99)     ; wait for HR (end of the line)
 		bit    5,a        
 		jr     z,1b   
@@ -93,7 +105,7 @@ raster_wave:
 		outi
 		
 		bit    6,a        ; wait for VR (end of the frame)
-		jr     z,.loop    
+		jr     z,.loop        
 		
 
 		xor    a          
@@ -106,23 +118,23 @@ raster_wave:
            
 
 sintab:  
-	include rast.txt
+		include rast.txt
 endsintab:
-		page 16
+		page 1
 _opening:
 		incbin "opening.bin",0x0000,0x2000
-		page 17
+		page 2
 		incbin "opening.bin",0x2000,0x2000
-		page 18
+		page 3
 		incbin "opening.bin",0x4000,0x2000
-		page 19
+		page 4
 		incbin "opening.bin",0x6000,0x2000
-		page 20
+		page 5
 		incbin "opening.bin",0x8000,0x2000
-		page 21
+		page 6
 		incbin "opening.bin",0xA000,0x2000
-		page 22
+		page 7
 		incbin "opening.bin",0xC000;,0x2000
-		page 23
+		; page 8
 		; incbin "opening.bin",0xE000;,,0x2000
 

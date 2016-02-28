@@ -4,9 +4,9 @@ _kBank3: equ 00009000h
 _kBank4: equ 0000B000h
 screeninit: equ 00004010h
 outvram: equ 0000401Eh
-START: equ 00004035h
-raster_wave: equ 0000404Fh
-raster_wave.loop: equ 00004063h
-sintab: equ 00004078h
-endsintab: equ 00004478h
+START: equ 00004041h
+raster_wave: equ 00004063h
+raster_wave.loop: equ 00004079h
+sintab: equ 0000408Eh
+endsintab: equ 0000428Eh
 _opening: equ 00006000h

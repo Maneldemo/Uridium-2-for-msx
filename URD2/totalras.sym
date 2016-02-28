@@ -1,0 +1,12 @@
+_kBank1: equ 00005000h
+_kBank2: equ 00007000h
+_kBank3: equ 00009000h
+_kBank4: equ 0000B000h
+screeninit: equ 00004010h
+outvram: equ 0000401Eh
+START: equ 00004035h
+raster_wave: equ 0000404Fh
+raster_wave.loop: equ 00004063h
+sintab: equ 00004078h
+endsintab: equ 00004478h
+_opening: equ 00006000h

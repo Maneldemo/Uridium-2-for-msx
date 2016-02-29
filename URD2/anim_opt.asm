@@ -25,16 +25,22 @@
 		; jp move_tile
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
+single_move:
+		ld 		a,(_displaypage)	; destination page	
+		ld		b,a		
+		ld		a,(_xoffset)
+		and		15		
+		jp 		move_tile
 
 animtest:
-		; ld		a,(_xoffset)		
-; [4]		add		a,a					
-		; ld		h,a
-
 		ld	a,(anim_buffer.flag)
 		and	a
 		jr	nz,.manage_buffer
+
+		ld		a,(_xoffset)		
+[4]		add		a,a					
+		ld		h,a
+		
 		
 		ld		a,(_xspeed+1)
 		rlc a
@@ -43,13 +49,17 @@ animtest:
 .scroll_right:			
 		ld		a,(_xoffset)	
 		cp		15
-		jp		z,.intercept_right
+		; jp		z,.intercept_right
 		
 		call 	movemarker
 		ld		a,e
 		ld		(anim_buffer.dy),a
 
-2:		ld		a,d
+		ld		a,h
+		cp		d
+		jp 		c,single_move
+		
+		ld		a,d
 		sub		a,16
 		ld		(anim_buffer.dx),a
 		jr		1f
@@ -57,13 +67,17 @@ animtest:
 .scroll_left:
 		ld		a,(_xoffset)	
 		and		a
-		jp		z,.intercept_left
+		; jp		z,.intercept_left
 		
 		call 	movemarker
 		ld		a,e
 		ld		(anim_buffer.dy),a
 
-2:		ld		a,d
+		ld		a,d
+		cp		h
+		jp 		c,single_move
+
+		ld		a,d
 		add		a,16
 		ld		(anim_buffer.dx),a
 1:		
@@ -79,7 +93,7 @@ animtest:
 		and		15
 		ld		(anim_buffer.tile),a
 		
-		jp move_tile
+		jp 		move_tile
 .intercept_right:
 .intercept_left:
 		ret
@@ -117,8 +131,6 @@ movemarker:
 		add	a,16
 		cp	240
 		jr	z,1f
-		; cp	h
-		; jr	z,1f
 		ld	(_xtest),a
 		jr	1f
 notright:
@@ -127,12 +139,10 @@ notright:
 		ld	a,(_xtest)
 		sub	a,16
 		jr	z,1f
-		; cp	h
-		; jr	z,1f
 		ld	(_xtest),a
 1:		
-		ld		a,(_xtest)
-		ld		d,a
+		ld	a,(_xtest)
+		ld	d,a
 
 		bit 5,l
 		jr	nz,notup
@@ -151,7 +161,7 @@ notup:
 		ld	(_ytest),a
 1:
 		ld	a,(_ytest)
-		ld		e,a
+		ld	e,a
 		ret
 		
 		

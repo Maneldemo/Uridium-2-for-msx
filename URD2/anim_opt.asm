@@ -1,28 +1,16 @@
-	
-		; ld		a,(_xoffset)		
-; [4]		add		a,a					
-		; cp		d
-		
-		; if _xoffset*16 =>dx 	
-			; b = _displaypage
-		; else	
-			; b = _displaypage xor 1
 
-		; jr		nc,1f
-		
-		; ld 		a,(_displaypage)	; destination page	
-		; xor		1
-		; ld		b,a	
-		; ld		a,16
-		; add		a,d
-		; ld		d,a
-		; ld		a,14	
-		; jp move_tile
-		
-; 1:		ld 		a,(_displaypage)	; destination page	
-		; ld		b,a		
-		; ld		a,15	
-		; jp move_tile
+test_change_page:
+		ld		hl,(_xmappos)		; corner top left of the screen window in the map in pixels
+		ld		a,(_displaypage)
+		ld		h,a
+		ld		a,16
+		and		l
+		jr		z,1f
+		ld		a,1
+1:		xor		h
+		ret						;	ZF=0 if there is no page change
+								;	ZF=1 if page changed
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 single_move:
@@ -49,7 +37,8 @@ animtest:
 .scroll_right:			
 		ld		a,(_xoffset)	
 		cp		15
-		; jp		z,.intercept_right
+		call	z,test_change_page		; if xoffset=15 test for page swap
+		jp		z,.intercept_right		; if page swap intercetp
 		
 		call 	movemarker
 		ld		a,e
@@ -67,7 +56,8 @@ animtest:
 .scroll_left:
 		ld		a,(_xoffset)	
 		and		a
-		; jp		z,.intercept_left
+		call	z,test_change_page		; if xoffset=0 test for page swap		
+		jp		z,.intercept_left		; if page swap intercetp
 		
 		call 	movemarker
 		ld		a,e
@@ -95,7 +85,17 @@ animtest:
 		
 		jp 		move_tile
 .intercept_right:
+		call 	movemarker
+
+		ld 		a,(_displaypage)	; destination page	
+		xor		1
+		ld		b,a		
+		ld		a,(_xoffset)
+		jp 		move_tile
+
 .intercept_left:
+		
+		
 		ret
 	
 .manage_buffer:

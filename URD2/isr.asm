@@ -248,7 +248,8 @@ lint:
 		and		1				; SHIFT
 		call 	z,animtest
 		
-		call	set_displaypage	; update displaypage and _xoffset
+								;  update displaypage and _xoffset
+		call	set_displaypage	; it has to be the LAST action in lint
 		
 		pop    ix         
 		pop    iy         

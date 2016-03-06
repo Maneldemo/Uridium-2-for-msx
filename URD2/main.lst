@@ -1,4 +1,4 @@
-Sjasm Z80 Assembler v0.42c - www.xl2s.tk             [2016.02.29 - 22:11:02]
+Sjasm Z80 Assembler v0.42c - www.xl2s.tk             [2016.03.06 - 10:10:29]
 
 main.asm
 Errors: 0
@@ -115,7 +115,7 @@ Errors: 0
       30   00:4000                      		
       31   00:4000                              org 4000h
       32   00:4000                              dw  4241h,START,0,0,0,0,0,0
-      32   00:4000  41 42 1B 49 00 00 00 00 00 00 00 00 00 00 00 00 
+      32   00:4000  41 42 4A 49 00 00 00 00 00 00 00 00 00 00 00 00 
       33   00:4010                      
       34   00:4010                      	;-------------------------------------		
       35   00:4010                      
@@ -948,10 +948,10 @@ Errors: 0
      217.  00:4366  D3 99               		out (0x99),a			; score bar in page 1
      218.  00:4368                      
      219.  00:4368  1E 08               		ld	e,8
-     220.  00:436A  CD 10 49            		call	checkkbd
+     220.  00:436A  CD 3F 49            		call	checkkbd
      221.  00:436D  32 1B CA            		ld	(joystick),a		
      222.  00:4370  1E 00               		ld	e,0
-     223.  00:4372  CD 10 49            		call	checkkbd
+     223.  00:4372  CD 3F 49            		call	checkkbd
      224.  00:4375  32 1C CA            		ld	(keys0_7),a
      225.  00:4378                      		
      226.  00:4378                      		; call	set_displaypage	; update displaypage and _xoffset
@@ -975,441 +975,442 @@ Errors: 0
      244.  00:4399                      
      245.  00:4399                      		
      246.  00:4399  1E 06               		ld	e,6
-     247.  00:439B  CD 10 49            		call	checkkbd
+     247.  00:439B  CD 3F 49            		call	checkkbd
      248.  00:439E  E6 01               		and		1				; SHIFT
-     249.  00:43A0  CC 4D 48            		call 	z,animtest
+     249.  00:43A0  CC 5D 48            		call 	z,animtest
      250.  00:43A3                      		
-     251.  00:43A3  CD EC 43            		call	set_displaypage	; update displaypage and _xoffset
-     252.  00:43A6                      		
-     253.  00:43A6  DD E1               		pop    ix         
-     254.  00:43A8  FD E1               		pop    iy         
-     255.  00:43AA  F1                  		pop    af         
-     256.  00:43AB  C1                  		pop    bc         
-     257.  00:43AC  D1                  		pop    de         
-     258.  00:43AD  E1                  		pop    hl         
-     259.  00:43AE  08                  		ex     af,af'     
-     260.  00:43AF  D9                  		exx               
-     261.  00:43B0  C1                  		pop    bc         
-     262.  00:43B1  D1                  		pop    de         
-     263.  00:43B2  E1                  		pop    hl         
-     264.  00:43B3                      
-     265.  00:43B3  F1                  		pop	 af
-     266.  00:43B4  FB                  		ei
-     267.  00:43B5  C9                  		ret
-     268.  00:43B6                      	
-     269.  00:43B6                      ; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;	
-     270.  00:43B6                      ; ; manage score bar at YSIZE
-     271.  00:43B6                      ; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;	
-     272.  00:43B6                      waitHBLANK:
-     273.  00:43B6  3E 02               		ld a,2 				; read S#2
-     274.  00:43B8  D3 99               		out (0x99),a
-     275.  00:43BA  3E 8F               		ld a,128+15
-     276.  00:43BC  D3 99               		out (0x99),a		; poll for HBLANK
-     277.  00:43BE                      		 
-     278.  00:43BE  DB 99               1:		in	a,(0x99)		; if 1 we are in HBLANK already, so wait until end of HBLANK
-     279.  00:43C0  E6 20               		and	0x20
-     280.  00:43C2  C2 BE 43            		jp	nz,1b			
-     281.  00:43C5                      
-     282.  00:43C5  DB 99               1:		in	a,(0x99)		; wait until end of the active area
-     283.  00:43C7  E6 20               		and	0x20
-     284.  00:43C9  CA C5 43            		jp	z,1b
-     285.  00:43CC  C9                  		ret
-     286.  00:43CD                      	
-     287.  00:43CD                      ; lint:	
-     288.  00:43CD                      		; ; call	waitHBLANK
-     289.  00:43CD                      		; ; now we are at the start of HBLANK
-     290.  00:43CD                      	
-     291.  00:43CD                      		; ; ld	a,(RG1SAV)
-     292.  00:43CD                      		; ; and	010111111B			; disable screen
-     293.  00:43CD                      		; ; ld	(RG1SAV),a
-     294.  00:43CD                      		; ; out	(0x99),a
-     295.  00:43CD                      		; ; ld	a,1+128
-     296.  00:43CD                      		; ; out	(0x99),a
-     297.  00:43CD                      
+     251.  00:43A3                      								;  update displaypage and _xoffset
+     252.  00:43A3  CD EC 43            		call	set_displaypage	; it has to be the LAST action in lint
+     253.  00:43A6                      		
+     254.  00:43A6  DD E1               		pop    ix         
+     255.  00:43A8  FD E1               		pop    iy         
+     256.  00:43AA  F1                  		pop    af         
+     257.  00:43AB  C1                  		pop    bc         
+     258.  00:43AC  D1                  		pop    de         
+     259.  00:43AD  E1                  		pop    hl         
+     260.  00:43AE  08                  		ex     af,af'     
+     261.  00:43AF  D9                  		exx               
+     262.  00:43B0  C1                  		pop    bc         
+     263.  00:43B1  D1                  		pop    de         
+     264.  00:43B2  E1                  		pop    hl         
+     265.  00:43B3                      
+     266.  00:43B3  F1                  		pop	 af
+     267.  00:43B4  FB                  		ei
+     268.  00:43B5  C9                  		ret
+     269.  00:43B6                      	
+     270.  00:43B6                      ; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;	
+     271.  00:43B6                      ; ; manage score bar at YSIZE
+     272.  00:43B6                      ; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;	
+     273.  00:43B6                      waitHBLANK:
+     274.  00:43B6  3E 02               		ld a,2 				; read S#2
+     275.  00:43B8  D3 99               		out (0x99),a
+     276.  00:43BA  3E 8F               		ld a,128+15
+     277.  00:43BC  D3 99               		out (0x99),a		; poll for HBLANK
+     278.  00:43BE                      		 
+     279.  00:43BE  DB 99               1:		in	a,(0x99)		; if 1 we are in HBLANK already, so wait until end of HBLANK
+     280.  00:43C0  E6 20               		and	0x20
+     281.  00:43C2  C2 BE 43            		jp	nz,1b			
+     282.  00:43C5                      
+     283.  00:43C5  DB 99               1:		in	a,(0x99)		; wait until end of the active area
+     284.  00:43C7  E6 20               		and	0x20
+     285.  00:43C9  CA C5 43            		jp	z,1b
+     286.  00:43CC  C9                  		ret
+     287.  00:43CD                      	
+     288.  00:43CD                      ; lint:	
+     289.  00:43CD                      		; ; call	waitHBLANK
+     290.  00:43CD                      		; ; now we are at the start of HBLANK
+     291.  00:43CD                      	
+     292.  00:43CD                      		; ; ld	a,(RG1SAV)
+     293.  00:43CD                      		; ; and	010111111B			; disable screen
+     294.  00:43CD                      		; ; ld	(RG1SAV),a
+     295.  00:43CD                      		; ; out	(0x99),a
+     296.  00:43CD                      		; ; ld	a,1+128
+     297.  00:43CD                      		; ; out	(0x99),a
      298.  00:43CD                      
-     299.  00:43CD                      		; ld a,00011111B		; 0XX11111B
-     300.  00:43CD                      		; out (0x99),a
-     301.  00:43CD                      		; ld a,2+128			; R#2 
-     302.  00:43CD                      		; out (0x99),a		; score bar in page 0
-     303.  00:43CD                      
-     304.  00:43CD                      		; ld    A,mapHeight*16-(YSIZE-2)	; SCROLL DOWN
-     305.  00:43CD                      		; out (0x99),a
-     306.  00:43CD                      		; ld    A,23+128
-     307.  00:43CD                      		; out (0x99),a
-     308.  00:43CD                      
-     309.  00:43CD                      		; xor		a
-     310.  00:43CD                      		; out	(099h),a
-     311.  00:43CD                      		; ld	a,18+128
-     312.  00:43CD                      		; out	(099h),a		; set adjust 0,0
-     313.  00:43CD                      
+     299.  00:43CD                      
+     300.  00:43CD                      		; ld a,00011111B		; 0XX11111B
+     301.  00:43CD                      		; out (0x99),a
+     302.  00:43CD                      		; ld a,2+128			; R#2 
+     303.  00:43CD                      		; out (0x99),a		; score bar in page 0
+     304.  00:43CD                      
+     305.  00:43CD                      		; ld    A,mapHeight*16-(YSIZE-2)	; SCROLL DOWN
+     306.  00:43CD                      		; out (0x99),a
+     307.  00:43CD                      		; ld    A,23+128
+     308.  00:43CD                      		; out (0x99),a
+     309.  00:43CD                      
+     310.  00:43CD                      		; xor		a
+     311.  00:43CD                      		; out	(099h),a
+     312.  00:43CD                      		; ld	a,18+128
+     313.  00:43CD                      		; out	(099h),a		; set adjust 0,0
      314.  00:43CD                      
-     315.  00:43CD                      		; ld	a,(RG8SAV)
-     316.  00:43CD                      		; or	000000010B		; disable sprites
-     317.  00:43CD                      		; ld	(RG8SAV),a
-     318.  00:43CD                      		; out	(0x99),a
-     319.  00:43CD                      		; ld	a,8+128
-     320.  00:43CD                      		; out	(0x99),a
-     321.  00:43CD                      
-     322.  00:43CD                      		; ; call	waitHBLANK
-     323.  00:43CD                      		
-     324.  00:43CD                      		; ; ld	a,(RG1SAV)
-     325.  00:43CD                      		; ; or 	01000010B		; enable screen
-     326.  00:43CD                      		; ; ld	(RG1SAV),a
-     327.  00:43CD                      		; ; out	(0x99),a
-     328.  00:43CD                      		; ; ld	a,1+128
-     329.  00:43CD                      		; ; out	(0x99),a
-     330.  00:43CD                      	
-     331.  00:43CD                      		; push   hl         
-     332.  00:43CD                      		; push   de         
-     333.  00:43CD                      		; push   bc         
-     334.  00:43CD                      		; exx               
-     335.  00:43CD                      		; ex     af,af'     
-     336.  00:43CD                      		; push   hl         
-     337.  00:43CD                      		; push   de         
-     338.  00:43CD                      		; push   bc         
-     339.  00:43CD                      		; push   af         
-     340.  00:43CD                      		; push   iy         
-     341.  00:43CD                      		; push   ix         
-     342.  00:43CD                      
-     343.  00:43CD                      		
-     344.  00:43CD                      		; ld	hl,.exit
-     345.  00:43CD                      		; push	hl
-     346.  00:43CD                      		; ld		a,(dxmap)
-     347.  00:43CD                      		; rlc a
-     348.  00:43CD                      
-     349.  00:43CD                      		; jp	nc,_blank_line_lft		; >0 == dx
-     350.  00:43CD                      		; jp	 c,_blank_line_rgt		; <0 == sx
-     351.  00:43CD                      ; 1:		pop	hl
-     352.  00:43CD                      ; .exit:
-     353.  00:43CD                      ; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-     354.  00:43CD                      		; ; ld		a,00001000B
-     355.  00:43CD                      		; ; out		(0x99),a
-     356.  00:43CD                      		; ; ld		a,7+128
-     357.  00:43CD                      		; ; out		(0x99),a
-     358.  00:43CD                      		
-     359.  00:43CD                      ; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-     360.  00:43CD                      		; call	test_star
-     361.  00:43CD                      
-     362.  00:43CD                      		; xor		a
-     363.  00:43CD                      		; out		(0x99),a
-     364.  00:43CD                      		; ld		a,7+128
-     365.  00:43CD                      		; out		(0x99),a
-     366.  00:43CD                      ; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-     367.  00:43CD                      		
-     368.  00:43CD                      		; pop    ix         
-     369.  00:43CD                      		; pop    iy         
-     370.  00:43CD                      		; pop    af         
-     371.  00:43CD                      		; pop    bc         
-     372.  00:43CD                      		; pop    de         
-     373.  00:43CD                      		; pop    hl         
-     374.  00:43CD                      		; ex     af,af'     
-     375.  00:43CD                      		; exx               
-     376.  00:43CD                      		; pop    bc         
-     377.  00:43CD                      		; pop    de         
-     378.  00:43CD                      		; pop    hl         
-     379.  00:43CD                      
-     380.  00:43CD                      		; pop		af
-     381.  00:43CD                      		; ei
-     382.  00:43CD                      		; ret
-     383.  00:43CD                      
-     384.  00:43CD                      ; ;-------------------------------------		
-     385.  00:43CD                      
-     386.  00:43CD                      ; border_color	equ 	0;	00100101B
-     387.  00:43CD                      		
-     388.  00:43CD                      ; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;	
-     389.  00:43CD                      ; ;   manage normal vblank routine
-     390.  00:43CD                      ; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;	
-     391.  00:43CD                      
-     392.  00:43CD                      ; vblank:
-     393.  00:43CD                      		; call	activate_window	
-     394.  00:43CD                      
-     395.  00:43CD                      		; push   hl         
-     396.  00:43CD                      		; push   de         
-     397.  00:43CD                      		; push   bc         
-     398.  00:43CD                      		; exx               
-     399.  00:43CD                      		; ex     af,af'     
-     400.  00:43CD                      		; push   hl         
-     401.  00:43CD                      		; push   de         
-     402.  00:43CD                      		; push   bc         
-     403.  00:43CD                      		; push   af         
-     404.  00:43CD                      		; push   iy         
-     405.  00:43CD                      		; push   ix         
-     406.  00:43CD                      
-     407.  00:43CD                      		; ; ld	a,00011100B		; red
-     408.  00:43CD                      		; ; out		(0x99),a
-     409.  00:43CD                      		; ; ld		a,7+128
-     410.  00:43CD                      		; ; out		(0x99),a
-     411.  00:43CD                      
-     412.  00:43CD                      		; call	changedir
-     413.  00:43CD                      				
-     414.  00:43CD                      		; ld	hl,(_jiffy)
-     415.  00:43CD                      		; inc	hl
-     416.  00:43CD                      		; ld	(_jiffy),hl
-     417.  00:43CD                      				
-     418.  00:43CD                      		; ; ld	a,00011100B		; red
-     419.  00:43CD                      		; ; out	(0x99),a
-     420.  00:43CD                      		; ; ld	a,7+128
-     421.  00:43CD                      		; ; out	(0x99),a
-     422.  00:43CD                      		
-     423.  00:43CD                      
-     424.  00:43CD                      		; ; xor		a		; black
-     425.  00:43CD                      		; ; out	(0x99),a
-     426.  00:43CD                      		; ; ld	a,7+128
-     427.  00:43CD                      		; ; out	(0x99),a
-     428.  00:43CD                      	
-     429.  00:43CD                      		; pop    ix         
-     430.  00:43CD                      		; pop    iy         
-     431.  00:43CD                      		; pop    af         
-     432.  00:43CD                      		; pop    bc         
-     433.  00:43CD                      		; pop    de         
-     434.  00:43CD                      		; pop    hl         
-     435.  00:43CD                      		; ex     af,af'     
-     436.  00:43CD                      		; exx               
-     437.  00:43CD                      		; pop    bc         
-     438.  00:43CD                      		; pop    de         
-     439.  00:43CD                      		; pop    hl         
-     440.  00:43CD                      
-     441.  00:43CD                      		; pop		af
-     442.  00:43CD                      		; ei
-     443.  00:43CD                      		; ret
-     444.  00:43CD                      ; ;-------------------------------------
+     315.  00:43CD                      
+     316.  00:43CD                      		; ld	a,(RG8SAV)
+     317.  00:43CD                      		; or	000000010B		; disable sprites
+     318.  00:43CD                      		; ld	(RG8SAV),a
+     319.  00:43CD                      		; out	(0x99),a
+     320.  00:43CD                      		; ld	a,8+128
+     321.  00:43CD                      		; out	(0x99),a
+     322.  00:43CD                      
+     323.  00:43CD                      		; ; call	waitHBLANK
+     324.  00:43CD                      		
+     325.  00:43CD                      		; ; ld	a,(RG1SAV)
+     326.  00:43CD                      		; ; or 	01000010B		; enable screen
+     327.  00:43CD                      		; ; ld	(RG1SAV),a
+     328.  00:43CD                      		; ; out	(0x99),a
+     329.  00:43CD                      		; ; ld	a,1+128
+     330.  00:43CD                      		; ; out	(0x99),a
+     331.  00:43CD                      	
+     332.  00:43CD                      		; push   hl         
+     333.  00:43CD                      		; push   de         
+     334.  00:43CD                      		; push   bc         
+     335.  00:43CD                      		; exx               
+     336.  00:43CD                      		; ex     af,af'     
+     337.  00:43CD                      		; push   hl         
+     338.  00:43CD                      		; push   de         
+     339.  00:43CD                      		; push   bc         
+     340.  00:43CD                      		; push   af         
+     341.  00:43CD                      		; push   iy         
+     342.  00:43CD                      		; push   ix         
+     343.  00:43CD                      
+     344.  00:43CD                      		
+     345.  00:43CD                      		; ld	hl,.exit
+     346.  00:43CD                      		; push	hl
+     347.  00:43CD                      		; ld		a,(dxmap)
+     348.  00:43CD                      		; rlc a
+     349.  00:43CD                      
+     350.  00:43CD                      		; jp	nc,_blank_line_lft		; >0 == dx
+     351.  00:43CD                      		; jp	 c,_blank_line_rgt		; <0 == sx
+     352.  00:43CD                      ; 1:		pop	hl
+     353.  00:43CD                      ; .exit:
+     354.  00:43CD                      ; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+     355.  00:43CD                      		; ; ld		a,00001000B
+     356.  00:43CD                      		; ; out		(0x99),a
+     357.  00:43CD                      		; ; ld		a,7+128
+     358.  00:43CD                      		; ; out		(0x99),a
+     359.  00:43CD                      		
+     360.  00:43CD                      ; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+     361.  00:43CD                      		; call	test_star
+     362.  00:43CD                      
+     363.  00:43CD                      		; xor		a
+     364.  00:43CD                      		; out		(0x99),a
+     365.  00:43CD                      		; ld		a,7+128
+     366.  00:43CD                      		; out		(0x99),a
+     367.  00:43CD                      ; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+     368.  00:43CD                      		
+     369.  00:43CD                      		; pop    ix         
+     370.  00:43CD                      		; pop    iy         
+     371.  00:43CD                      		; pop    af         
+     372.  00:43CD                      		; pop    bc         
+     373.  00:43CD                      		; pop    de         
+     374.  00:43CD                      		; pop    hl         
+     375.  00:43CD                      		; ex     af,af'     
+     376.  00:43CD                      		; exx               
+     377.  00:43CD                      		; pop    bc         
+     378.  00:43CD                      		; pop    de         
+     379.  00:43CD                      		; pop    hl         
+     380.  00:43CD                      
+     381.  00:43CD                      		; pop		af
+     382.  00:43CD                      		; ei
+     383.  00:43CD                      		; ret
+     384.  00:43CD                      
+     385.  00:43CD                      ; ;-------------------------------------		
+     386.  00:43CD                      
+     387.  00:43CD                      ; border_color	equ 	0;	00100101B
+     388.  00:43CD                      		
+     389.  00:43CD                      ; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;	
+     390.  00:43CD                      ; ;   manage normal vblank routine
+     391.  00:43CD                      ; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;	
+     392.  00:43CD                      
+     393.  00:43CD                      ; vblank:
+     394.  00:43CD                      		; call	activate_window	
+     395.  00:43CD                      
+     396.  00:43CD                      		; push   hl         
+     397.  00:43CD                      		; push   de         
+     398.  00:43CD                      		; push   bc         
+     399.  00:43CD                      		; exx               
+     400.  00:43CD                      		; ex     af,af'     
+     401.  00:43CD                      		; push   hl         
+     402.  00:43CD                      		; push   de         
+     403.  00:43CD                      		; push   bc         
+     404.  00:43CD                      		; push   af         
+     405.  00:43CD                      		; push   iy         
+     406.  00:43CD                      		; push   ix         
+     407.  00:43CD                      
+     408.  00:43CD                      		; ; ld	a,00011100B		; red
+     409.  00:43CD                      		; ; out		(0x99),a
+     410.  00:43CD                      		; ; ld		a,7+128
+     411.  00:43CD                      		; ; out		(0x99),a
+     412.  00:43CD                      
+     413.  00:43CD                      		; call	changedir
+     414.  00:43CD                      				
+     415.  00:43CD                      		; ld	hl,(_jiffy)
+     416.  00:43CD                      		; inc	hl
+     417.  00:43CD                      		; ld	(_jiffy),hl
+     418.  00:43CD                      				
+     419.  00:43CD                      		; ; ld	a,00011100B		; red
+     420.  00:43CD                      		; ; out	(0x99),a
+     421.  00:43CD                      		; ; ld	a,7+128
+     422.  00:43CD                      		; ; out	(0x99),a
+     423.  00:43CD                      		
+     424.  00:43CD                      
+     425.  00:43CD                      		; ; xor		a		; black
+     426.  00:43CD                      		; ; out	(0x99),a
+     427.  00:43CD                      		; ; ld	a,7+128
+     428.  00:43CD                      		; ; out	(0x99),a
+     429.  00:43CD                      	
+     430.  00:43CD                      		; pop    ix         
+     431.  00:43CD                      		; pop    iy         
+     432.  00:43CD                      		; pop    af         
+     433.  00:43CD                      		; pop    bc         
+     434.  00:43CD                      		; pop    de         
+     435.  00:43CD                      		; pop    hl         
+     436.  00:43CD                      		; ex     af,af'     
+     437.  00:43CD                      		; exx               
+     438.  00:43CD                      		; pop    bc         
+     439.  00:43CD                      		; pop    de         
+     440.  00:43CD                      		; pop    hl         
+     441.  00:43CD                      
+     442.  00:43CD                      		; pop		af
+     443.  00:43CD                      		; ei
+     444.  00:43CD                      		; ret
      445.  00:43CD                      ; ;-------------------------------------
-     446.  00:43CD                      
-     447.  00:43CD                      ; _blank_line_lft:
-     448.  00:43CD                      		; ; ld	a,00000111B		; blue
-     449.  00:43CD                      		; ; out	(0x99),a
-     450.  00:43CD                      		; ; ld	a,7+128
-     451.  00:43CD                      		; ; out	(0x99),a
-     452.  00:43CD                      
-     453.  00:43CD                      		; ld	e,0
-     454.  00:43CD                      		; call	blank_line
-     455.  00:43CD                      
-     456.  00:43CD                      		
+     446.  00:43CD                      ; ;-------------------------------------
+     447.  00:43CD                      
+     448.  00:43CD                      ; _blank_line_lft:
+     449.  00:43CD                      		; ; ld	a,00000111B		; blue
+     450.  00:43CD                      		; ; out	(0x99),a
+     451.  00:43CD                      		; ; ld	a,7+128
+     452.  00:43CD                      		; ; out	(0x99),a
+     453.  00:43CD                      
+     454.  00:43CD                      		; ld	e,0
+     455.  00:43CD                      		; call	blank_line
+     456.  00:43CD                      
      457.  00:43CD                      		
-     458.  00:43CD                      		; ; xor	a
-     459.  00:43CD                      		; ; out	(0x99),a
-     460.  00:43CD                      		; ; ld	a,7+128
-     461.  00:43CD                      		; ; out	(0x99),a
-     462.  00:43CD                      		; ret
-     463.  00:43CD                      
-     464.  00:43CD                      ; ;-------------------------------------	
-     465.  00:43CD                      
-     466.  00:43CD                      ; _blank_line_rgt
-     467.  00:43CD                      		; ; ld	a,00000111B		; blue
-     468.  00:43CD                      		; ; out	(0x99),a
-     469.  00:43CD                      		; ; ld	a,7+128
-     470.  00:43CD                      		; ; out	(0x99),a
-     471.  00:43CD                      
-     472.  00:43CD                      		; ld	e,240
-     473.  00:43CD                      		; call	blank_line
-     474.  00:43CD                      
-     475.  00:43CD                      		; ; xor	a
-     476.  00:43CD                      		; ; out	(0x99),a
-     477.  00:43CD                      		; ; ld	a,7+128
-     478.  00:43CD                      		; ; out	(0x99),a
-     479.  00:43CD                      		; ret
-     480.  00:43CD                      		
-     481.  00:43CD                      ; ;-------------------------------------	
-     482.  00:43CD                      		
-     483.  00:43CD                      ; inc_xoffset
-     484.  00:43CD                      		; call	plot_line_rgt1
-     485.  00:43CD                      		; call	.movex
-     486.  00:43CD                      		; call	plot_line_rgt2
-     487.  00:43CD                      				
-     488.  00:43CD                      		; ; ld	a,00000010B		; blue
-     489.  00:43CD                      		; ; out	(0x99),a
-     490.  00:43CD                      		; ; ld	a,7+128
-     491.  00:43CD                      		; ; out	(0x99),a
-     492.  00:43CD                      		
-     493.  00:43CD                      		; jp		newxmap
-     494.  00:43CD                      		
-     495.  00:43CD                      ; .movex
-     496.  00:43CD                      		; ld		a,(_xoffset)
-     497.  00:43CD                      		; and		a
-     498.  00:43CD                      		; jr		nz,.case1_15
-     499.  00:43CD                      ; .case0
-     500.  00:43CD                      		; ld 		a,(_displaypage)
-     501.  00:43CD                      		; xor		1
-     502.  00:43CD                      		; ld 		d,a
-     503.  00:43CD                      		; ld		e,240
-     504.  00:43CD                      		; jp		clrboder
-     505.  00:43CD                      		
-     506.  00:43CD                      ; .case1_15
-     507.  00:43CD                      ; [4]		add		a,a
-     508.  00:43CD                      		; ld		e,a
-     509.  00:43CD                      		; sub		a,16
-     510.  00:43CD                      		; ld		d,a
-     511.  00:43CD                      		; jp		move_block
-     512.  00:43CD                      
+     458.  00:43CD                      		
+     459.  00:43CD                      		; ; xor	a
+     460.  00:43CD                      		; ; out	(0x99),a
+     461.  00:43CD                      		; ; ld	a,7+128
+     462.  00:43CD                      		; ; out	(0x99),a
+     463.  00:43CD                      		; ret
+     464.  00:43CD                      
+     465.  00:43CD                      ; ;-------------------------------------	
+     466.  00:43CD                      
+     467.  00:43CD                      ; _blank_line_rgt
+     468.  00:43CD                      		; ; ld	a,00000111B		; blue
+     469.  00:43CD                      		; ; out	(0x99),a
+     470.  00:43CD                      		; ; ld	a,7+128
+     471.  00:43CD                      		; ; out	(0x99),a
+     472.  00:43CD                      
+     473.  00:43CD                      		; ld	e,240
+     474.  00:43CD                      		; call	blank_line
+     475.  00:43CD                      
+     476.  00:43CD                      		; ; xor	a
+     477.  00:43CD                      		; ; out	(0x99),a
+     478.  00:43CD                      		; ; ld	a,7+128
+     479.  00:43CD                      		; ; out	(0x99),a
+     480.  00:43CD                      		; ret
+     481.  00:43CD                      		
+     482.  00:43CD                      ; ;-------------------------------------	
+     483.  00:43CD                      		
+     484.  00:43CD                      ; inc_xoffset
+     485.  00:43CD                      		; call	plot_line_rgt1
+     486.  00:43CD                      		; call	.movex
+     487.  00:43CD                      		; call	plot_line_rgt2
+     488.  00:43CD                      				
+     489.  00:43CD                      		; ; ld	a,00000010B		; blue
+     490.  00:43CD                      		; ; out	(0x99),a
+     491.  00:43CD                      		; ; ld	a,7+128
+     492.  00:43CD                      		; ; out	(0x99),a
+     493.  00:43CD                      		
+     494.  00:43CD                      		; jp		newxmap
+     495.  00:43CD                      		
+     496.  00:43CD                      ; .movex
+     497.  00:43CD                      		; ld		a,(_xoffset)
+     498.  00:43CD                      		; and		a
+     499.  00:43CD                      		; jr		nz,.case1_15
+     500.  00:43CD                      ; .case0
+     501.  00:43CD                      		; ld 		a,(_displaypage)
+     502.  00:43CD                      		; xor		1
+     503.  00:43CD                      		; ld 		d,a
+     504.  00:43CD                      		; ld		e,240
+     505.  00:43CD                      		; jp		clrboder
+     506.  00:43CD                      		
+     507.  00:43CD                      ; .case1_15
+     508.  00:43CD                      ; [4]		add		a,a
+     509.  00:43CD                      		; ld		e,a
+     510.  00:43CD                      		; sub		a,16
+     511.  00:43CD                      		; ld		d,a
+     512.  00:43CD                      		; jp		move_block
      513.  00:43CD                      
-     514.  00:43CD                      ; ;-------------------------------------	
-     515.  00:43CD                      	
-     516.  00:43CD                      ; dec_xoffset
-     517.  00:43CD                      		; call	plot_line_lft1
-     518.  00:43CD                      		; call	.movex
-     519.  00:43CD                      		; call	plot_line_lft2
-     520.  00:43CD                      				
-     521.  00:43CD                      		; ; ld	a,00000011B		; blue
-     522.  00:43CD                      		; ; out	(0x99),a
-     523.  00:43CD                      		; ; ld	a,7+128
-     524.  00:43CD                      		; ; out	(0x99),a
-     525.  00:43CD                      
-     526.  00:43CD                      		; jp		newxmap
-     527.  00:43CD                      		
-     528.  00:43CD                      ; .movex
-     529.  00:43CD                      		; ld		a,(_xoffset)
-     530.  00:43CD                      		; cp	15
-     531.  00:43CD                      		; jr		nz,.case0_14
-     532.  00:43CD                      ; .case15
-     533.  00:43CD                      		; ld 		a,(_displaypage)
-     534.  00:43CD                      		; xor		1
-     535.  00:43CD                      		; ld 		d,a
-     536.  00:43CD                      		; ld		e,0
-     537.  00:43CD                      		; jp		clrboder
-     538.  00:43CD                      		
-     539.  00:43CD                      ; .case0_14
-     540.  00:43CD                      ; [4]		add		a,a
-     541.  00:43CD                      		; ld		e,a
-     542.  00:43CD                      		; add		a,16
-     543.  00:43CD                      		; ld		d,a
-     544.  00:43CD                      		; jp		move_block
-     545.  00:43CD                      
+     514.  00:43CD                      
+     515.  00:43CD                      ; ;-------------------------------------	
+     516.  00:43CD                      	
+     517.  00:43CD                      ; dec_xoffset
+     518.  00:43CD                      		; call	plot_line_lft1
+     519.  00:43CD                      		; call	.movex
+     520.  00:43CD                      		; call	plot_line_lft2
+     521.  00:43CD                      				
+     522.  00:43CD                      		; ; ld	a,00000011B		; blue
+     523.  00:43CD                      		; ; out	(0x99),a
+     524.  00:43CD                      		; ; ld	a,7+128
+     525.  00:43CD                      		; ; out	(0x99),a
+     526.  00:43CD                      
+     527.  00:43CD                      		; jp		newxmap
+     528.  00:43CD                      		
+     529.  00:43CD                      ; .movex
+     530.  00:43CD                      		; ld		a,(_xoffset)
+     531.  00:43CD                      		; cp	15
+     532.  00:43CD                      		; jr		nz,.case0_14
+     533.  00:43CD                      ; .case15
+     534.  00:43CD                      		; ld 		a,(_displaypage)
+     535.  00:43CD                      		; xor		1
+     536.  00:43CD                      		; ld 		d,a
+     537.  00:43CD                      		; ld		e,0
+     538.  00:43CD                      		; jp		clrboder
+     539.  00:43CD                      		
+     540.  00:43CD                      ; .case0_14
+     541.  00:43CD                      ; [4]		add		a,a
+     542.  00:43CD                      		; ld		e,a
+     543.  00:43CD                      		; add		a,16
+     544.  00:43CD                      		; ld		d,a
+     545.  00:43CD                      		; jp		move_block
      546.  00:43CD                      
-     547.  00:43CD                      ; ;-------------------------------------
-     548.  00:43CD                      ; newxmap
-     549.  00:43CD                      		; call 	plot_enemy		
-     550.  00:43CD                      		; call	color_enemy
-     551.  00:43CD                      
-     552.  00:43CD                      		; ld		hl,(_xmapx4)
-     553.  00:43CD                      		; ld		a,(dxmap)
-     554.  00:43CD                      		; ld		e,a
-     555.  00:43CD                      		; add 	a,a
-     556.  00:43CD                      		; sbc 	a,a
-     557.  00:43CD                      		; ld		d,a
-     558.  00:43CD                      		; add 	hl,de
-     559.  00:43CD                      		; ld		(_xmapx4),hl
-     560.  00:43CD                      		; repeat 2
-     561.  00:43CD                      		; sra		h
-     562.  00:43CD                      		; rr  	l
-     563.  00:43CD                      		; endrepeat
-     564.  00:43CD                      		; ld		(xmap),hl
-     565.  00:43CD                      		; ld 		a,l
-     566.  00:43CD                      		; and		15
-     567.  00:43CD                      		; ld		(_xoffset),a
-     568.  00:43CD                      		; repeat 4
-     569.  00:43CD                      		; sra		h
-     570.  00:43CD                      		; rr  	l
-     571.  00:43CD                      		; endrepeat
-     572.  00:43CD                      		; ld 		a,l
-     573.  00:43CD                      		; and		1
-     574.  00:43CD                      		; ld		(_displaypage),a
-     575.  00:43CD                      		; ld		de,_levelmap
-     576.  00:43CD                      		; add		hl,de
-     577.  00:43CD                      		; ld		(_levelmap_pos),hl
-     578.  00:43CD                      		; ret
-     579.  00:43CD                      		
-     580.  00:43CD                      ; ;-------------------------------------
-     581.  00:43CD                      
-     582.  00:43CD                      ; activate_window	
-     583.  00:43CD                      		; ld	a,(_displaypage)
-     584.  00:43CD                      ; [5]		add a,a 			; x32
-     585.  00:43CD                      		; or	00011111B
-     586.  00:43CD                      		; out (0x99),a
-     587.  00:43CD                      		; ld a,2+128
-     588.  00:43CD                      		; out (0x99),a
-     589.  00:43CD                      		
-     590.  00:43CD                      		; ld    A,(_yoffset)		; SCROLL DOWN
-     591.  00:43CD                      		; out (0x99),a
-     592.  00:43CD                      		; add    A,YSIZE-1
-     593.  00:43CD                      		; ld		l,a
-     594.  00:43CD                      		; ld    A,23+128
-     595.  00:43CD                      		; out (0x99),a
-     596.  00:43CD                      
-     597.  00:43CD                      		; ld    a,l
-     598.  00:43CD                      		; out (0x99),a			; set interrupt line
-     599.  00:43CD                      		; ld    A,19+128
-     600.  00:43CD                      		; out (0x99),a
-     601.  00:43CD                      		
-     602.  00:43CD                      		; ld	a,(_xoffset)		; set R#18 only if not scrolling
-     603.  00:43CD                      		; add	a,-8
-     604.  00:43CD                      		; and	0Fh
-     605.  00:43CD                      		; out	(099h),a
-     606.  00:43CD                      		; ld	a,18+128
-     607.  00:43CD                      		; out	(099h),a
-     608.  00:43CD                      
-     609.  00:43CD                      		; ld	a,(RG8SAV)		; enable sprites
-     610.  00:43CD                      		; and	11111101B
-     611.  00:43CD                      		; ld	(RG8SAV),a
-     612.  00:43CD                      		; out	(0x99),a
-     613.  00:43CD                      		; ld	a,8+128
-     614.  00:43CD                      		; out	(0x99),a
-     615.  00:43CD                      
-     616.  00:43CD                      		; ret
-     617.  00:43CD                      			
-     618.  00:43CD                      ; ;-------------------------------------
-     619.  00:43CD                      	
-     620.  00:43CD                      ; changedir:
-     621.  00:43CD                      		; ld		a,(_dxmap)
-     622.  00:43CD                      		; and		128
-     623.  00:43CD                      		; ld		b,a
-     624.  00:43CD                      		; inc		hl
-     625.  00:43CD                      		; ld		a,(dxmap)		; dxmap
-     626.  00:43CD                      		; ld		c,a
-     627.  00:43CD                      		; and		128
-     628.  00:43CD                      		; xor		b				; compare signs
-     629.  00:43CD                      		; jp		z,nodirchange
-     630.  00:43CD                      		; ld		(_dxchng),a		; a<>0
-     631.  00:43CD                      		; bit		7,c
-     632.  00:43CD                      		; jr		z,.right
-     633.  00:43CD                      ; .left
-     634.  00:43CD                      		; call	plot_line_lft1
-     635.  00:43CD                      		; ld 		a,(_displaypage)
-     636.  00:43CD                      		; xor		1
-     637.  00:43CD                      		; ld 		d,a
-     638.  00:43CD                      		; ld		e,0
-     639.  00:43CD                      		; call	clrboder
-     640.  00:43CD                      		; call	plot_line_lft2
-     641.  00:43CD                      		; jp		newxmap
-     642.  00:43CD                      
-     643.  00:43CD                      ; .right
-     644.  00:43CD                      		; call	plot_line_rgt1
-     645.  00:43CD                      		; ld 		a,(_displaypage)
-     646.  00:43CD                      		; xor		1
-     647.  00:43CD                      		; ld 		d,a
-     648.  00:43CD                      		; ld		e,240
-     649.  00:43CD                      		; call	clrboder
-     650.  00:43CD                      		; call	plot_line_rgt2
-     651.  00:43CD                      		; jp		newxmap
-     652.  00:43CD                      
-     653.  00:43CD                      ; nodirchange:
-     654.  00:43CD                      		; ld		a,(_dxchng)
-     655.  00:43CD                      		; and		a
-     656.  00:43CD                      		; jr		nz,1f
-     657.  00:43CD                      		; bit		7,c
-     658.  00:43CD                      		; jp		z,inc_xoffset
-     659.  00:43CD                      		; jp		dec_xoffset
-     660.  00:43CD                      	
-     661.  00:43CD                      ; 1:		xor	a
-     662.  00:43CD                      		; ld		(_dxchng),a
-     663.  00:43CD                      		; bit		7,c
-     664.  00:43CD                      		; jp		z,.right
-     665.  00:43CD                      ; .left
-     666.  00:43CD                      		; call	plot_line_lft1
-     667.  00:43CD                      		; ld		e,240-16
-     668.  00:43CD                      		; ld		d,240
-     669.  00:43CD                      		; call	move_block
-     670.  00:43CD                      		; call	plot_line_lft2
-     671.  00:43CD                      		; jp		newxmap
-     672.  00:43CD                      
-     673.  00:43CD                      ; .right
-     674.  00:43CD                      		; call	plot_line_rgt1
-     675.  00:43CD                      		; ld		e,16
-     676.  00:43CD                      		; ld		d,0
-     677.  00:43CD                      		; call	move_block
-     678.  00:43CD                      		; call	plot_line_rgt2
-     679.  00:43CD                      		; jp		newxmap
-     680.  00:43CD                      
-     681.  00:43CD                      ; ;-------------------------------------
+     547.  00:43CD                      
+     548.  00:43CD                      ; ;-------------------------------------
+     549.  00:43CD                      ; newxmap
+     550.  00:43CD                      		; call 	plot_enemy		
+     551.  00:43CD                      		; call	color_enemy
+     552.  00:43CD                      
+     553.  00:43CD                      		; ld		hl,(_xmapx4)
+     554.  00:43CD                      		; ld		a,(dxmap)
+     555.  00:43CD                      		; ld		e,a
+     556.  00:43CD                      		; add 	a,a
+     557.  00:43CD                      		; sbc 	a,a
+     558.  00:43CD                      		; ld		d,a
+     559.  00:43CD                      		; add 	hl,de
+     560.  00:43CD                      		; ld		(_xmapx4),hl
+     561.  00:43CD                      		; repeat 2
+     562.  00:43CD                      		; sra		h
+     563.  00:43CD                      		; rr  	l
+     564.  00:43CD                      		; endrepeat
+     565.  00:43CD                      		; ld		(xmap),hl
+     566.  00:43CD                      		; ld 		a,l
+     567.  00:43CD                      		; and		15
+     568.  00:43CD                      		; ld		(_xoffset),a
+     569.  00:43CD                      		; repeat 4
+     570.  00:43CD                      		; sra		h
+     571.  00:43CD                      		; rr  	l
+     572.  00:43CD                      		; endrepeat
+     573.  00:43CD                      		; ld 		a,l
+     574.  00:43CD                      		; and		1
+     575.  00:43CD                      		; ld		(_displaypage),a
+     576.  00:43CD                      		; ld		de,_levelmap
+     577.  00:43CD                      		; add		hl,de
+     578.  00:43CD                      		; ld		(_levelmap_pos),hl
+     579.  00:43CD                      		; ret
+     580.  00:43CD                      		
+     581.  00:43CD                      ; ;-------------------------------------
+     582.  00:43CD                      
+     583.  00:43CD                      ; activate_window	
+     584.  00:43CD                      		; ld	a,(_displaypage)
+     585.  00:43CD                      ; [5]		add a,a 			; x32
+     586.  00:43CD                      		; or	00011111B
+     587.  00:43CD                      		; out (0x99),a
+     588.  00:43CD                      		; ld a,2+128
+     589.  00:43CD                      		; out (0x99),a
+     590.  00:43CD                      		
+     591.  00:43CD                      		; ld    A,(_yoffset)		; SCROLL DOWN
+     592.  00:43CD                      		; out (0x99),a
+     593.  00:43CD                      		; add    A,YSIZE-1
+     594.  00:43CD                      		; ld		l,a
+     595.  00:43CD                      		; ld    A,23+128
+     596.  00:43CD                      		; out (0x99),a
+     597.  00:43CD                      
+     598.  00:43CD                      		; ld    a,l
+     599.  00:43CD                      		; out (0x99),a			; set interrupt line
+     600.  00:43CD                      		; ld    A,19+128
+     601.  00:43CD                      		; out (0x99),a
+     602.  00:43CD                      		
+     603.  00:43CD                      		; ld	a,(_xoffset)		; set R#18 only if not scrolling
+     604.  00:43CD                      		; add	a,-8
+     605.  00:43CD                      		; and	0Fh
+     606.  00:43CD                      		; out	(099h),a
+     607.  00:43CD                      		; ld	a,18+128
+     608.  00:43CD                      		; out	(099h),a
+     609.  00:43CD                      
+     610.  00:43CD                      		; ld	a,(RG8SAV)		; enable sprites
+     611.  00:43CD                      		; and	11111101B
+     612.  00:43CD                      		; ld	(RG8SAV),a
+     613.  00:43CD                      		; out	(0x99),a
+     614.  00:43CD                      		; ld	a,8+128
+     615.  00:43CD                      		; out	(0x99),a
+     616.  00:43CD                      
+     617.  00:43CD                      		; ret
+     618.  00:43CD                      			
+     619.  00:43CD                      ; ;-------------------------------------
+     620.  00:43CD                      	
+     621.  00:43CD                      ; changedir:
+     622.  00:43CD                      		; ld		a,(_dxmap)
+     623.  00:43CD                      		; and		128
+     624.  00:43CD                      		; ld		b,a
+     625.  00:43CD                      		; inc		hl
+     626.  00:43CD                      		; ld		a,(dxmap)		; dxmap
+     627.  00:43CD                      		; ld		c,a
+     628.  00:43CD                      		; and		128
+     629.  00:43CD                      		; xor		b				; compare signs
+     630.  00:43CD                      		; jp		z,nodirchange
+     631.  00:43CD                      		; ld		(_dxchng),a		; a<>0
+     632.  00:43CD                      		; bit		7,c
+     633.  00:43CD                      		; jr		z,.right
+     634.  00:43CD                      ; .left
+     635.  00:43CD                      		; call	plot_line_lft1
+     636.  00:43CD                      		; ld 		a,(_displaypage)
+     637.  00:43CD                      		; xor		1
+     638.  00:43CD                      		; ld 		d,a
+     639.  00:43CD                      		; ld		e,0
+     640.  00:43CD                      		; call	clrboder
+     641.  00:43CD                      		; call	plot_line_lft2
+     642.  00:43CD                      		; jp		newxmap
+     643.  00:43CD                      
+     644.  00:43CD                      ; .right
+     645.  00:43CD                      		; call	plot_line_rgt1
+     646.  00:43CD                      		; ld 		a,(_displaypage)
+     647.  00:43CD                      		; xor		1
+     648.  00:43CD                      		; ld 		d,a
+     649.  00:43CD                      		; ld		e,240
+     650.  00:43CD                      		; call	clrboder
+     651.  00:43CD                      		; call	plot_line_rgt2
+     652.  00:43CD                      		; jp		newxmap
+     653.  00:43CD                      
+     654.  00:43CD                      ; nodirchange:
+     655.  00:43CD                      		; ld		a,(_dxchng)
+     656.  00:43CD                      		; and		a
+     657.  00:43CD                      		; jr		nz,1f
+     658.  00:43CD                      		; bit		7,c
+     659.  00:43CD                      		; jp		z,inc_xoffset
+     660.  00:43CD                      		; jp		dec_xoffset
+     661.  00:43CD                      	
+     662.  00:43CD                      ; 1:		xor	a
+     663.  00:43CD                      		; ld		(_dxchng),a
+     664.  00:43CD                      		; bit		7,c
+     665.  00:43CD                      		; jp		z,.right
+     666.  00:43CD                      ; .left
+     667.  00:43CD                      		; call	plot_line_lft1
+     668.  00:43CD                      		; ld		e,240-16
+     669.  00:43CD                      		; ld		d,240
+     670.  00:43CD                      		; call	move_block
+     671.  00:43CD                      		; call	plot_line_lft2
+     672.  00:43CD                      		; jp		newxmap
+     673.  00:43CD                      
+     674.  00:43CD                      ; .right
+     675.  00:43CD                      		; call	plot_line_rgt1
+     676.  00:43CD                      		; ld		e,16
+     677.  00:43CD                      		; ld		d,0
+     678.  00:43CD                      		; call	move_block
+     679.  00:43CD                      		; call	plot_line_rgt2
+     680.  00:43CD                      		; jp		newxmap
+     681.  00:43CD                      
+     682.  00:43CD                      ; ;-------------------------------------
       40   00:43CD                      		include fsmscroll.asm
        1.  00:43CD                      
        2.  00:43CD                      
@@ -2164,403 +2165,404 @@ Errors: 0
      312.  00:4840  C9                  		ret
      313.  00:4841                      		
       43   00:4841                      		include anim_opt.asm
-       1.  00:4841                      	
-       2.  00:4841                      		; ld		a,(_xoffset)		
-       3.  00:4841                      ; [4]		add		a,a					
-       4.  00:4841                      		; cp		d
-       5.  00:4841                      		
-       6.  00:4841                      		; if _xoffset*16 =>dx 	
-       7.  00:4841                      			; b = _displaypage
-       8.  00:4841                      		; else	
-       9.  00:4841                      			; b = _displaypage xor 1
-      10.  00:4841                      
-      11.  00:4841                      		; jr		nc,1f
-      12.  00:4841                      		
-      13.  00:4841                      		; ld 		a,(_displaypage)	; destination page	
-      14.  00:4841                      		; xor		1
-      15.  00:4841                      		; ld		b,a	
-      16.  00:4841                      		; ld		a,16
-      17.  00:4841                      		; add		a,d
-      18.  00:4841                      		; ld		d,a
-      19.  00:4841                      		; ld		a,14	
-      20.  00:4841                      		; jp move_tile
-      21.  00:4841                      		
-      22.  00:4841                      ; 1:		ld 		a,(_displaypage)	; destination page	
-      23.  00:4841                      		; ld		b,a		
-      24.  00:4841                      		; ld		a,15	
-      25.  00:4841                      		; jp move_tile
-      26.  00:4841                      
-      27.  00:4841                      ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-      28.  00:4841                      single_move:
-      29.  00:4841  3A 25 CA            		ld 		a,(_displaypage)	; destination page	
-      30.  00:4844  47                  		ld		b,a		
-      31.  00:4845  3A 26 CA            		ld		a,(_xoffset)
-      32.  00:4848  E6 0F               		and		15		
-      33.  00:484A  C3 B7 44            		jp 		move_tile
-      34.  00:484D                      
-      35.  00:484D                      animtest:
-      36.  00:484D  3A 16 CA            		ld	a,(anim_buffer.flag)
-      37.  00:4850  A7                  		and	a
-      38.  00:4851  20 59               		jr	nz,.manage_buffer
-      39.  00:4853                      
-      40.  00:4853  3A 26 CA            		ld		a,(_xoffset)		
-      41.  00:4856  87 87 87 87         [4]		add		a,a					
-      42.  00:485A  67                  		ld		h,a
-      43.  00:485B                      		
-      44.  00:485B                      		
-      45.  00:485B  3A 22 CA            		ld		a,(_xspeed+1)
-      46.  00:485E  CB 07               		rlc a
-      47.  00:4860  DA 7C 48            		jp	c,.scroll_left
-      48.  00:4863                      		
-      49.  00:4863                      .scroll_right:			
-      50.  00:4863  3A 26 CA            		ld		a,(_xoffset)	
-      51.  00:4866  FE 0F               		cp		15
-      52.  00:4868                      		; jp		z,.intercept_right
-      53.  00:4868                      		
-      54.  00:4868  CD C2 48            		call 	movemarker
-      55.  00:486B  7B                  		ld		a,e
-      56.  00:486C  32 17 CA            		ld		(anim_buffer.dy),a
-      57.  00:486F                      
-      58.  00:486F  7C                  		ld		a,h
-      59.  00:4870  BA                  		cp		d
-      60.  00:4871  DA 41 48            		jp 		c,single_move
-      61.  00:4874                      		
-      62.  00:4874  7A                  		ld		a,d
-      63.  00:4875  D6 10               		sub		a,16
-      64.  00:4877  32 18 CA            		ld		(anim_buffer.dx),a
-      65.  00:487A  18 16               		jr		1f
-      66.  00:487C                      		
-      67.  00:487C                      .scroll_left:
-      68.  00:487C  3A 26 CA            		ld		a,(_xoffset)	
-      69.  00:487F  A7                  		and		a
-      70.  00:4880                      		; jp		z,.intercept_left
-      71.  00:4880                      		
-      72.  00:4880  CD C2 48            		call 	movemarker
-      73.  00:4883  7B                  		ld		a,e
-      74.  00:4884  32 17 CA            		ld		(anim_buffer.dy),a
-      75.  00:4887                      
-      76.  00:4887  7A                  		ld		a,d
-      77.  00:4888  BC                  		cp		h
-      78.  00:4889  DA 41 48            		jp 		c,single_move
-      79.  00:488C                      
-      80.  00:488C  7A                  		ld		a,d
-      81.  00:488D  C6 10               		add		a,16
-      82.  00:488F  32 18 CA            		ld		(anim_buffer.dx),a
-      83.  00:4892                      1:		
-      84.  00:4892  3A 25 CA            		ld 		a,(_displaypage)	; destination page	
-      85.  00:4895  47                  		ld		b,a		
-      86.  00:4896  EE 01               		xor		1
-      87.  00:4898  32 1A CA            		ld		(anim_buffer.page),a
-      88.  00:489B                      		
-      89.  00:489B  3E 0F               		ld		a,15	
-      90.  00:489D  32 16 CA            		ld		(anim_buffer.flag),a
-      91.  00:48A0                      
-      92.  00:48A0  3A 26 CA            		ld		a,(_xoffset)
-      93.  00:48A3  E6 0F               		and		15
-      94.  00:48A5  32 19 CA            		ld		(anim_buffer.tile),a
-      95.  00:48A8                      		
-      96.  00:48A8  C3 B7 44            		jp 		move_tile
-      97.  00:48AB                      .intercept_right:
-      98.  00:48AB                      .intercept_left:
-      99.  00:48AB  C9                  		ret
-     100.  00:48AC                      	
-     101.  00:48AC                      .manage_buffer:
-     102.  00:48AC  AF                  		xor	a
-     103.  00:48AD  32 16 CA            		ld	(anim_buffer.flag),a
-     104.  00:48B0                      		
-     105.  00:48B0  3A 17 CA            		ld	a,(anim_buffer.dy)
-     106.  00:48B3  5F                  		ld	e,a
-     107.  00:48B4                      		
-     108.  00:48B4  3A 18 CA            		ld	a,(anim_buffer.dx)
-     109.  00:48B7  57                  		ld	d,a
-     110.  00:48B8                      		
-     111.  00:48B8  3A 1A CA            		ld	a,(anim_buffer.page)
-     112.  00:48BB  47                  		ld	b,a
-     113.  00:48BC                      		
-     114.  00:48BC  3A 19 CA            		ld	a,(anim_buffer.tile)
-     115.  00:48BF  C3 B7 44            		jp move_tile
-     116.  00:48C2                      		
-     117.  00:48C2                      ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-     118.  00:48C2                      ; test code to move a marker
-     119.  00:48C2                      ;
-     120.  00:48C2                      ; returns
-     121.  00:48C2                      ; d = dx	
-     122.  00:48C2                      ; e = dy	
-     123.  00:48C2                      
-     124.  00:48C2                      movemarker:		
-     125.  00:48C2  3A 1B CA            		ld	a,(joystick)
-     126.  00:48C5  6F                  		ld	l,a
-     127.  00:48C6                      
-     128.  00:48C6  CB 7D               		bit 7,l
-     129.  00:48C8  20 0E               		jr	nz,notright
-     130.  00:48CA  3A 14 CA            		ld	a,(_xtest)
-     131.  00:48CD  C6 10               		add	a,16
-     132.  00:48CF  FE F0               		cp	240
-     133.  00:48D1  28 13               		jr	z,1f
-     134.  00:48D3  32 14 CA            		ld	(_xtest),a
-     135.  00:48D6  18 0E               		jr	1f
-     136.  00:48D8                      notright:
-     137.  00:48D8  CB 65               		bit 4,l
-     138.  00:48DA  20 0A               		jr	nz,1f
-     139.  00:48DC  3A 14 CA            		ld	a,(_xtest)
-     140.  00:48DF  D6 10               		sub	a,16
-     141.  00:48E1  28 03               		jr	z,1f
-     142.  00:48E3  32 14 CA            		ld	(_xtest),a
-     143.  00:48E6                      1:		
-     144.  00:48E6  3A 14 CA            		ld	a,(_xtest)
-     145.  00:48E9  57                  		ld	d,a
-     146.  00:48EA                      
-     147.  00:48EA  CB 6D               		bit 5,l
-     148.  00:48EC  20 0D               		jr	nz,notup
-     149.  00:48EE  3A 15 CA            		ld	a,(_ytest)
-     150.  00:48F1  D6 10               		sub	a,16
-     151.  00:48F3  DA 0B 49            		jp	c,1f
-     152.  00:48F6  32 15 CA            		ld	(_ytest),a
-     153.  00:48F9  18 10               		jr	1f
-     154.  00:48FB                      notup:
-     155.  00:48FB  CB 75               		bit 6,l
-     156.  00:48FD  20 0C               		jr	nz,1f
-     157.  00:48FF  3A 15 CA            		ld	a,(_ytest)
-     158.  00:4902  C6 10               		add	a,16
-     159.  00:4904  FE A0               		cp	10*16
-     160.  00:4906  28 03               		jr	z,1f
-     161.  00:4908  32 15 CA            		ld	(_ytest),a
-     162.  00:490B                      1:
-     163.  00:490B  3A 15 CA            		ld	a,(_ytest)
-     164.  00:490E  5F                  		ld	e,a
-     165.  00:490F  C9                  		ret
-     166.  00:4910                      		
-     167.  00:4910                      		
-     168.  00:4910                      		
-      44   00:4910                      		
-      45   00:4910                      		include checkkbd.asm
-       1.  00:4910                      
-       2.  00:4910                      ; // Line Bit_7 Bit_6 Bit_5 Bit_4 Bit_3 Bit_2 Bit_1 Bit_0
-       3.  00:4910                      ; // 0 	   "7"  "6"   "5"   "4"   "3"   "2"   "1"   "0"
-       4.  00:4910                      ; // 1 	   ";"  "]"   "["   "\"   "="   "-"   "9"   "8"
-       5.  00:4910                      ; // 2 	   "B"  "A"   ???   "/"   "."   ","   "'"   "`"
-       6.  00:4910                      ; // 3 	   "J"  "I"   "H"   "G"   "F"   "E"   "D"   "C"
-       7.  00:4910                      ; // 4 	   "R"  "Q"   "P"   "O"   "N"   "M"   "L"   "K"
-       8.  00:4910                      ; // 5 	   "Z"  "Y"   "X"   "W"   "V"   "U"   "T"   "S"
-       9.  00:4910                      ; // 6 	   F3 	 F2    F1  CODE   CAP  GRAPH  CTRL SHIFT
-      10.  00:4910                      ; // 7 	   RET  SEL    BS  STOP   TAB   ESC    F5    F4
-      11.  00:4910                      ; // 8 	   RIGHT DOWN  UP  LEFT   DEL   INS   HOME SPACE
-      12.  00:4910                      
-      13.  00:4910                      checkkbd:
-      14.  00:4910                      		; di
-      15.  00:4910  DB AA               		in	a,(0aah)
-      16.  00:4912  E6 F0               		and 011110000B			; upper 4 bits contain info to preserve
-      17.  00:4914  B3                  		or	e
-      18.  00:4915  D3 AA               		out (0aah),a
-      19.  00:4917  DB A9               		in	a,(0a9h)
-      20.  00:4919  6F                  		ld	l,a
-      21.  00:491A                      		; ei
-      22.  00:491A  C9                  		ret
-      46   00:491B                      		
-      47   00:491B                      ;-------------------------------------
-      48   00:491B                      ; Entry point
-      49   00:491B                      ;-------------------------------------
-      50   00:491B                      START:
-      51   00:491B  AF                  		xor	a
-      52   00:491C  3C                  		inc	a
-      53   00:491D  32 13 CA            		ld	(SEL_NTSC),a		; NTSC MODE
-      54   00:4920  CD 0A 42            		call	set_scr			; set video mode to screen 8
-      55   00:4923  F3                  		di
-      56   00:4924                      		
-      57   00:4924                      ;-------------------------------------
-      58   00:4924                      ;   Power-up routine for 32K ROM
-      59   00:4924                      ;   set pages and sub slot
-      60   00:4924                      ;-------------------------------------
-      61   00:4924  CD 10 40                    call    search_slot
-      62   00:4927  CD 2F 40                    call    search_slotram	
-      63   00:492A  CD 61 40            		call	setrompage2		; ROM in page 1 & 2
-      64   00:492D  CD 5B 40            		call	setrampage0		; RAM in page 0 & 3
-      65   00:4930                      
-      66   00:4930                      
-      67   00:4930                      		; activate  the fist 24K of rom
-      68   00:4930  AF                  		xor	a			   
-      69   00:4931  32 00 50            		ld	(_kBank1),a
-      70   00:4934  3C                  		inc	a
-      71   00:4935  32 00 70            		ld	(_kBank2),a
-      72   00:4938  3C                  		inc	a
-      73   00:4939  32 00 90            		ld	(_kBank3),a
-      74   00:493C                      		
-      75   00:493C  CD 78 41            		call	_cls
-      76   00:493F                      		
-      77   00:493F                      		;--- initialise ISR in RAM
-      78   00:493F                      		
-      79   00:493F  F3                  		di
-      80   00:4940                      	
-      81   00:4940  CD 5C 42            		call	isr_set
-      82   00:4943                      		
-      83   00:4943                      		; copy the level map from ROM to RAM
-      84   00:4943                      		
-      85   00:4943  CD 0B 4A            		call	vdptest
-      86   00:4946  CD A5 41            		call	font_cpy
-      87   00:4949  CD 97 49            		call	mapinit
-      88   00:494C                      		
-      89   00:494C                      		
-      90   00:494C  21 00 00            		ld	hl,0
-      91   00:494F  22 9E FC            		ld	(_jiffy),hl		
-      92   00:4952  3E 20               		ld	a,32
-      93   00:4954  32 14 CA            		ld	(_xtest),a
-      94   00:4957  AF                  		xor	a
-      95   00:4958  32 15 CA            		ld	(_ytest),a
-      96   00:495B  32 25 CA            		ld	(_displaypage),a		
-      97   00:495E  32 16 CA            		ld	(anim_buffer.flag),a
-      98   00:4961  32 23 CA            		ld	(_dxchng),a
-      99   00:4964  32 24 CA            		ld	(_dxchng2),a
-     100   00:4967  3D                  		dec	a
-     101   00:4968  32 10 CA            		ld	(_sliceflag_reset),a
-     102   00:496B  CD 09 44            		call	reset_sliceflag
-     103   00:496E                      		
-     104   00:496E  FB                  		ei
-     105   00:496F  76                  1:		halt
-     106   00:4970  76                  		halt
-     107   00:4971                      		
-     108   00:4971  3A 9E FC            		ld	a,(_jiffy)		
-     109   00:4974  E6 1F               		and	31
-     110   00:4976  C2 6F 49            		jp	nz,1b
-     111   00:4979                      		
-     112   00:4979  1E 08               		ld	e,8
-     113   00:497B  CD 10 49            		call	checkkbd
-     114   00:497E  E6 01               		and	1				; space
-     115   00:4980  CC 86 49            		call	z,PAL_ntsc
-     116   00:4983  C3 6F 49            		jp	1b
-     117   00:4986                      		
-     118   00:4986                      PAL_ntsc:
-     119   00:4986  F3                  		di
-     120   00:4987  3A E8 FF            		ld		a,(RG9SAV)		
-     121   00:498A  EE 02               		xor		00000010B		; PAL or NTSC 
-     122   00:498C  32 E8 FF            		ld		(RG9SAV),a
-     123   00:498F  D3 99               		out		(0x99),a
-     124   00:4991  3E 89               		ld		a,9+128
-     125   00:4993  D3 99               		out		(0x99),a
-     126   00:4995  FB                  		ei
-     127   00:4996  C9                  		ret
-     128   00:4997                      
-     129   00:4997                      mapinit:		
-     130   00:4997  3E 0C               		ld		a, :_level
-     131   00:4999  32 00 B0            		ld		(_kBank4),a
-     132   00:499C  21 00 A0            		ld		hl,_level
-     133   00:499F  11 00 C0            		ld		de,_levelmap
-     134   00:49A2  01 00 0A            		ld		bc,mapWidth*mapHeight
-     135   00:49A5  ED B0               		ldir
-     136   00:49A7                      		
-     137   00:49A7  AF                  		xor		a
-     138   00:49A8  32 1D CA            		ld		(_ymappos),a
-     139   00:49AB  32 20 CA            		ld		(_xmappos+2),a	; 24 bit	
-     140   00:49AE  21 00 01            		ld		hl,256
-     141   00:49B1  22 21 CA            		ld		(_xspeed),hl
-     142   00:49B4  21 00 03            		ld		hl,768
-     143   00:49B7  22 1E CA            		ld		(_xmappos),hl
-     144   00:49BA                      		; ret
-     145   00:49BA                      
-     146   00:49BA                      buildmap:
-     147   00:49BA  2A 1E CA            		ld	hl,(_xmappos)
-     148   00:49BD                      
-     149   00:49BD                      		repeat 4
-     150   00:49BD                    < 		srl	h
-     151   00:49BD                    < 		rr	l
-     152   00:49BD                    < 		endrepeat					; corner top left of the screen window in the map in tiles
-     152   00:49BD  CB 3C CB 1D CB 3C CB 1D CB 3C CB 1D CB 3C CB 1D 
-     153   00:49CD                      		
-     154   00:49CD  11 00 C0            		ld	de,_levelmap
-     155   00:49D0  19                  		add	hl,de					; HL = corner top right of the screen window in the map in tiles
-     156   00:49D1                      		
-     157   00:49D1  11 00 00            		ld	de,0			; dest y,x
-     158   00:49D4  06 96               		ld	b,15*10
-     159   00:49D6                      1:		
-     160   00:49D6                      		set_tile (hl)
-     160   00:49D6  7E                >   ld a,reg
-     160   00:49D7  07 07 07          > [3]  rlca
-     160   00:49DA  E6 07             >   and 00000111B
-     160   00:49DC  C6 04             >   add a,:_tiles0
-     160   00:49DE  32 00 B0          >   ld (_kBank4),a
-     160   00:49E1                    > 
-     160   00:49E1  7E                >   ld a,reg
-     160   00:49E2  E6 1F             >   and 00011111B
-     160   00:49E4  C6 A0             >   add a,high _tiles0
-     161   00:49E6  E5                  		push	hl
-     162   00:49E7                      
-     163   00:49E7  67                  		ld	h,a				; select offset in the bank
-     164   00:49E8  2E 00               		ld	l,0
-     165   00:49EA                      		
-     166   00:49EA  D5                  		push	de
-     167   00:49EB  C5                  		push	bc
-     168   00:49EC  06 00               		ld		b,0				; page
-     169   00:49EE  CD 75 44            		call	LMMC_tile
-     170   00:49F1  C1                  		pop		bc
-     171   00:49F2  D1                  		pop		de
-     172   00:49F3                      		
-     173   00:49F3  E1                  		pop		hl
-     174   00:49F4                      
-     175   00:49F4  23                  		inc	hl
-     176   00:49F5                      
-     177   00:49F5  3E 10               		ld		a,16		; x=x+16
-     178   00:49F7  83                  		add		a,e
-     179   00:49F8  5F                  		ld		e,a
-     180   00:49F9                      		
-     181   00:49F9  FE F0               		cp		15*16
-     182   00:49FB  38 0B               		jr		c,2f
-     183   00:49FD                      
-     184   00:49FD  1E 00               		ld		e,0			; x = 0
-     185   00:49FF                      		
-     186   00:49FF  3E 10               		ld		a,16		; y=y+16
-     187   00:4A01  82                  		add		a,d
-     188   00:4A02  57                  		ld		d,a
-     189   00:4A03                      
-     190   00:4A03  3E F1               		ld		a,-15
-     191   00:4A05  85                  		add		a,l
-     192   00:4A06  6F                  		ld		l,a
-     193   00:4A07  24                  		inc		h
-     194   00:4A08                      		
-     195   00:4A08  10 CC               2:		djnz	1b
-     196   00:4A0A  C9                  		ret
-     197   00:4A0B                      		
-     198   00:4A0B                      vdptest:
-     199   00:4A0B  16 A0               		ld	d,160			; dest y
-     200   00:4A0D  1E 00               		ld	e,0				; dest x
-     201   00:4A0F  0E A0               		ld	c,160			; initial tile
-     202   00:4A11  06 20               		ld	b,32			; number of tiles
-     203   00:4A13                      1:		
-     204   00:4A13                      		set_tile c
-     204   00:4A13  79                >   ld a,reg
-     204   00:4A14  07 07 07          > [3]  rlca
-     204   00:4A17  E6 07             >   and 00000111B
-     204   00:4A19  C6 04             >   add a,:_tiles0
-     204   00:4A1B  32 00 B0          >   ld (_kBank4),a
-     204   00:4A1E                    > 
-     204   00:4A1E  79                >   ld a,reg
-     204   00:4A1F  E6 1F             >   and 00011111B
-     204   00:4A21  C6 A0             >   add a,high _tiles0
-     205   00:4A23                      
-     206   00:4A23  67                  		ld	h,a				; select offset in the bank
-     207   00:4A24  2E 00               		ld	l,0
-     208   00:4A26                      
-     209   00:4A26  D5                  		push	de
-     210   00:4A27  C5                  		push	bc
-     211   00:4A28  06 01               		ld		b,1				; page
-     212   00:4A2A  CD 75 44            		call	LMMC_tile
-     213   00:4A2D  C1                  		pop		bc
-     214   00:4A2E  D1                  		pop		de
-     215   00:4A2F                      		
-     216   00:4A2F  0C                  		inc		c
-     217   00:4A30                      		
-     218   00:4A30  3E 10               		ld		a,16		; x=x+16
-     219   00:4A32  83                  		add		a,e
-     220   00:4A33  5F                  		ld		e,a
-     221   00:4A34  30 04               		jr		nc,2f
-     222   00:4A36                      
-     223   00:4A36  3E 10               		ld		a,16		; y=y+16
-     224   00:4A38  82                  		add		a,d
-     225   00:4A39  57                  		ld		d,a
-     226   00:4A3A                      		
-     227   00:4A3A  10 D7               2:		djnz	1b
-     228   00:4A3C  C9                  		ret
-     229   00:4A3D                      		
-     230   00:4A3D                      		
-     231   00:4A3D  (04)                		page 4
+       1.  00:4841                      
+       2.  00:4841                      test_change_page:
+       3.  00:4841  2A 1E CA            		ld		hl,(_xmappos)		; corner top left of the screen window in the map in pixels
+       4.  00:4844  3A 25 CA            		ld		a,(_displaypage)
+       5.  00:4847  67                  		ld		h,a
+       6.  00:4848  3E 10               		ld		a,16
+       7.  00:484A  A5                  		and		l
+       8.  00:484B  28 02               		jr		z,1f
+       9.  00:484D  3E 01               		ld		a,1
+      10.  00:484F  AC                  1:		xor		h
+      11.  00:4850  C9                  		ret						;	ZF=0 if there is no page change
+      12.  00:4851                      								;	ZF=1 if page changed
+      13.  00:4851                      
+      14.  00:4851                      
+      15.  00:4851                      ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+      16.  00:4851                      single_move:
+      17.  00:4851  3A 25 CA            		ld 		a,(_displaypage)	; destination page	
+      18.  00:4854  47                  		ld		b,a		
+      19.  00:4855  3A 26 CA            		ld		a,(_xoffset)
+      20.  00:4858  E6 0F               		and		15		
+      21.  00:485A  C3 B7 44            		jp 		move_tile
+      22.  00:485D                      
+      23.  00:485D                      animtest:
+      24.  00:485D  3A 16 CA            		ld	a,(anim_buffer.flag)
+      25.  00:4860  A7                  		and	a
+      26.  00:4861  20 78               		jr	nz,.manage_buffer
+      27.  00:4863                      
+      28.  00:4863  3A 26 CA            		ld		a,(_xoffset)		
+      29.  00:4866  87 87 87 87         [4]		add		a,a					
+      30.  00:486A  67                  		ld		h,a
+      31.  00:486B                      		
+      32.  00:486B                      		
+      33.  00:486B  3A 22 CA            		ld		a,(_xspeed+1)
+      34.  00:486E  CB 07               		rlc a
+      35.  00:4870  DA 92 48            		jp	c,.scroll_left
+      36.  00:4873                      		
+      37.  00:4873                      .scroll_right:			
+      38.  00:4873  3A 26 CA            		ld		a,(_xoffset)	
+      39.  00:4876  FE 0F               		cp		15
+      40.  00:4878  CC 41 48            		call	z,test_change_page		; if xoffset=15 test for page swap
+      41.  00:487B  CA C7 48            		jp		z,.intercept_right		; if page swap intercetp
+      42.  00:487E                      		
+      43.  00:487E  CD F1 48            		call 	movemarker
+      44.  00:4881  7B                  		ld		a,e
+      45.  00:4882  32 17 CA            		ld		(anim_buffer.dy),a
+      46.  00:4885                      
+      47.  00:4885  7C                  		ld		a,h
+      48.  00:4886  BA                  		cp		d
+      49.  00:4887  DA 51 48            		jp 		c,single_move
+      50.  00:488A                      		
+      51.  00:488A  7A                  		ld		a,d
+      52.  00:488B  D6 10               		sub		a,16
+      53.  00:488D  32 18 CA            		ld		(anim_buffer.dx),a
+      54.  00:4890  18 1C               		jr		1f
+      55.  00:4892                      		
+      56.  00:4892                      .scroll_left:
+      57.  00:4892  3A 26 CA            		ld		a,(_xoffset)	
+      58.  00:4895  A7                  		and		a
+      59.  00:4896  CC 41 48            		call	z,test_change_page		; if xoffset=0 test for page swap		
+      60.  00:4899  CA DA 48            		jp		z,.intercept_left		; if page swap intercetp
+      61.  00:489C                      		
+      62.  00:489C  CD F1 48            		call 	movemarker
+      63.  00:489F  7B                  		ld		a,e
+      64.  00:48A0  32 17 CA            		ld		(anim_buffer.dy),a
+      65.  00:48A3                      
+      66.  00:48A3  7A                  		ld		a,d
+      67.  00:48A4  BC                  		cp		h
+      68.  00:48A5  DA 51 48            		jp 		c,single_move
+      69.  00:48A8                      
+      70.  00:48A8  7A                  		ld		a,d
+      71.  00:48A9  C6 10               		add		a,16
+      72.  00:48AB  32 18 CA            		ld		(anim_buffer.dx),a
+      73.  00:48AE                      1:		
+      74.  00:48AE  3A 25 CA            		ld 		a,(_displaypage)	; destination page	
+      75.  00:48B1  47                  		ld		b,a		
+      76.  00:48B2  EE 01               		xor		1
+      77.  00:48B4  32 1A CA            		ld		(anim_buffer.page),a
+      78.  00:48B7                      		
+      79.  00:48B7  3E 0F               		ld		a,15	
+      80.  00:48B9  32 16 CA            		ld		(anim_buffer.flag),a
+      81.  00:48BC                      
+      82.  00:48BC  3A 26 CA            		ld		a,(_xoffset)
+      83.  00:48BF  E6 0F               		and		15
+      84.  00:48C1  32 19 CA            		ld		(anim_buffer.tile),a
+      85.  00:48C4                      		
+      86.  00:48C4  C3 B7 44            		jp 		move_tile
+      87.  00:48C7                      .intercept_right:
+      88.  00:48C7  CD F1 48            		call 	movemarker
+      89.  00:48CA  7B                  		ld		a,e
+      90.  00:48CB  32 17 CA            		ld		(anim_buffer.dy),a
+      91.  00:48CE  3A 25 CA            		ld 		a,(_displaypage)	; destination page	
+      92.  00:48D1  EE 01               		xor		1
+      93.  00:48D3  47                  		ld		b,a		
+      94.  00:48D4  3A 26 CA            		ld		a,(_xoffset)
+      95.  00:48D7  C3 B7 44            		jp 		move_tile
+      96.  00:48DA                      
+      97.  00:48DA                      .intercept_left:
+      98.  00:48DA                      		
+      99.  00:48DA                      		
+     100.  00:48DA  C9                  		ret
+     101.  00:48DB                      	
+     102.  00:48DB                      .manage_buffer:
+     103.  00:48DB  AF                  		xor	a
+     104.  00:48DC  32 16 CA            		ld	(anim_buffer.flag),a
+     105.  00:48DF                      		
+     106.  00:48DF  3A 17 CA            		ld	a,(anim_buffer.dy)
+     107.  00:48E2  5F                  		ld	e,a
+     108.  00:48E3                      		
+     109.  00:48E3  3A 18 CA            		ld	a,(anim_buffer.dx)
+     110.  00:48E6  57                  		ld	d,a
+     111.  00:48E7                      		
+     112.  00:48E7  3A 1A CA            		ld	a,(anim_buffer.page)
+     113.  00:48EA  47                  		ld	b,a
+     114.  00:48EB                      		
+     115.  00:48EB  3A 19 CA            		ld	a,(anim_buffer.tile)
+     116.  00:48EE  C3 B7 44            		jp move_tile
+     117.  00:48F1                      		
+     118.  00:48F1                      ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+     119.  00:48F1                      ; test code to move a marker
+     120.  00:48F1                      ;
+     121.  00:48F1                      ; returns
+     122.  00:48F1                      ; d = dx	
+     123.  00:48F1                      ; e = dy	
+     124.  00:48F1                      
+     125.  00:48F1                      movemarker:		
+     126.  00:48F1  3A 1B CA            		ld	a,(joystick)
+     127.  00:48F4  6F                  		ld	l,a
+     128.  00:48F5                      
+     129.  00:48F5  CB 7D               		bit 7,l
+     130.  00:48F7  20 0E               		jr	nz,notright
+     131.  00:48F9  3A 14 CA            		ld	a,(_xtest)
+     132.  00:48FC  C6 10               		add	a,16
+     133.  00:48FE  FE F0               		cp	240
+     134.  00:4900  28 13               		jr	z,1f
+     135.  00:4902  32 14 CA            		ld	(_xtest),a
+     136.  00:4905  18 0E               		jr	1f
+     137.  00:4907                      notright:
+     138.  00:4907  CB 65               		bit 4,l
+     139.  00:4909  20 0A               		jr	nz,1f
+     140.  00:490B  3A 14 CA            		ld	a,(_xtest)
+     141.  00:490E  D6 10               		sub	a,16
+     142.  00:4910  28 03               		jr	z,1f
+     143.  00:4912  32 14 CA            		ld	(_xtest),a
+     144.  00:4915                      1:		
+     145.  00:4915  3A 14 CA            		ld	a,(_xtest)
+     146.  00:4918  57                  		ld	d,a
+     147.  00:4919                      
+     148.  00:4919  CB 6D               		bit 5,l
+     149.  00:491B  20 0D               		jr	nz,notup
+     150.  00:491D  3A 15 CA            		ld	a,(_ytest)
+     151.  00:4920  D6 10               		sub	a,16
+     152.  00:4922  DA 3A 49            		jp	c,1f
+     153.  00:4925  32 15 CA            		ld	(_ytest),a
+     154.  00:4928  18 10               		jr	1f
+     155.  00:492A                      notup:
+     156.  00:492A  CB 75               		bit 6,l
+     157.  00:492C  20 0C               		jr	nz,1f
+     158.  00:492E  3A 15 CA            		ld	a,(_ytest)
+     159.  00:4931  C6 10               		add	a,16
+     160.  00:4933  FE A0               		cp	10*16
+     161.  00:4935  28 03               		jr	z,1f
+     162.  00:4937  32 15 CA            		ld	(_ytest),a
+     163.  00:493A                      1:
+     164.  00:493A  3A 15 CA            		ld	a,(_ytest)
+     165.  00:493D  5F                  		ld	e,a
+     166.  00:493E  C9                  		ret
+     167.  00:493F                      		
+     168.  00:493F                      		
+     169.  00:493F                      		
+      44   00:493F                      		
+      45   00:493F                      		include checkkbd.asm
+       1.  00:493F                      
+       2.  00:493F                      ; // Line Bit_7 Bit_6 Bit_5 Bit_4 Bit_3 Bit_2 Bit_1 Bit_0
+       3.  00:493F                      ; // 0 	   "7"  "6"   "5"   "4"   "3"   "2"   "1"   "0"
+       4.  00:493F                      ; // 1 	   ";"  "]"   "["   "\"   "="   "-"   "9"   "8"
+       5.  00:493F                      ; // 2 	   "B"  "A"   ???   "/"   "."   ","   "'"   "`"
+       6.  00:493F                      ; // 3 	   "J"  "I"   "H"   "G"   "F"   "E"   "D"   "C"
+       7.  00:493F                      ; // 4 	   "R"  "Q"   "P"   "O"   "N"   "M"   "L"   "K"
+       8.  00:493F                      ; // 5 	   "Z"  "Y"   "X"   "W"   "V"   "U"   "T"   "S"
+       9.  00:493F                      ; // 6 	   F3 	 F2    F1  CODE   CAP  GRAPH  CTRL SHIFT
+      10.  00:493F                      ; // 7 	   RET  SEL    BS  STOP   TAB   ESC    F5    F4
+      11.  00:493F                      ; // 8 	   RIGHT DOWN  UP  LEFT   DEL   INS   HOME SPACE
+      12.  00:493F                      
+      13.  00:493F                      checkkbd:
+      14.  00:493F                      		; di
+      15.  00:493F  DB AA               		in	a,(0aah)
+      16.  00:4941  E6 F0               		and 011110000B			; upper 4 bits contain info to preserve
+      17.  00:4943  B3                  		or	e
+      18.  00:4944  D3 AA               		out (0aah),a
+      19.  00:4946  DB A9               		in	a,(0a9h)
+      20.  00:4948  6F                  		ld	l,a
+      21.  00:4949                      		; ei
+      22.  00:4949  C9                  		ret
+      46   00:494A                      		
+      47   00:494A                      ;-------------------------------------
+      48   00:494A                      ; Entry point
+      49   00:494A                      ;-------------------------------------
+      50   00:494A                      START:
+      51   00:494A  AF                  		xor	a
+      52   00:494B  3C                  		inc	a
+      53   00:494C  32 13 CA            		ld	(SEL_NTSC),a		; NTSC MODE
+      54   00:494F  CD 0A 42            		call	set_scr			; set video mode to screen 8
+      55   00:4952  F3                  		di
+      56   00:4953                      		
+      57   00:4953                      ;-------------------------------------
+      58   00:4953                      ;   Power-up routine for 32K ROM
+      59   00:4953                      ;   set pages and sub slot
+      60   00:4953                      ;-------------------------------------
+      61   00:4953  CD 10 40                    call    search_slot
+      62   00:4956  CD 2F 40                    call    search_slotram	
+      63   00:4959  CD 61 40            		call	setrompage2		; ROM in page 1 & 2
+      64   00:495C  CD 5B 40            		call	setrampage0		; RAM in page 0 & 3
+      65   00:495F                      
+      66   00:495F                      
+      67   00:495F                      		; activate  the fist 24K of rom
+      68   00:495F  AF                  		xor	a			   
+      69   00:4960  32 00 50            		ld	(_kBank1),a
+      70   00:4963  3C                  		inc	a
+      71   00:4964  32 00 70            		ld	(_kBank2),a
+      72   00:4967  3C                  		inc	a
+      73   00:4968  32 00 90            		ld	(_kBank3),a
+      74   00:496B                      		
+      75   00:496B  CD 78 41            		call	_cls
+      76   00:496E                      		
+      77   00:496E                      		;--- initialise ISR in RAM
+      78   00:496E                      		
+      79   00:496E  F3                  		di
+      80   00:496F                      	
+      81   00:496F  CD 5C 42            		call	isr_set
+      82   00:4972                      		
+      83   00:4972                      		; copy the level map from ROM to RAM
+      84   00:4972                      		
+      85   00:4972  CD 3A 4A            		call	vdptest
+      86   00:4975  CD A5 41            		call	font_cpy
+      87   00:4978  CD C6 49            		call	mapinit
+      88   00:497B                      		
+      89   00:497B                      		
+      90   00:497B  21 00 00            		ld	hl,0
+      91   00:497E  22 9E FC            		ld	(_jiffy),hl		
+      92   00:4981  3E 20               		ld	a,32
+      93   00:4983  32 14 CA            		ld	(_xtest),a
+      94   00:4986  AF                  		xor	a
+      95   00:4987  32 15 CA            		ld	(_ytest),a
+      96   00:498A  32 25 CA            		ld	(_displaypage),a		
+      97   00:498D  32 16 CA            		ld	(anim_buffer.flag),a
+      98   00:4990  32 23 CA            		ld	(_dxchng),a
+      99   00:4993  32 24 CA            		ld	(_dxchng2),a
+     100   00:4996  3D                  		dec	a
+     101   00:4997  32 10 CA            		ld	(_sliceflag_reset),a
+     102   00:499A  CD 09 44            		call	reset_sliceflag
+     103   00:499D                      		
+     104   00:499D  FB                  		ei
+     105   00:499E  76                  1:		halt
+     106   00:499F  76                  		halt
+     107   00:49A0                      		
+     108   00:49A0  3A 9E FC            		ld	a,(_jiffy)		
+     109   00:49A3  E6 1F               		and	31
+     110   00:49A5  C2 9E 49            		jp	nz,1b
+     111   00:49A8                      		
+     112   00:49A8  1E 08               		ld	e,8
+     113   00:49AA  CD 3F 49            		call	checkkbd
+     114   00:49AD  E6 01               		and	1				; space
+     115   00:49AF  CC B5 49            		call	z,PAL_ntsc
+     116   00:49B2  C3 9E 49            		jp	1b
+     117   00:49B5                      		
+     118   00:49B5                      PAL_ntsc:
+     119   00:49B5  F3                  		di
+     120   00:49B6  3A E8 FF            		ld		a,(RG9SAV)		
+     121   00:49B9  EE 02               		xor		00000010B		; PAL or NTSC 
+     122   00:49BB  32 E8 FF            		ld		(RG9SAV),a
+     123   00:49BE  D3 99               		out		(0x99),a
+     124   00:49C0  3E 89               		ld		a,9+128
+     125   00:49C2  D3 99               		out		(0x99),a
+     126   00:49C4  FB                  		ei
+     127   00:49C5  C9                  		ret
+     128   00:49C6                      
+     129   00:49C6                      mapinit:		
+     130   00:49C6  3E 0C               		ld		a, :_level
+     131   00:49C8  32 00 B0            		ld		(_kBank4),a
+     132   00:49CB  21 00 A0            		ld		hl,_level
+     133   00:49CE  11 00 C0            		ld		de,_levelmap
+     134   00:49D1  01 00 0A            		ld		bc,mapWidth*mapHeight
+     135   00:49D4  ED B0               		ldir
+     136   00:49D6                      		
+     137   00:49D6  AF                  		xor		a
+     138   00:49D7  32 1D CA            		ld		(_ymappos),a
+     139   00:49DA  32 20 CA            		ld		(_xmappos+2),a	; 24 bit	
+     140   00:49DD  21 00 01            		ld		hl,256
+     141   00:49E0  22 21 CA            		ld		(_xspeed),hl
+     142   00:49E3  21 00 03            		ld		hl,768
+     143   00:49E6  22 1E CA            		ld		(_xmappos),hl
+     144   00:49E9                      		; ret
+     145   00:49E9                      
+     146   00:49E9                      buildmap:
+     147   00:49E9  2A 1E CA            		ld	hl,(_xmappos)
+     148   00:49EC                      
+     149   00:49EC                      		repeat 4
+     150   00:49EC                    < 		srl	h
+     151   00:49EC                    < 		rr	l
+     152   00:49EC                    < 		endrepeat					; corner top left of the screen window in the map in tiles
+     152   00:49EC  CB 3C CB 1D CB 3C CB 1D CB 3C CB 1D CB 3C CB 1D 
+     153   00:49FC                      		
+     154   00:49FC  11 00 C0            		ld	de,_levelmap
+     155   00:49FF  19                  		add	hl,de					; HL = corner top right of the screen window in the map in tiles
+     156   00:4A00                      		
+     157   00:4A00  11 00 00            		ld	de,0			; dest y,x
+     158   00:4A03  06 96               		ld	b,15*10
+     159   00:4A05                      1:		
+     160   00:4A05                      		set_tile (hl)
+     160   00:4A05  7E                >   ld a,reg
+     160   00:4A06  07 07 07          > [3]  rlca
+     160   00:4A09  E6 07             >   and 00000111B
+     160   00:4A0B  C6 04             >   add a,:_tiles0
+     160   00:4A0D  32 00 B0          >   ld (_kBank4),a
+     160   00:4A10                    > 
+     160   00:4A10  7E                >   ld a,reg
+     160   00:4A11  E6 1F             >   and 00011111B
+     160   00:4A13  C6 A0             >   add a,high _tiles0
+     161   00:4A15  E5                  		push	hl
+     162   00:4A16                      
+     163   00:4A16  67                  		ld	h,a				; select offset in the bank
+     164   00:4A17  2E 00               		ld	l,0
+     165   00:4A19                      		
+     166   00:4A19  D5                  		push	de
+     167   00:4A1A  C5                  		push	bc
+     168   00:4A1B  06 00               		ld		b,0				; page
+     169   00:4A1D  CD 75 44            		call	LMMC_tile
+     170   00:4A20  C1                  		pop		bc
+     171   00:4A21  D1                  		pop		de
+     172   00:4A22                      		
+     173   00:4A22  E1                  		pop		hl
+     174   00:4A23                      
+     175   00:4A23  23                  		inc	hl
+     176   00:4A24                      
+     177   00:4A24  3E 10               		ld		a,16		; x=x+16
+     178   00:4A26  83                  		add		a,e
+     179   00:4A27  5F                  		ld		e,a
+     180   00:4A28                      		
+     181   00:4A28  FE F0               		cp		15*16
+     182   00:4A2A  38 0B               		jr		c,2f
+     183   00:4A2C                      
+     184   00:4A2C  1E 00               		ld		e,0			; x = 0
+     185   00:4A2E                      		
+     186   00:4A2E  3E 10               		ld		a,16		; y=y+16
+     187   00:4A30  82                  		add		a,d
+     188   00:4A31  57                  		ld		d,a
+     189   00:4A32                      
+     190   00:4A32  3E F1               		ld		a,-15
+     191   00:4A34  85                  		add		a,l
+     192   00:4A35  6F                  		ld		l,a
+     193   00:4A36  24                  		inc		h
+     194   00:4A37                      		
+     195   00:4A37  10 CC               2:		djnz	1b
+     196   00:4A39  C9                  		ret
+     197   00:4A3A                      		
+     198   00:4A3A                      vdptest:
+     199   00:4A3A  16 A0               		ld	d,160			; dest y
+     200   00:4A3C  1E 00               		ld	e,0				; dest x
+     201   00:4A3E  0E A0               		ld	c,160			; initial tile
+     202   00:4A40  06 20               		ld	b,32			; number of tiles
+     203   00:4A42                      1:		
+     204   00:4A42                      		set_tile c
+     204   00:4A42  79                >   ld a,reg
+     204   00:4A43  07 07 07          > [3]  rlca
+     204   00:4A46  E6 07             >   and 00000111B
+     204   00:4A48  C6 04             >   add a,:_tiles0
+     204   00:4A4A  32 00 B0          >   ld (_kBank4),a
+     204   00:4A4D                    > 
+     204   00:4A4D  79                >   ld a,reg
+     204   00:4A4E  E6 1F             >   and 00011111B
+     204   00:4A50  C6 A0             >   add a,high _tiles0
+     205   00:4A52                      
+     206   00:4A52  67                  		ld	h,a				; select offset in the bank
+     207   00:4A53  2E 00               		ld	l,0
+     208   00:4A55                      
+     209   00:4A55  D5                  		push	de
+     210   00:4A56  C5                  		push	bc
+     211   00:4A57  06 01               		ld		b,1				; page
+     212   00:4A59  CD 75 44            		call	LMMC_tile
+     213   00:4A5C  C1                  		pop		bc
+     214   00:4A5D  D1                  		pop		de
+     215   00:4A5E                      		
+     216   00:4A5E  0C                  		inc		c
+     217   00:4A5F                      		
+     218   00:4A5F  3E 10               		ld		a,16		; x=x+16
+     219   00:4A61  83                  		add		a,e
+     220   00:4A62  5F                  		ld		e,a
+     221   00:4A63  30 04               		jr		nc,2f
+     222   00:4A65                      
+     223   00:4A65  3E 10               		ld		a,16		; y=y+16
+     224   00:4A67  82                  		add		a,d
+     225   00:4A68  57                  		ld		d,a
+     226   00:4A69                      		
+     227   00:4A69  10 D7               2:		djnz	1b
+     228   00:4A6B  C9                  		ret
+     229   00:4A6C                      		
+     230   00:4A6C                      		
+     231   00:4A6C  (04)                		page 4
      232   04:A000                      _tiles0:
      233   04:A000  (2000)              		incbin "tiles.bin",0x0000,0x2000
      234   04:C000  (05)                		page 5
@@ -3141,22 +3143,23 @@ Errors: 0
 00:000046ED   plot_col32
 00:000046F0   plot_col16
 00:000046F7   _plot_col16
-00:00004841   single_move
-00:0000484D   animtest
-00:00004863 X animtest.scroll_right
-00:0000487C   animtest.scroll_left
-00:000048AB X animtest.intercept_right
-00:000048AB X animtest.intercept_left
-00:000048AC   animtest.manage_buffer
-00:000048C2   movemarker
-00:000048D8   notright
-00:000048FB   notup
-00:00004910   checkkbd
-00:0000491B   START
-00:00004986   PAL_ntsc
-00:00004997   mapinit
-00:000049BA X buildmap
-00:00004A0B   vdptest
+00:00004841   test_change_page
+00:00004851   single_move
+00:0000485D   animtest
+00:00004873 X animtest.scroll_right
+00:00004892   animtest.scroll_left
+00:000048C7   animtest.intercept_right
+00:000048DA   animtest.intercept_left
+00:000048DB   animtest.manage_buffer
+00:000048F1   movemarker
+00:00004907   notright
+00:0000492A   notup
+00:0000493F   checkkbd
+00:0000494A   START
+00:000049B5   PAL_ntsc
+00:000049C6   mapinit
+00:000049E9 X buildmap
+00:00004A3A   vdptest
 04:0000A000   _tiles0
 0C:0000A000   _level
 0D:0000A000   fonts
@@ -3196,11 +3199,11 @@ Errors: 0
 -------------------------------------------------
 
  Page: 00
-  Org: 00004000  Size: 00002000  Used: 00000A3D
+  Org: 00004000  Size: 00002000  Used: 00000A6C
 
    Address   Length Align   Label
-   00004000    2621         search_slot
-   00004A3D    5571       <empty>
+   00004000    2668         search_slot
+   00004A6C    5524       <empty>
 
  Page: 01
   Org: 00006000  Size: 00002000  Used: 00000000

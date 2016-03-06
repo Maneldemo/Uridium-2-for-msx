@@ -243,9 +243,15 @@ lint:
 
 
 		
-		ld	e,6
-		call	checkkbd
-		and		1				; SHIFT
+		
+		; ld	e,6
+		; call	checkkbd
+		; and		1				; SHIFT
+		; ld		a,(_xoffset)
+		; cp	14
+		; call 	z,animtest
+		ld		a,(_xoffset)
+		cp	15
 		call 	z,animtest
 		
 								;  update displaypage and _xoffset

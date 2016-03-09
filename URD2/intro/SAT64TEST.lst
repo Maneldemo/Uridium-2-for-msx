@@ -1,0 +1,398 @@
+Sjasm Z80 Assembler v0.42c - www.xl2s.tk             [2016.03.09 - 23:47:45]
+
+SAT64TEST.asm
+Errors: 0
+
+       1   00:0000                      		output "SAT64TEST.rom"
+       2   00:0000                      
+       3   00:0000                      		defpage	 0,0x4000, 0x2000		; page 0 main code 
+       4   00:0000                      		defpage	 1,0x6000, 0x2000		; page 1 
+       5   00:0000                      		defpage	 2..7					; swapped data 
+       6   00:0000                      	
+       7   00:0000                      		;	konami scc
+       8   00:0000                      		
+       9   00:0000  (00:5000)           _kBank1:	equ 05000h ;- 57FFh (5000h used)
+      10   00:0000  (00:7000)           _kBank2: 	equ 07000h ;- 77FFh (7000h used)
+      11   00:0000  (00:9000)           _kBank3: 	equ 09000h ;- 97FFh (9000h used)
+      12   00:0000  (00:B000)           _kBank4: 	equ 0B000h ;- B7FFh (B000h used)
+      13   00:0000                      	
+      14   00:0000  (00)                		page 0
+      15   00:4000                      		
+      16   00:4000                              org 4000h
+      17   00:4000                              dw  4241h,START,0,0,0,0,0,0
+      17   00:4000  41 42 32 40 00 00 00 00 00 00 00 00 00 00 00 00 
+      18   00:4010                      
+      19   00:4010  (00:0004)           CGTABL:			equ	0x0004		
+      20   00:4010  (00:0040)           MAX_SPRITES:	equ	64		; System flikering
+      21   00:4010  (00:3800)           SPRTBL:			equ	0x3800	; Tabla de Sprites
+      22   00:4010  (00:1B00)           SPRATR:			equ	0x1B00	; Tabla de los atributos de los sprites
+      23   00:4010  (00:5B00)           SATor64:		equ	0x5b00
+      24   00:4010                      
+      25   00:4010  (00:00D1)           SPR_Y_NODRAW:	equ	209
+      26   00:4010                      
+      27   00:4010  (00:0000)           SPRITE_Y	equ	0
+      28   00:4010  (00:0001)           SPRITE_X	equ	1
+      29   00:4010  (00:0002)           SPRITE_INDEX	equ	2
+      30   00:4010  (00:0003)           SPRITE_COLOR	equ	3
+      31   00:4010                      	
+      32   00:4010                      screeninit:
+      33   00:4010  3E 02               		ld		a,2
+      34   00:4012  CD 5F 00            		call	005fh		
+      35   00:4015  21 00 38            		ld		hl,SPRTBL
+      36   00:4018  CD 53 00            		call	0053h		
+      37   00:401B                      
+      38   00:401B  2A 04 00            		ld		hl,(CGTABL)
+      39   00:401E  01 98 00            		ld		bc,098h
+      40   00:4021                      [8]		otir
+      40   00:4021  ED B3 ED B3 ED B3 ED B3 ED B3 ED B3 ED B3 ED B3 
+      41   00:4031  C9                  		ret
+      42   00:4032                      
+      43   00:4032                      START:  
+      44   00:4032  CD 10 40            		call	screeninit
+      45   00:4035                      		
+      46   00:4035  AF                  		xor		a
+      47   00:4036  32 00 C1            		ld		(ram_count),a
+      48   00:4039  32 02 C1            		ld	[m_iSprDrawFrame],a		
+      49   00:403C                      		
+      50   00:403C  0E 40               		ld		c,MAX_SPRITES
+      51   00:403E  CD BC 40            		call	CLEAN_SPRITES
+      52   00:4041                      				
+      53   00:4041  76                  1:		halt              
+      54   00:4042  CD 9E 40            		call	DRAW_SPRITES
+      55   00:4045                      
+      56   00:4045  1E 08               		ld	e,8
+      57   00:4047  CD 53 41            		call   	checkkbd      
+      58   00:404A  E6 01               		and		1
+      59   00:404C  CC 53 40            		call	z,addsprite
+      60   00:404F  C3 41 40            		jp	1b
+      61   00:4052                      		
+      62   00:4052  C9                  		ret    
+      63   00:4053                      
+      64   00:4053                      addsprite
+      65   00:4053  FD 21 06 C1         		ld	iy,ramdata
+      66   00:4057  ED 5F               		ld	a,r
+      67   00:4059  E6 03               		and	3
+      68   00:405B  57                  		ld	d,a
+      69   00:405C  3A 00 C1            		ld	a,(ram_count)
+      70   00:405F  E6 07               		and	7
+      71   00:4061  87 87 87 87 87      [5]		add	a,a				;	x32
+      72   00:4066  C6 10               		add	a,16
+      73   00:4068  82                  		add	a,d
+      74   00:4069  FD 77 01            		ld	(iy+SPRITE_X),a		; x
+      75   00:406C                      
+      76   00:406C  ED 5F               		ld	a,r
+      77   00:406E  E6 03               		and	3
+      78   00:4070  57                  		ld	d,a
+      79   00:4071  3A 00 C1            		ld	a,(ram_count)
+      80   00:4074  E6 F8               		and	0xF8
+      81   00:4076  87                  		add	a,a				;	x16
+      82   00:4077  82                  		add	a,d
+      83   00:4078  FD 77 00            		ld	(iy+SPRITE_Y),a		; y
+      84   00:407B                      
+      85   00:407B  ED 5F               		ld	a,r
+      86   00:407D  E6 03               		and	3
+      87   00:407F  C6 0A               		add	a,10
+      88   00:4081  FD 77 03            		ld	(iy+SPRITE_COLOR),a		; c
+      89   00:4084  FD 36 02 41         		ld	(iy+SPRITE_INDEX),'A'		; sp
+      90   00:4088                      
+      91   00:4088  FD 21 06 C1         		ld	iy,ramdata
+      92   00:408C  CD D0 40            		call	INSERT_SPRITE
+      93   00:408F                      		
+      94   00:408F  3A 00 C1            		ld	a,(ram_count)
+      95   00:4092  3C                  		inc	a
+      96   00:4093  E6 3F               		and	63
+      97   00:4095  32 00 C1            		ld	(ram_count),a
+      98   00:4098                      		
+      99   00:4098  0E 40               		ld		c,MAX_SPRITES
+     100   00:409A  CC BC 40            		call	z,CLEAN_SPRITES
+     101   00:409D  C9                  		ret
+     102   00:409E                      	   
+     103   00:409E                      
+     104   00:409E                      ;-----------------------------------------------------------
+     105   00:409E                      ; Draw sprites
+     106   00:409E                      ;-----------------------------------------------------------
+     107   00:409E                      DRAW_SPRITES:
+     108   00:409E                      	;---------------------------------------------------
+     109   00:409E                      	; SISTEM FLIKERING----------------------------------
+     110   00:409E                      	;---------------------------------------------------
+     111   00:409E                      
+     112   00:409E  3A 02 C1            	ld	a,[m_iSprDrawFrame]
+     113   00:40A1  B7                  	or	a
+     114   00:40A2  CC FB 40            	call	z,WRITESAT			; Note: WRITESAT returns always with Z
+     115   00:40A5  C4 23 41            	call	nz,revWRITESAT
+     116   00:40A8                      
+     117   00:40A8                      	;---------------------------------------------------
+     118   00:40A8                      	; par-inpar frame run
+     119   00:40A8                      
+     120   00:40A8  3A 02 C1            	ld	a,[m_iSprDrawFrame]
+     121   00:40AB  EE 01               	xor	1
+     122   00:40AD  32 02 C1            	ld	[m_iSprDrawFrame],a
+     123   00:40B0                      
+     124   00:40B0  C9                  	ret
+     125   00:40B1                      	
+     126   00:40B1                      sat_reset:
+     127   00:40B1                      	;---------------------------------------------------
+     128   00:40B1                      	; reset virtual sat
+     129   00:40B1  AF                  	xor	a
+     130   00:40B2  32 03 C1            	ld	[m_iNumSpr],a
+     131   00:40B5  21 00 C0            	ld	hl,m_iSprAtr
+     132   00:40B8  22 04 C1            	ld	[m_iSprAtrPointer],hl
+     133   00:40BB  C9                  	ret
+     134   00:40BC                      	;---------------------------------------------------
+     135   00:40BC                      
+     136   00:40BC                      ;-----------------------------------------------------------
+     137   00:40BC                      ; Clean sprites
+     138   00:40BC                      ; C = number of bytes to clean
+     139   00:40BC                      ;-----------------------------------------------------------
+     140   00:40BC                      CLEAN_SPRITES:
+     141   00:40BC                      	;---------------------------------------------------
+     142   00:40BC                      	; clean sprites
+     143   00:40BC  AF                  	xor	a
+     144   00:40BD  B1                  	or	c
+     145   00:40BE  C8                  	ret	z
+     146   00:40BF                      
+     147   00:40BF  41                  	ld	b,c
+     148   00:40C0  21 00 C0            	ld	hl,m_iSprAtr	
+     149   00:40C3  11 04 00            	ld	de,4		; 10 cycles
+     150   00:40C6  3E D1               	ld	a,SPR_Y_NODRAW
+     151   00:40C8                      clsprts:
+     152   00:40C8  77                  	ld	[hl],a			; 8 cycles ; y in the place where sprites are not processed to be drawn
+     153   00:40C9  19                  	add	hl,de			; 11 cycles
+     154   00:40CA  10 FC               	djnz	clsprts
+     155   00:40CC                      
+     156   00:40CC  CD B1 40            	call	sat_reset
+     157   00:40CF  C9                  	ret
+     158   00:40D0                      
+     159   00:40D0                      ;-----------------------------------------------------------
+     160   00:40D0                      ; Sprite system
+     161   00:40D0                      ; IY = position of buffer. The buffer format must be y, x, color. sprite
+     162   00:40D0                      ;-----------------------------------------------------------
+     163   00:40D0                      INSERT_SPRITE:
+     164   00:40D0  2A 04 C1            	ld	hl,[m_iSprAtrPointer]
+     165   00:40D3  11 00 40            	ld	de, 0xFFFF & (-m_iSprAtr) 
+     166   00:40D6  19                  	add	hl,de
+     167   00:40D7  25                  	dec	h					; if hl=64*4 return 
+     168   00:40D8  C8                  	ret	z					
+     169   00:40D9                      	; set values
+     170   00:40D9  2A 04 C1            	ld	hl,[m_iSprAtrPointer]
+     171   00:40DC  FD 7E 00            	ld	a,[iy+SPRITE_Y]		; +19c
+     172   00:40DF  77                  	ld	[hl],a				; +7c add y data
+     173   00:40E0  23                  	inc	hl					; +6c
+     174   00:40E1  FD 7E 01            	ld	a,[iy+SPRITE_X]		; +19c
+     175   00:40E4  77                  	ld	[hl],a				; +7c add x data
+     176   00:40E5  23                  	inc	hl					; +6c
+     177   00:40E6  FD 7E 02            	ld	a,[iy+SPRITE_INDEX]	; +19c
+     178   00:40E9  77                  	ld	[hl],a				; +7c add color
+     179   00:40EA  23                  	inc	hl					; +6c
+     180   00:40EB  FD 7E 03            	ld	a,[iy+SPRITE_COLOR]	; +19c
+     181   00:40EE  77                  	ld	[hl],a				; +7c add sprite index
+     182   00:40EF  23                  	inc	hl					; +6c
+     183   00:40F0  22 04 C1            	ld	[m_iSprAtrPointer],hl
+     184   00:40F3                      							
+     185   00:40F3                      	; increment num sprites index
+     186   00:40F3  3A 03 C1            	ld	a,[m_iNumSpr]
+     187   00:40F6  3C                  	inc	a
+     188   00:40F7  32 03 C1            	ld	[m_iNumSpr],a
+     189   00:40FA  C9                  	ret
+     190   00:40FB                      	
+     191   00:40FB                      ; -------------------
+     192   00:40FB                      ; direct write sat
+     193   00:40FB                      ; 
+     194   00:40FB                      ; -------------------
+     195   00:40FB                      WRITESAT:
+     196   00:40FB  2A 04 C1            	ld	hl,[m_iSprAtrPointer]
+     197   00:40FE  11 00 40            	ld	de, 0xFFFF & (-m_iSprAtr) 
+     198   00:4101  19                  	add	hl,de
+     199   00:4102                      	
+     200   00:4102  3E 00               	ld	a,SATor64 & 255
+     201   00:4104  D3 99               	out	[0x99],a
+     202   00:4106  3E 5B               	ld	a,SATor64/256
+     203   00:4108  D3 99               	out	[0x99],a
+     204   00:410A                      
+     205   00:410A  2C                  	inc	l
+     206   00:410B  2D                  	dec	l
+     207   00:410C  28 10               	jr	z,ws2f
+     208   00:410E                      	
+     209   00:410E  45                  	ld	b,l						;	always safe, as we test for more than 64 sprites in INSERT_SPRITE
+     210   00:410F                      	
+     211   00:410F  21 00 C0            	ld	hl,m_iSprAtr
+     212   00:4112  0E 98               	ld	c,0x98
+     213   00:4114                      ws1b:
+     214   00:4114  ED A3               	outi
+     215   00:4116  ED A3               	outi
+     216   00:4118  ED A3               	outi
+     217   00:411A  ED A3               	outi
+     218   00:411C  20 F6               	jr	nz,ws1b
+     219   00:411E                      			
+     220   00:411E                      ws2f:	
+     221   00:411E  3E D0               	ld	a,208
+     222   00:4120  D3 98               	out	[0x98],a
+     223   00:4122  C9                  	ret 
+     224   00:4123                      
+     225   00:4123                      			
+     226   00:4123                      ; -------------------
+     227   00:4123                      ; reverse write sat
+     228   00:4123                      ; 
+     229   00:4123                      ; -------------------
+     230   00:4123                      revWRITESAT:
+     231   00:4123  2A 04 C1            	ld	hl,[m_iSprAtrPointer]
+     232   00:4126  11 00 40            	ld	de, 0xFFFF & (-m_iSprAtr) 
+     233   00:4129  19                  	add	hl,de
+     234   00:412A                      	
+     235   00:412A  3E 00               	ld a,SATor64 & 255
+     236   00:412C  D3 99               	out (0x99),a
+     237   00:412E  3E 5B               	ld a,SATor64/256
+     238   00:4130  D3 99               	out (0x99),a
+     239   00:4132                      
+     240   00:4132  2C                  	inc	l
+     241   00:4133  2D                  	dec	l
+     242   00:4134  28 18               	jr	z,rw2f
+     243   00:4136                      
+     244   00:4136  45                  	ld	b,l					;	always safe, as we test for more than 64 sprites in INSERT_SPRITE
+     245   00:4137                      
+     246   00:4137  2A 04 C1            	ld	hl,[m_iSprAtrPointer]
+     247   00:413A  11 FC FF            	ld	de,-4
+     248   00:413D  19                  	add	hl,de
+     249   00:413E  11 F8 FF            	ld	de,-8
+     250   00:4141  0E 98               	ld c,0x98
+     251   00:4143                      rw1b:
+     252   00:4143  ED A3               	outi
+     253   00:4145  ED A3               	outi
+     254   00:4147  ED A3               	outi
+     255   00:4149  ED A3               	outi
+     256   00:414B  19                  	add	hl,de				; it does not affect Z
+     257   00:414C  20 F5               	jr	nz,rw1b
+     258   00:414E                      
+     259   00:414E                      rw2f:
+     260   00:414E  3E D0               	ld	a,208
+     261   00:4150  D3 98               	out	(0x98),a
+     262   00:4152  C9                  	ret 	
+     263   00:4153                      
+     264   00:4153                      ; // Line Bit_7 Bit_6 Bit_5 Bit_4 Bit_3 Bit_2 Bit_1 Bit_0
+     265   00:4153                      ; // 0 	   "7"  "6"   "5"   "4"   "3"   "2"   "1"   "0"
+     266   00:4153                      ; // 1 	   ";"  "]"   "["   "\"   "="   "-"   "9"   "8"
+     267   00:4153                      ; // 2 	   "B"  "A"   ???   "/"   "."   ","   "'"   "`"
+     268   00:4153                      ; // 3 	   "J"  "I"   "H"   "G"   "F"   "E"   "D"   "C"
+     269   00:4153                      ; // 4 	   "R"  "Q"   "P"   "O"   "N"   "M"   "L"   "K"
+     270   00:4153                      ; // 5 	   "Z"  "Y"   "X"   "W"   "V"   "U"   "T"   "S"
+     271   00:4153                      ; // 6 	   F3 	 F2    F1  CODE   CAP  GRAPH  CTRL SHIFT
+     272   00:4153                      ; // 7 	   RET  SEL    BS  STOP   TAB   ESC    F5    F4
+     273   00:4153                      ; // 8 	   RIGHT DOWN  UP  LEFT   DEL   INS   HOME SPACE
+     274   00:4153                      
+     275   00:4153                      checkkbd:
+     276   00:4153                      		; di
+     277   00:4153  DB AA               		in	a,(0aah)
+     278   00:4155  E6 F0               		and 011110000B			; upper 4 bits contain info to preserve
+     279   00:4157  B3                  		or	e
+     280   00:4158  D3 AA               		out (0aah),a
+     281   00:415A  DB A9               		in	a,(0a9h)
+     282   00:415C  6F                  		ld	l,a
+     283   00:415D                      		; ei
+     284   00:415D  C9                  		ret
+     285   00:415E                      
+     286   00:415E  (C000)              	map 0xc000
+     287   00:415E                      	
+     288   00:415E                      	; SPRITE MACHINE
+     289   00:415E  (00:C000)           m_iSprAtr:			#(MAX_SPRITES*4)		; Sprite system buffers
+     290   00:415E                      
+     291   00:415E  (00:C100)           ram_count:			#2
+     292   00:415E                      	
+     293   00:415E  (00:C102)           m_iSprDrawFrame:	#1
+     294   00:415E  (00:C103)           m_iNumSpr:			#1
+     295   00:415E  (00:C104)           m_iSprAtrPointer:	#2
+     296   00:415E                      
+     297   00:415E                      
+     298   00:415E  (00:C106)           ramdata:			#4
+     299   00:415E  (0000)              	endmap
+
+    LABELS
+-------------------------------------------------
+00:00005000 X _kBank1
+00:00007000 X _kBank2
+00:00009000 X _kBank3
+00:0000B000 X _kBank4
+00:00000004   CGTABL
+00:00000040   MAX_SPRITES
+00:00003800   SPRTBL
+00:00001B00 X SPRATR
+00:00005B00   SATor64
+00:000000D1   SPR_Y_NODRAW
+00:00000000   SPRITE_Y
+00:00000001   SPRITE_X
+00:00000002   SPRITE_INDEX
+00:00000003   SPRITE_COLOR
+00:00004010   screeninit
+00:00004032   START
+00:00004053   addsprite
+00:0000409E   DRAW_SPRITES
+00:000040B1   sat_reset
+00:000040BC   CLEAN_SPRITES
+00:000040C8   clsprts
+00:000040D0   INSERT_SPRITE
+00:000040FB   WRITESAT
+00:00004114   ws1b
+00:0000411E   ws2f
+00:00004123   revWRITESAT
+00:00004143   rw1b
+00:0000414E   rw2f
+00:00004153   checkkbd
+00:0000C000   m_iSprAtr
+00:0000C100   ram_count
+00:0000C102   m_iSprDrawFrame
+00:0000C103   m_iNumSpr
+00:0000C104   m_iSprAtrPointer
+00:0000C106   ramdata
+
+
+ Output: SAT64TEST.out
+-------------------------------------------------
+
+ Page: 00
+  Org: 00004000  Size: *  Used: 00000000
+
+    No output
+
+ Output: SAT64TEST.rom
+-------------------------------------------------
+
+ Page: 00
+  Org: 00004000  Size: 00002000  Used: 0000015E
+
+   Address   Length Align   Label
+   00004000     350         screeninit
+   0000415E    7842       <empty>
+
+ Page: 01
+  Org: 00006000  Size: 00002000  Used: 00000000
+
+   00006000    8192       <empty>
+
+ Page: 02
+  Org: 00006000  Size: 00002000  Used: 00000000
+
+   00006000    8192       <empty>
+
+ Page: 03
+  Org: 00006000  Size: 00002000  Used: 00000000
+
+   00006000    8192       <empty>
+
+ Page: 04
+  Org: 00006000  Size: 00002000  Used: 00000000
+
+   00006000    8192       <empty>
+
+ Page: 05
+  Org: 00006000  Size: 00002000  Used: 00000000
+
+   00006000    8192       <empty>
+
+ Page: 06
+  Org: 00006000  Size: 00002000  Used: 00000000
+
+   00006000    8192       <empty>
+
+ Page: 07
+  Org: 00006000  Size: 00002000  Used: 00000000
+
+   00006000    8192       <empty>

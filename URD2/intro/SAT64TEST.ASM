@@ -24,8 +24,8 @@ SATor64:		equ	0x5b00
 
 SPR_Y_NODRAW:	equ	209
 
-SPRITE_Y	equ	0
-SPRITE_X	equ	1
+SPRITE_Y		equ	0
+SPRITE_X		equ	1
 SPRITE_INDEX	equ	2
 SPRITE_COLOR	equ	3
 	
@@ -44,19 +44,25 @@ START:
 		call	screeninit
 		
 		xor		a
-		ld		(ram_count),a
-		ld	[m_iSprDrawFrame],a		
+		ld		[m_iSprDrawFrame],a		
 		
-		ld		c,MAX_SPRITES
-		call	CLEAN_SPRITES
 				
-1:		halt              
+1:		xor		a
+		ld		(ram_count),a
+		call	sat_reset
+		
+2:		call	addsprite
+		jr	nz,2b
+
+		halt              
 		call	DRAW_SPRITES
 
-		ld	e,8
-		call   	checkkbd      
-		and		1
-		call	z,addsprite
+		; ld	e,8
+		; call   	checkkbd      
+		; and		1
+		; call	z,addsprite
+		
+		
 		jp	1b
 		
 		ret    
@@ -95,9 +101,7 @@ addsprite
 		inc	a
 		and	63
 		ld	(ram_count),a
-		
-		ld		c,MAX_SPRITES
-		call	z,CLEAN_SPRITES
+
 		ret
 	   
 
@@ -133,32 +137,10 @@ sat_reset:
 	ret
 	;---------------------------------------------------
 
-;-----------------------------------------------------------
-; Clean sprites
-; C = number of bytes to clean
-;-----------------------------------------------------------
-CLEAN_SPRITES:
-	;---------------------------------------------------
-	; clean sprites
-	xor	a
-	or	c
-	ret	z
-
-	ld	b,c
-	ld	hl,m_iSprAtr	
-	ld	de,4		; 10 cycles
-	ld	a,SPR_Y_NODRAW
-clsprts:
-	ld	[hl],a			; 8 cycles ; y in the place where sprites are not processed to be drawn
-	add	hl,de			; 11 cycles
-	djnz	clsprts
-
-	call	sat_reset
-	ret
 
 ;-----------------------------------------------------------
 ; Sprite system
-; IY = position of buffer. The buffer format must be y, x, color. sprite
+; IY = position of buffer. The buffer format must be y, x, color, sprite
 ;-----------------------------------------------------------
 INSERT_SPRITE:
 	ld	hl,[m_iSprAtrPointer]
@@ -194,19 +176,21 @@ INSERT_SPRITE:
 ; -------------------
 WRITESAT:
 	ld	hl,[m_iSprAtrPointer]
-	ld	de, 0xFFFF & (-m_iSprAtr) 
-	add	hl,de
+	ld	bc, 0xFFFF & (-m_iSprAtr) 
+	add	hl,bc
 	
 	ld	a,SATor64 & 255
 	out	[0x99],a
 	ld	a,SATor64/256
 	out	[0x99],a
 
-	inc	l
-	dec	l
+	ld	a,l
+	or	h
 	jr	z,ws2f
 	
 	ld	b,l						;	always safe, as we test for more than 64 sprites in INSERT_SPRITE
+	
+	ld	b,128
 	
 	ld	hl,m_iSprAtr
 	ld	c,0x98
@@ -229,19 +213,20 @@ ws2f:
 ; -------------------
 revWRITESAT:
 	ld	hl,[m_iSprAtrPointer]
-	ld	de, 0xFFFF & (-m_iSprAtr) 
-	add	hl,de
+	ld	bc, 0xFFFF & (-m_iSprAtr) 
+	add	hl,bc
 	
 	ld a,SATor64 & 255
 	out (0x99),a
 	ld a,SATor64/256
 	out (0x99),a
 
-	inc	l
-	dec	l
+	ld	a,l
+	or	h
 	jr	z,rw2f
 
 	ld	b,l					;	always safe, as we test for more than 64 sprites in INSERT_SPRITE
+	ld	b,128
 
 	ld	hl,[m_iSprAtrPointer]
 	ld	de,-4
@@ -288,7 +273,7 @@ checkkbd:
 	; SPRITE MACHINE
 m_iSprAtr:			#(MAX_SPRITES*4)		; Sprite system buffers
 
-ram_count:			#2
+ram_count:			#1
 	
 m_iSprDrawFrame:	#1
 m_iNumSpr:			#1

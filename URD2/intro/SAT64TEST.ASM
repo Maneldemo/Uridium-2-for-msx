@@ -29,16 +29,6 @@ SPRITE_X		equ	1
 SPRITE_INDEX	equ	2
 SPRITE_COLOR	equ	3
 	
-screeninit:
-		ld		a,2
-		call	005fh		
-		ld		hl,SPRTBL
-		call	0053h		
-
-		ld		hl,(CGTABL)
-		ld		bc,098h
-[8]		otir
-		ret
 
 START:  
 		call	screeninit
@@ -61,38 +51,42 @@ START:
 		; call   	checkkbd      
 		; and		1
 		; call	z,addsprite
-		
-		
+				
 		jp	1b
 		
 		ret    
+;-----------------------------------------------------------
+		
+screeninit:
+		ld		a,2
+		call	005fh		
+		ld		hl,SPRTBL
+		call	0053h		
+
+		ld		hl,(CGTABL)
+		ld		bc,098h
+[8]		otir
+		ret
+;-----------------------------------------------------------
 
 addsprite
 		ld	iy,ramdata
-		ld	a,r
-		and	3
-		ld	d,a
 		ld	a,(ram_count)
 		and	00000011b
-[6]		add	a,a				;	x64
+[6]		add	a,a					; x64
 		add	a,32
-		add	a,d
 		ld	(iy+SPRITE_X),a		; x
 
-		ld	a,r
-		and	3
-		ld	d,a
 		ld	a,(ram_count)
 		and	11111100b
-		add	a,a				;	x16
-		add	a,d
+		add	a,a					; x8
 		ld	(iy+SPRITE_Y),a		; y
 
-		ld	a,r
-		and	3
-		add	a,10
+		ld	a,(ram_count)
+		and	7
+		add	a,8
 		ld	(iy+SPRITE_COLOR),a		; c
-		ld	(iy+SPRITE_INDEX),'A'		; sp
+		ld	(iy+SPRITE_INDEX),'A'	; sp
 
 		ld	iy,ramdata
 		call	INSERT_SPRITE
@@ -101,9 +95,7 @@ addsprite
 		inc	a
 		and	63
 		ld	(ram_count),a
-
 		ret
-	   
 
 ;-----------------------------------------------------------
 ; Draw sprites
@@ -198,10 +190,7 @@ WRITESAT:
 	ld	hl,m_iSprAtr
 	ld	c,0x98
 ws1b:
-	outi
-	outi
-	outi
-	outi
+[4]	outi
 	jr	nz,ws1b
 			
 ws2f:	
@@ -241,11 +230,8 @@ revWRITESAT:
 	ld	de,-8
 	ld c,0x98
 rw1b:
-	outi
-	outi
-	outi
-	outi
-	add	hl,de				; it does not affect Z
+[4]	outi
+	add	hl,de		; it does not affect Z
 	jr	nz,rw1b
 
 rw2f:

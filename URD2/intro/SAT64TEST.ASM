@@ -73,9 +73,9 @@ addsprite
 		and	3
 		ld	d,a
 		ld	a,(ram_count)
-		and	7
-[5]		add	a,a				;	x32
-		add	a,16
+		and	00000011b
+[6]		add	a,a				;	x64
+		add	a,32
 		add	a,d
 		ld	(iy+SPRITE_X),a		; x
 
@@ -83,7 +83,7 @@ addsprite
 		and	3
 		ld	d,a
 		ld	a,(ram_count)
-		and	0xF8
+		and	11111100b
 		add	a,a				;	x16
 		add	a,d
 		ld	(iy+SPRITE_Y),a		; y
@@ -188,9 +188,12 @@ WRITESAT:
 	or	h
 	jr	z,ws2f
 	
-	ld	b,l						;	always safe, as we test for more than 64 sprites in INSERT_SPRITE
-	
-	ld	b,128
+	ld	b,l			;	always safe, as we test for more than 64 sprites in INSERT_SPRITE
+	ld	a,128
+	cp	b
+	jr	nc,1f
+	ld	b,a
+1:
 	
 	ld	hl,m_iSprAtr
 	ld	c,0x98
@@ -225,8 +228,12 @@ revWRITESAT:
 	or	h
 	jr	z,rw2f
 
-	ld	b,l					;	always safe, as we test for more than 64 sprites in INSERT_SPRITE
-	ld	b,128
+	ld	b,l			;	always safe, as we test for more than 64 sprites in INSERT_SPRITE
+	ld	a,128
+	cp	b
+	jr	nc,1f
+	ld	b,a
+1:
 
 	ld	hl,[m_iSprAtrPointer]
 	ld	de,-4

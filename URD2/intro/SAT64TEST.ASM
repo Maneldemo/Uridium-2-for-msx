@@ -261,6 +261,109 @@ checkkbd:
 		; ei
 		ret
 
+
+;	16 bit divide and modulus routines
+;	called with dividend in hl and divisor in de
+;	returns with result in hl.
+;	adiv (amod) is signed divide (modulus), ldiv (lmod) is unsigned
+
+	;global	adiv,ldiv,amod,lmod
+	;psect	text,class=CODE
+
+amod:
+	call	adiv
+	ex	de,hl		;put modulus in hl
+	ret
+
+lmod:
+	call	ldiv
+	ex	de,hl
+	ret
+
+ldiv:
+	xor	a
+	push	af
+	ex	de,hl
+	jr	dv1
+
+
+adiv:
+	ld	a,h
+	xor	d		;set sign flag for quotient
+	ld	a,h		;get sign of dividend
+	push	af
+	call	negif
+	ex	de,hl
+	call	negif
+dv1:	
+	ld	b,1
+	ld	a,h
+	or	l
+	jr	nz,dv8
+	pop	af
+	ret
+
+dv8:
+	push	hl
+	add	hl,hl
+	jr	c,dv2
+	ld	a,d
+	cp	h
+	jr	c,dv2
+	jp	nz,dv6
+	ld	a,e
+	cp	l
+	jr	c,dv2
+dv6:
+	pop	af
+	inc	b
+	jp	dv8
+
+dv2:
+	pop	hl
+	ex	de,hl
+	push	hl
+	ld	hl,0
+	ex	(sp),hl
+
+dv4:
+	ld	a,h
+	cp	d
+	jr	c,dv3
+	jp	nz,dv5
+	ld	a,l
+	cp	e
+	jr	c,dv3
+dv5:	
+	sbc	hl,de
+dv3:	
+	ex	(sp),hl
+	ccf
+	adc	hl,hl
+	srl	d
+	rr	e
+	ex	(sp),hl
+	djnz	dv4
+	pop	de
+	ex	de,hl
+	pop	af
+	call	m,negat
+	ex	de,hl
+	or	a			;test remainder sign bit
+	call	m,negat
+	ex	de,hl
+	ret
+
+negif:
+	bit	7,h
+	ret	z
+negat:
+	ld	b,h
+	ld	c,l
+	ld	hl,0
+	or	a
+	sbc	hl,bc
+	ret
 	
 ; Square of a 8 bit value
 ; in: A = 8 bit value, ZF = sign of A
@@ -394,6 +497,37 @@ UsignedMul:
 temp01	equ 0xF67A	
 temp02	equ	0xF67C
 
+;;;;;;;;;;;;;;;;;;;;
+ENEMY_Y			equ	0
+ENEMY_Y_SUB		equ	1
+ENEMY_X			equ	2
+ENEMY_X_SUB		equ	3
+ENEMY_SPRITE	equ	4
+ENEMY_COLOR		equ	5
+
+ENEMY_DY		equ	6
+ENEMY_DY_SUB	equ	7
+ENEMY_DX		equ	8
+ENEMY_DX_SUB	equ	9
+
+	
+	map 0xd000
+m_iP1Y:		ds	2
+m_iP1X:		ds	2	
+	endmap
+	
+;;;;;;;;;;;;;;;;;;;;;;
+
+_NPC_y		equ	ENEMY_Y
+_NPC_x		equ	ENEMY_X
+
+_NPC_dy		equ	ENEMY_DY
+_NPC_ddy	equ	ENEMY_DY_SUB
+_NPC_dx		equ	ENEMY_DX
+_NPC_ddx	equ	ENEMY_DX_SUB
+myX			equ	m_iP1Y
+myY			equ	m_iP1X
+
 	; 1st bullet
 
 	; dx
@@ -427,7 +561,7 @@ temp02	equ	0xF67C
 	ld	l,0
 	bit	7,(ix+_NPC_ddy)
 	call	Div16						; HL = HL /D
-	add	hl,hl							; here to increase bullet speed
+	add	hl,hl							; here x2 to increase bullet speed
 	ld	(ix+_NPC_dy),l
 	ld	(ix+_NPC_ddy),h
 
@@ -436,12 +570,15 @@ temp02	equ	0xF67C
 	ld	l,0
 	bit	7,(ix+_NPC_ddx)
 	call	Div16						; HL = HL /D
-	add	hl,hl							; here to increase bullet speed
+	add	hl,hl							; here x2 to increase bullet speed
 	ld	(ix+_NPC_dx),l
 	ld	(ix+_NPC_ddx),h
 	
 					; now we have |dx|^2+|dy|^2=1
 
+	; IX initial bullet
+	; IY new rotated bullet
+	; IY + recordsize other new rotated bullet
 
 	; a=15;
 	; cos_a = round(cos(2*pi*a/360)*256) 
@@ -477,6 +614,8 @@ sin_a	equ 66
 	
 	; dy' = dy*cos(a)+dx*sin(a)
 
+	; other bullet
+	
 	ld	e,(ix+_NPC_dy)
 	ld	d,(ix+_NPC_ddy)
 	ld	a,cos_a
@@ -507,6 +646,7 @@ sin_a	equ 66
 	ld	hl,(temp02)
 	ld	(iy+_NPC_dy),l
 	ld	(iy+_NPC_ddy),h		
+	
 	map 0xc000
 	
 	; SPRITE MACHINE
